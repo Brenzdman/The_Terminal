@@ -15,12 +15,24 @@ body {
   padding: 20px; /* Padding to give terminal-like appearance */
 }
 
+::selection {
+  background-color: #d6d6d6; /* Background color of selected text */
+  color: #000000;            /* Text color of selected text */
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255; /* White text */
     --background-start-rgb: 0, 0, 0; /* Black background */
     --background-end-rgb: 0, 0, 0; /* Black background */
   }
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Cascadia+Code:wght@400;700&display=swap');
+
+span {
+  font-family: 'Cascadia Code', 'Courier New', Courier, monospace;
+  color : #cfcfcf;
 }
 
 @layer utilities {

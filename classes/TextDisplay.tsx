@@ -1,15 +1,31 @@
 import { MAX_LINE_LENGTH } from "@/constants/constants";
 
 class Line {
+  color: string = "#fff";
   text: string = "";
   userGenerated: boolean = false;
   constructor(text: string) {
     this.text = text;
   }
+
+  copy() {
+    let newLine = new Line(this.text);
+    newLine.userGenerated = this.userGenerated;
+    newLine.color = this.color;
+    return newLine;
+  }
 }
 
 export class TextDisplay {
-  lines: Line[] = [new Line("")];
+  lines: Line[] = [];
+
+  constructor(lines?: string[]) {
+    if (lines) {
+      this.addLines(lines);
+    } else {
+      this.lines.push(new Line(""));
+    }
+  }
 
   addLines(lines: string[]) {
     if (lines[lines.length - 1] === "") {
@@ -39,6 +55,14 @@ export class TextDisplay {
     this.lines.push(new Line(""));
   }
 
+  clear() {
+    while (this.lines.length > 0) {
+      this.lines.pop();
+    }
+
+    this.lines.push(new Line(""));
+  }
+
   renderText() {
     return linesToText(this.lines);
   }
@@ -46,11 +70,7 @@ export class TextDisplay {
 
 function linesToText(lines: Line[]) {
   let newLines: Line[] = [];
-  let linesCopy = lines.map((line) => {
-    let newLine = new Line(line.text);
-    newLine.userGenerated = line.userGenerated;
-    return newLine;
-  });
+  let linesCopy = lines.map((line) => line.copy());
 
   const splitLongLines = (line: Line): Line[] => {
     let text = line.text;
@@ -71,8 +91,8 @@ function linesToText(lines: Line[]) {
     splitLines.push(text);
 
     return splitLines.map((splitLine) => {
-      let newLine = new Line(splitLine);
-      newLine.userGenerated = line.userGenerated;
+      let newLine = line.copy();
+      newLine.text = splitLine;
       return newLine;
     });
   };
@@ -82,7 +102,7 @@ function linesToText(lines: Line[]) {
   }
 
   return (
-    <div>
+    <div style={divStyle}>
       {newLines.map((line, index) => {
         let content;
         if (line.text === " " && !line.userGenerated) {
@@ -97,3 +117,12 @@ function linesToText(lines: Line[]) {
     </div>
   );
 }
+
+const divStyle: React.CSSProperties = {
+  width: "100%",
+  height: "100%",
+  position: "fixed",
+  zIndex: 1,
+  overflow: "auto",
+  paddingBottom: "60vh",
+};

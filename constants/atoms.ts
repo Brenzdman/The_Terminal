@@ -5,5 +5,13 @@ import { atom } from "jotai";
 // Atoms
 const directories = [atom(new Directory("home"))];
 
-export const textDisplayAtom = atom(new TextDisplay());
+const welcomeMessage = [
+  "Welcome to the Terminal.",
+  "Type 'help' to see a list of available commands.",
+];
+
+export const textDisplayAtom = atom(new TextDisplay(welcomeMessage));
+
+
 export const currentDirectory = atom(directories[0]);
+

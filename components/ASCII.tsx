@@ -42,6 +42,7 @@ const ASCII: React.FC = () => {
     whiteSpace: "pre-wrap",
     backgroundColor: "#000",
     color: "#17214f",
+    userSelect: "none",
   };
 
   return (

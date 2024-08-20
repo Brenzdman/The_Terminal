@@ -1,3 +1,3 @@
 
-export const MAX_LINE_LENGTH = 50;
+export const MAX_LINE_LENGTH = 100;
 
