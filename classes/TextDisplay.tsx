@@ -112,6 +112,7 @@ function linesToText(lines: Line[]) {
         } else {
           content = <span>{line.text}</span>;
         }
+
         return <div key={index}>{content}</div>;
       })}
     </div>
