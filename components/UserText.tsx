@@ -1,7 +1,7 @@
 "use client";
 import { useAtom } from "jotai";
 import React, { useEffect } from "react";
-import { textDisplayAtom } from "../constants";
+import { textDisplayAtom } from "../constants/atoms";
 import { TextDisplay } from "@/classes/TextDisplay";
 
 const UserText = () => {
@@ -16,7 +16,7 @@ const UserText = () => {
     } else if (event.key === "Backspace") {
       updatedTextDisplay.removeCharacter();
     } else if (event.key === "Enter") {
-      updatedTextDisplay.newLine();
+      getResponseText(textDisplay);
     }
 
     setTextDisplay(updatedTextDisplay);
@@ -32,5 +32,10 @@ const UserText = () => {
 
   return <div>{}</div>;
 };
+
+function getResponseText(textDisplay: TextDisplay) {
+  const lastLine = textDisplay.lines[textDisplay.lines.length - 1].text;
+  textDisplay.addLines(["You typed " + lastLine]);
+}
 
 export default UserText;
