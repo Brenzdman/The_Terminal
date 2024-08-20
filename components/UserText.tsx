@@ -36,7 +36,10 @@ const UserText = () => {
   return <div>{}</div>;
 };
 
-function getResponseText(textDisplay: TextDisplay, currentDirectory: Directory) {
+function getResponseText(
+  textDisplay: TextDisplay,
+  currentDirectory: Directory
+) {
   const lastLine = textDisplay.lines[textDisplay.lines.length - 1].text;
   const text = lastLine.trim().toLowerCase();
 
@@ -69,21 +72,30 @@ function getResponseText(textDisplay: TextDisplay, currentDirectory: Directory) 
 
   if (segments[0] === "help") {
     textDisplay.addLines(helpScreen);
+
   } else if (segments[0] === "ls") {
     textDisplay.addLines(currentDirectory.ls());
+
   } else if (segments[0] === "cd") {
     textDisplay.addLines(["cd command not implemented."]);
+
   } else if (segments[0] === "cat") {
-    textDisplay.addLines(["cat command not implemented."]);
+    const ran = currentDirectory.readFile(segments[1], textDisplay);
+    if (!ran) textDisplay.addLines(errorMessage);
+
   } else if (segments[0] === "echo") {
     textDisplay.addLines(["echo command not implemented."]);
+
   } else if (segments[0] === "clear") {
     textDisplay.clear();
+
   } else if (segments[0] === "exit") {
     window.open("about:blank", "_self");
     window.close();
+
   } else {
-    textDisplay.addLines(errorMessage);
+    const ran = currentDirectory.runFile(text, textDisplay);
+    if (!ran) textDisplay.addLines(errorMessage);
   }
 }
 
