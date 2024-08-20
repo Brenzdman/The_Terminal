@@ -7,6 +7,8 @@ const ButtonStyle: React.CSSProperties = {
   right: "20px",
   justifyContent: "right",
   zIndex: 1000,
+  userSelect: "none",
+  cursor: "pointer",
 };
 
 const FullscreenButton: React.FC = () => {

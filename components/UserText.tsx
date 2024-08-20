@@ -1,11 +1,13 @@
 "use client";
 import { useAtom } from "jotai";
 import React, { useEffect } from "react";
-import { textDisplayAtom } from "../constants/atoms";
+import { currentDirectoryAtom, textDisplayAtom } from "../constants/atoms";
 import { TextDisplay } from "@/classes/TextDisplay";
+import { Directory } from "@/classes/Directory";
 
 const UserText = () => {
   const [textDisplay, setTextDisplay] = useAtom(textDisplayAtom);
+  const [currentDirectory, setCurrentDirectory] = useAtom(currentDirectoryAtom);
 
   const handleKeyDown = (event: KeyboardEvent) => {
     const updatedTextDisplay = new TextDisplay();
@@ -16,10 +18,11 @@ const UserText = () => {
     } else if (event.key === "Backspace") {
       updatedTextDisplay.removeCharacter();
     } else if (event.key === "Enter") {
-      getResponseText(textDisplay);
+      getResponseText(textDisplay, currentDirectory);
     }
 
     setTextDisplay(updatedTextDisplay);
+    setCurrentDirectory(currentDirectory);
   };
 
   useEffect(() => {
@@ -33,7 +36,7 @@ const UserText = () => {
   return <div>{}</div>;
 };
 
-function getResponseText(textDisplay: TextDisplay) {
+function getResponseText(textDisplay: TextDisplay, currentDirectory: Directory) {
   const lastLine = textDisplay.lines[textDisplay.lines.length - 1].text;
   const text = lastLine.trim().toLowerCase();
 
@@ -67,7 +70,7 @@ function getResponseText(textDisplay: TextDisplay) {
   if (segments[0] === "help") {
     textDisplay.addLines(helpScreen);
   } else if (segments[0] === "ls") {
-    textDisplay.addLines(["ls command not implemented."]);
+    textDisplay.addLines(currentDirectory.ls());
   } else if (segments[0] === "cd") {
     textDisplay.addLines(["cd command not implemented."]);
   } else if (segments[0] === "cat") {

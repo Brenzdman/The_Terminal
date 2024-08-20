@@ -1,9 +1,9 @@
-import { Directory } from "@/classes/Directory";
 import { TextDisplay } from "@/classes/TextDisplay";
+import { generateDirectory } from "@/functions/generateDirectory";
 import { atom } from "jotai";
 
 // Atoms
-const directories = [atom(new Directory("home"))];
+let home = generateDirectory();
 
 const welcomeMessage = [
   "Welcome to the Terminal.",
@@ -11,7 +11,4 @@ const welcomeMessage = [
 ];
 
 export const textDisplayAtom = atom(new TextDisplay(welcomeMessage));
-
-
-export const currentDirectory = atom(directories[0]);
-
+export const currentDirectoryAtom = atom(home);

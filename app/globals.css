@@ -20,6 +20,10 @@ body {
   color: #000000;            /* Text color of selected text */
 }
 
+* {
+  -webkit-user-drag: none; /* For WebKit browsers like Chrome and Safari */
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255; /* White text */
