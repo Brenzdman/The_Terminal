@@ -21,8 +21,10 @@ export class Directory_Manager {
     if (path == "..") {
       path = directory?.path || "/";
       // Goes back a segment
-      path = path.split("/").slice(0, -1).join("/");
-    }
+      path = path.split("/").slice(0, -1).join("/") + "/";
+      }
+      
+      console.log(path);
 
     for (let i = 0; i < this.directories.length; i++) {
       const dir = this.directories[i];
@@ -66,7 +68,7 @@ export class Directory {
     let newFolder = new Directory(
       this.directoryManager,
       name,
-      this.path + "/" + name
+      this.path + name + "/"
     );
     this.directories.push(newFolder);
   }

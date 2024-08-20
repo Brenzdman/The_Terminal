@@ -6,45 +6,40 @@ import { TextDisplay } from "@/classes/TextDisplay";
 import { Directory } from "@/classes/Directory";
 
 const UserText = () => {
-  const [textDisplay, setTextDisplay] = useAtom(textDisplayAtom);
+  const [mainTextDisplay, setTextDisplay] = useAtom(textDisplayAtom);
   const [currentDirectory, setCurrentDirectory] = useAtom(currentDirectoryAtom);
+  const textDisplay = new TextDisplay();
+  Object.assign(textDisplay, mainTextDisplay);
 
   const handleKeyDown = (event: KeyboardEvent) => {
-    const updatedTextDisplay = new TextDisplay();
-    Object.assign(updatedTextDisplay, textDisplay);
-
     if (event.key.length === 1) {
-      updatedTextDisplay.typeCharacter(event.key);
+      textDisplay.typeCharacter(event.key, true);
     } else if (event.key === "Backspace") {
-      updatedTextDisplay.removeCharacter();
+      textDisplay.removeCharacter();
     } else if (event.key === "Enter") {
-      getResponseText(textDisplay, currentDirectory);
+      getResponseText();
     }
 
-    setTextDisplay(updatedTextDisplay);
+    setTextDisplay(textDisplay);
   };
 
-  const getResponseText = (
-    textDisplay: TextDisplay,
-    currentDirectory: Directory
-  ) => {
+  const getResponseText = () => {
     const lastLine = textDisplay.lines[textDisplay.lines.length - 1].text;
     const text = lastLine.trim();
 
     let segments = text.split(" ");
 
     // Messages
-    const welcomeMessage = [
-      "Welcome to [#######] Terminal.",
-      "Type 'help' to see a list of available commands.",
-    ];
-
     const errorMessage = [
       "Error: Command not found. Type 'help' for a list of available commands.",
     ];
 
     const badCat = (fileName: string) => {
       return [`cat: file '${fileName}' not found.`];
+    };
+
+    const badCd = (dirName: string) => {
+      return [`cd: no such file or directory: ${dirName}`];
     };
 
     const helpScreen = [
@@ -61,35 +56,53 @@ const UserText = () => {
       "exit         - Close the terminal.",
     ];
     // End messages
+    // Commands
 
+    // Help
     if (segments[0] === "help") {
       textDisplay.addLines(helpScreen);
+
+      // List directories and files
     } else if (segments[0] === "ls") {
       textDisplay.addLines(currentDirectory.ls());
+
+      // Change directory
     } else if (segments[0] === "cd") {
       const dir = currentDirectory.cd(segments[1]);
-      if (!dir)
-        textDisplay.addLines(["cd: no such file or directory: " + segments[1]]);
+      if (!dir) textDisplay.addLines(badCd(segments[1]));
       else {
         setCurrentDirectory(dir);
+        textDisplay.setPath(dir.path);
+        console.log(currentDirectory);
         textDisplay.newLine();
       }
+
+      // Display txt file content
     } else if (segments[0] === "cat") {
       const ran = currentDirectory.readFile(segments[1], textDisplay);
       if (!ran) textDisplay.addLines(badCat(segments[1]));
+
+      // Echo text to terminal
     } else if (segments[0] === "echo") {
       textDisplay.addLines([text.slice(5)]);
+
+      // Clear terminal screen
     } else if (segments[0] === "clear") {
       textDisplay.clear();
+
+      // Exit terminal
     } else if (segments[0] === "exit") {
       window.open("about:blank", "_self");
       window.close();
+
+      // Run file
     } else if (segments[0] === "") {
       textDisplay.newLine();
     } else {
       const ran = currentDirectory.runFile(text, textDisplay);
       if (!ran) textDisplay.addLines(errorMessage);
     }
+    setTextDisplay(textDisplay);
   };
 
   useEffect(() => {

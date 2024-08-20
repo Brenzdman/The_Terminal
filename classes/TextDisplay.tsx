@@ -4,26 +4,30 @@ class Line {
   color: string = "#fff";
   text: string = "";
   userGenerated: boolean = false;
-  constructor(text: string) {
+  path: string;
+  constructor(text: string, path: string) {
     this.text = text;
+    this.path = path;
   }
 
   copy() {
-    let newLine = new Line(this.text);
+    let newLine = new Line(this.text, this.path);
     newLine.userGenerated = this.userGenerated;
     newLine.color = this.color;
+    newLine.path = this.path;
     return newLine;
   }
 }
 
 export class TextDisplay {
   lines: Line[] = [];
+  currentPath: string = "/";
 
   constructor(lines?: string[]) {
     if (lines) {
       this.addLines(lines);
     } else {
-      this.lines.push(new Line(""));
+      this.lines.push(new Line("", this.currentPath));
     }
   }
 
@@ -33,16 +37,18 @@ export class TextDisplay {
     }
 
     lines.forEach((line) => {
-      this.lines.push(new Line(line));
+      this.lines.push(new Line(line, this.currentPath));
     });
 
-    this.lines.push(new Line(" "));
-    this.lines.push(new Line(""));
+    this.lines.push(new Line(" ", this.currentPath));
+    this.lines.push(new Line("", this.currentPath));
   }
 
   typeCharacter(letter: string, userGenerated: boolean = true) {
     this.lines[this.lines.length - 1].text += letter;
     this.lines[this.lines.length - 1].userGenerated = userGenerated;
+    this.lines[this.lines.length - 1].path = this.currentPath;
+    console.log(this.currentPath);
   }
 
   removeCharacter() {
@@ -52,7 +58,8 @@ export class TextDisplay {
   }
 
   newLine() {
-    this.lines.push(new Line(""));
+    const newLine = new Line("", this.currentPath);
+    this.lines.push(newLine);
   }
 
   clear() {
@@ -60,7 +67,12 @@ export class TextDisplay {
       this.lines.pop();
     }
 
-    this.lines.push(new Line(""));
+    this.lines.push(new Line("", this.currentPath));
+  }
+
+  setPath(path: string) {
+    this.currentPath = path;
+    console.log(this.currentPath);
   }
 
   renderText() {
@@ -108,7 +120,7 @@ function linesToText(lines: Line[]) {
         if (line.text === " " && !line.userGenerated) {
           content = <br />;
         } else if (line.userGenerated || line.text === "") {
-          content = <span>{"> " + line.text}</span>;
+          content = <span>{line.path + " > " + line.text}</span>;
         } else {
           content = <span>{line.text}</span>;
         }
