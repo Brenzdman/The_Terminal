@@ -33,7 +33,11 @@ export class TextDisplay {
     }
   }
 
-  addLines(lines: string[]) {
+  addLines(lines: string[] | string) {
+    if (typeof lines === "string") {
+      lines = lines.split("\n");
+    }
+
     if (lines[lines.length - 1] === "") {
       lines.pop();
     }

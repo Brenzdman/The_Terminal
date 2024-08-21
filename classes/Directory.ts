@@ -1,5 +1,6 @@
 import { getColor } from "@/functions/color";
 import { TextDisplay } from "./TextDisplay";
+import { get } from "http";
 
 export class Directory_Manager {
   public directories: Directory[] = [];
@@ -23,13 +24,22 @@ export class Directory_Manager {
     directory: Directory | null,
     path: string
   ): Directory | null {
+    // Finds previous directory
+    console.log("path", path);
     if (path == "..") {
-      path = directory?.path || "/";
-      // Goes back a segment
-      path = path.split("/").slice(0, -1).join("/") + "/";
-    }
+      let path = directory?.path;
 
-    console.log(path);
+      // Gets second to "/" from the end
+      let lastSlash = path?.lastIndexOf("/", path.length - 2);
+
+      if (lastSlash === -1) {
+        path = "/";
+      }
+
+      path = path?.slice(0, lastSlash! + 1);
+
+      return this.getDirectory(this.currentDirectory, path!);
+    }
 
     for (let i = 0; i < this.directories.length; i++) {
       const dir = this.directories[i];

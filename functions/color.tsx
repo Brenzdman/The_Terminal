@@ -4,7 +4,6 @@ export const dirColor = "#FFFF00";
 export const errorColor = "#FF0000";
 
 export const getColor = (type: string) => {
-    console.log(type);
   switch (type) {
     case ".exe":
       return exeColor;
@@ -12,49 +11,67 @@ export const getColor = (type: string) => {
       return txtColor;
     case "dir":
       return dirColor;
+    case "error":
+      return errorColor;
     default:
       return errorColor;
   }
 };
 
+export const getColorString = (text: string, color: string): string => {
+  return `[${color}${text}]`;
+};
+
 export const getColorDiv = (text: string): React.ReactElement => {
   const segments: { text: string; color: string | null }[] = [];
 
+  let string = "";
   let i = 0;
+
   while (i < text.length) {
-    if (text[i] === "[") {
-      // Find the color code
+    const char = text[i];
+
+    // Check for the beginning of a color code
+    if (char === "[" && i + 8 < text.length) {
       const colorCode = text.slice(i + 1, i + 8);
-      const color = /^#[0-9a-fA-F]{6}$/.test(colorCode) ? colorCode : "#000000"; // Default to black if invalid
-      i += 8; // Skip past the color code
-      // Find the closing bracket
-      const endBracket = text.indexOf("]", i);
-      if (endBracket === -1) break;
-      const coloredText = text.slice(i, endBracket);
-      segments.push({ text: coloredText, color });
-      i = endBracket + 1; // Move past the closing bracket
-    } else {
-      // Handle text outside of color codes
-      const nextBracket = text.indexOf("[", i);
-      const segment =
-        nextBracket === -1 ? text.slice(i) : text.slice(i, nextBracket);
-      if (segment) {
-        segments.push({ text: segment, color: null });
+      const isColor = /^#[0-9a-fA-F]{6}$/.test(colorCode);
+
+      // If valid color
+      if (isColor) {
+        const remainingText = text.slice(i + 8);
+        const endBracket = remainingText.indexOf("]");
+
+        if (endBracket !== -1) {
+          const coloredText = remainingText.slice(0, endBracket);
+          segments.push({ text: string, color: null });
+          segments.push({ text: coloredText, color: colorCode });
+          string = "";
+          // Move past the closing bracket
+          i += endBracket + 8 + 1;
+          continue;
+        }
       }
-      i = nextBracket === -1 ? text.length : nextBracket;
     }
+
+    // Accumulate characters into the default string
+    string += char;
+    i++;
   }
 
-  // Generate React elements
+  // Push any remaining text
+  if (string) {
+    segments.push({ text: string, color: null });
+  }
+
   return (
     <div>
       {segments.map(({ text, color }, index) =>
         color ? (
-          <span key={index} style={{ color }}>
+          <span key={`color-${index}`} style={{ color }}>
             {text}
           </span>
         ) : (
-          <span key={index}>{text}</span>
+          <span key={`text-${index}`}>{text}</span>
         )
       )}
     </div>

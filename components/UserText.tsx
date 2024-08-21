@@ -3,6 +3,8 @@ import { useAtom } from "jotai";
 import React, { useEffect } from "react";
 import { currentDirectoryAtom, textDisplayAtom } from "../constants/atoms";
 import { TextDisplay } from "@/classes/TextDisplay";
+import { getColor, getColorString } from "@/functions/color";
+import { get } from "http";
 
 const UserText = () => {
   const [mainTextDisplay, setTextDisplay] = useAtom(textDisplayAtom);
@@ -29,16 +31,21 @@ const UserText = () => {
     let segments = text.split(" ");
 
     // Messages
-    const errorMessage = [
+    const errorColor = getColor("error");
+    const errorMessage = getColorString(
       "Error: Command not found. Type 'help' for a list of available commands.",
-    ];
+      errorColor
+    );
 
     const badCat = (fileName: string) => {
-      return [`cat: file '${fileName}' not found.`];
+      return getColorString(`cat: file '${fileName}' not found.`, errorColor);
     };
 
     const badCd = (dirName: string) => {
-      return [`cd: no such file or directory: ${dirName}`];
+      return getColorString(
+        `cd: no such file or directory: ${dirName}`,
+        errorColor
+      );
     };
 
     const helpScreen = [

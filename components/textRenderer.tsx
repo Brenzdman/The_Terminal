@@ -83,14 +83,13 @@ const Renderer: React.FC<{
           if (line.text === " " && !line.userGenerated) {
             content = <br />;
           } else if (line.userGenerated || line.text === "") {
-            if (line.path !== "/")
-              content = (
-                <span>
-                  {line.path.slice(0, line.path.length - 1) + "> "}
-                  {getColorDiv(line.text)}
-                </span>
-              );
-            else content = <span>{line.path + "> " + getColorDiv(line.text)}</span>;
+            let text = line.path + "> " + line.text;
+            if (line.path !== "/") {
+              text =
+                line.path.slice(0, line.path.length - 1) + "> " + line.text;
+            }
+
+            content = <span>{getColorDiv(text)}</span>;
           } else {
             content = <span>{getColorDiv(line.text)}</span>;
           }
