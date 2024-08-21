@@ -1,6 +1,6 @@
 "use client";
+import { ASCIIimg } from "@/images/ASCII";
 import React, { useEffect, useState } from "react";
-import asciiText from "../images/ASCII.txt";
 
 const ASCII: React.FC = () => {
   const [text, setText] = useState<string>("Loading...");
@@ -14,7 +14,7 @@ const ASCII: React.FC = () => {
   };
 
   useEffect(() => {
-    setText(asciiText);
+    setText(ASCIIimg);
     calculateFontSize(); // Set initial font size
 
     const handleResize = () => {

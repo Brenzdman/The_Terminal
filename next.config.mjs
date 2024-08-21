@@ -1,14 +1,4 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-  webpack: (config, { isServer }) => {
-    // Add a rule to handle .txt files with raw-loader
-    config.module.rules.push({
-      test: /\.txt$/,
-      use: "raw-loader",
-    });
-
-    return config;
-  },
-};
+const nextConfig = {};
 
 export default nextConfig;
