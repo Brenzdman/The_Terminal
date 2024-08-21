@@ -1,6 +1,5 @@
 import { getColor } from "@/functions/color";
 import { TextDisplay } from "./TextDisplay";
-import { get } from "http";
 
 export class Directory_Manager {
   public directories: Directory[] = [];
@@ -25,7 +24,11 @@ export class Directory_Manager {
     path: string
   ): Directory | null {
     // Finds previous directory
-    console.log("path", path);
+
+    if (path == "~") {
+      return this.homeDirectory;
+    }
+
     if (path == "..") {
       let path = directory?.path;
 
