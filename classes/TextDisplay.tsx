@@ -120,7 +120,13 @@ function linesToText(lines: Line[]) {
         if (line.text === " " && !line.userGenerated) {
           content = <br />;
         } else if (line.userGenerated || line.text === "") {
-          content = <span>{line.path + " > " + line.text}</span>;
+          if (line.path !== "/")
+            content = (
+              <span>
+                {line.path.slice(0, line.path.length - 1) + "> " + line.text}
+              </span>
+            );
+          else content = <span>{line.path + "> " + line.text}</span>;
         } else {
           content = <span>{line.text}</span>;
         }

@@ -28,7 +28,8 @@ export class Directory_Manager {
 
     for (let i = 0; i < this.directories.length; i++) {
       const dir = this.directories[i];
-      if (dir.path === path) {
+      console.log(dir.path);
+      if (dir.path === path || dir.path === path + "/") {
         return dir;
       }
     }
@@ -71,14 +72,15 @@ export class Directory {
       this.path + name + "/"
     );
     this.directories.push(newFolder);
+    this.directoryManager.directories.push(newFolder);
   }
 
   public cd(path: string): Directory | null {
     for (let i = 0; i < this.directories.length; i++) {
       const dir = this.directories[i];
-      if (dir.name === path) {
+      if (dir.name == path) {
         return dir;
-      }
+      } 
     }
 
     return this.directoryManager.getDirectory(this, path);
