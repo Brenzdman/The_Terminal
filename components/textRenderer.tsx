@@ -28,8 +28,11 @@ const TextDisplayRenderer: React.FC = () => {
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      console.log("Scroll position updated:", scrollRef.current.scrollTop);
+    } else {
+      console.log("Scroll ref is null");
     }
-  }, [lines]);
+  }, [textDisplay]);
 
   return <Renderer lines={lines} scrollRef={scrollRef} />;
 };

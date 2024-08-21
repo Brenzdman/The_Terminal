@@ -3,7 +3,6 @@ import { useAtom } from "jotai";
 import React, { useEffect } from "react";
 import { currentDirectoryAtom, textDisplayAtom } from "../constants/atoms";
 import { TextDisplay } from "@/classes/TextDisplay";
-import { Directory } from "@/classes/Directory";
 
 const UserText = () => {
   const [mainTextDisplay, setTextDisplay] = useAtom(textDisplayAtom);

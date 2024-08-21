@@ -22,9 +22,10 @@ export class Line {
 
 export class TextDisplay {
   lines: Line[] = [];
-  currentPath: string = "/";
+  currentPath: string;
 
-  constructor(lines?: string[]) {
+  constructor(currentPath: string, lines?: string[]) {
+    this.currentPath = currentPath;
     if (lines) {
       this.addLines(lines);
     } else {

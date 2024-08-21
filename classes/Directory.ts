@@ -5,7 +5,9 @@ export class Directory_Manager {
   public currentDirectory: Directory;
 
   constructor() {
-    this.currentDirectory = this.createDirectory("root", "/");
+    let root = this.createDirectory("root", "/");
+    root.addDirectory("home");
+    this.currentDirectory = root.addDirectory("home").addDirectory("user");
   }
 
   public createDirectory(name: string, path: string): Directory {
@@ -65,7 +67,7 @@ export class Directory {
     this.files.push(file);
   }
 
-  public addDirectory(name: string) {
+  public addDirectory(name: string): Directory {
     let newFolder = new Directory(
       this.directoryManager,
       name,
@@ -73,11 +75,13 @@ export class Directory {
     );
     this.directories.push(newFolder);
     this.directoryManager.directories.push(newFolder);
+
+    return newFolder;
   }
 
   public cd(path: string): Directory | null {
     console.log(path);
-    if (path == "") {
+    if (!path || path == ".") {
       return this;
     }
 

@@ -1,22 +1,22 @@
-import { Dir_File, Directory, Directory_Manager } from "@/classes/Directory";
+import { Dir_File, Directory_Manager } from "@/classes/Directory";
 import { start } from "./start";
 
 export function generateDirectory(): Directory_Manager {
   let directoryManager = new Directory_Manager();
-  let root = directoryManager.getDirectory(null, "/");
+  let currentDirectory = directoryManager.currentDirectory;
 
-  if (!root) {
-    throw new Error("Root directory not found");
+  if (!currentDirectory) {
+    throw new Error("Directory not found!");
   }
 
   const startFile = new Dir_File("start", ".exe", start);
-  root.addFile(startFile);
+  currentDirectory.addFile(startFile);
 
   const testFile = new Dir_File("test", ".txt");
   testFile.content = "Hello World!";
-  root.addFile(testFile);
+  currentDirectory.addFile(testFile);
 
-  root.addDirectory("newDir");
+  currentDirectory.addDirectory("newDir");
 
   return directoryManager;
 }
