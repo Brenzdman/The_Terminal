@@ -22,9 +22,9 @@ export class Directory_Manager {
       path = directory?.path || "/";
       // Goes back a segment
       path = path.split("/").slice(0, -1).join("/") + "/";
-      }
-      
-      console.log(path);
+    }
+
+    console.log(path);
 
     for (let i = 0; i < this.directories.length; i++) {
       const dir = this.directories[i];
@@ -76,11 +76,16 @@ export class Directory {
   }
 
   public cd(path: string): Directory | null {
+    console.log(path);
+    if (path == "") {
+      return this;
+    }
+
     for (let i = 0; i < this.directories.length; i++) {
       const dir = this.directories[i];
       if (dir.name == path) {
         return dir;
-      } 
+      }
     }
 
     return this.directoryManager.getDirectory(this, path);

@@ -1,4 +1,3 @@
-import { Directory_Manager } from "@/classes/Directory";
 import { TextDisplay } from "@/classes/TextDisplay";
 import { generateDirectory } from "@/functions/generateDirectory";
 import { atom } from "jotai";

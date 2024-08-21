@@ -1,6 +1,7 @@
 import { MAX_LINE_LENGTH } from "@/constants/constants";
+import React, { useEffect, useRef } from "react";
 
-class Line {
+export class Line {
   color: string = "#fff";
   text: string = "";
   userGenerated: boolean = false;
@@ -45,16 +46,15 @@ export class TextDisplay {
   }
 
   typeCharacter(letter: string, userGenerated: boolean = true) {
-    this.lines[this.lines.length - 1].text += letter;
-    this.lines[this.lines.length - 1].userGenerated = userGenerated;
-    this.lines[this.lines.length - 1].path = this.currentPath;
-    console.log(this.currentPath);
+    const lastLine = this.lines[this.lines.length - 1];
+    lastLine.text += letter;
+    lastLine.userGenerated = userGenerated;
+    lastLine.path = this.currentPath;
   }
 
   removeCharacter() {
-    this.lines[this.lines.length - 1].text = this.lines[
-      this.lines.length - 1
-    ].text.slice(0, -1);
+    const lastLine = this.lines[this.lines.length - 1];
+    lastLine.text = lastLine.text.slice(0, -1);
   }
 
   newLine() {
@@ -63,85 +63,11 @@ export class TextDisplay {
   }
 
   clear() {
-    while (this.lines.length > 0) {
-      this.lines.pop();
-    }
-
-    this.lines.push(new Line("", this.currentPath));
+    this.lines = [new Line("", this.currentPath)];
   }
 
   setPath(path: string) {
     this.currentPath = path;
     console.log(this.currentPath);
   }
-
-  renderText() {
-    return linesToText(this.lines);
-  }
 }
-
-function linesToText(lines: Line[]) {
-  let newLines: Line[] = [];
-  let linesCopy = lines.map((line) => line.copy());
-
-  const splitLongLines = (line: Line): Line[] => {
-    let text = line.text;
-    const splitLines: string[] = [];
-
-    while (text.length >= MAX_LINE_LENGTH) {
-      const segment = text.slice(0, MAX_LINE_LENGTH);
-      const lastSpace = segment.lastIndexOf(" ");
-
-      if (lastSpace > -1) {
-        splitLines.push(segment.slice(0, lastSpace));
-        text = text.slice(lastSpace + 1);
-      } else {
-        splitLines.push(segment);
-        text = text.slice(MAX_LINE_LENGTH);
-      }
-    }
-    splitLines.push(text);
-
-    return splitLines.map((splitLine) => {
-      let newLine = line.copy();
-      newLine.text = splitLine;
-      return newLine;
-    });
-  };
-
-  for (let i = 0; i < linesCopy.length; i++) {
-    newLines.push(...splitLongLines(linesCopy[i]));
-  }
-
-  return (
-    <div style={divStyle}>
-      {newLines.map((line, index) => {
-        let content;
-        if (line.text === " " && !line.userGenerated) {
-          content = <br />;
-        } else if (line.userGenerated || line.text === "") {
-          if (line.path !== "/")
-            content = (
-              <span>
-                {line.path.slice(0, line.path.length - 1) + "> " + line.text}
-              </span>
-            );
-          else content = <span>{line.path + "> " + line.text}</span>;
-        } else {
-          content = <span>{line.text}</span>;
-        }
-
-        return <div key={index}>{content}</div>;
-      })}
-    </div>
-  );
-}
-
-const divStyle: React.CSSProperties = {
-  width: "100%",
-  height: "100%",
-  position: "fixed",
-  zIndex: 1,
-  overflow: "auto",
-  paddingBottom: "60vh",
-};
