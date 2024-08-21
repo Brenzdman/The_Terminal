@@ -7,7 +7,7 @@ import { TextDisplay } from "@/classes/TextDisplay";
 const UserText = () => {
   const [mainTextDisplay, setTextDisplay] = useAtom(textDisplayAtom);
   const [currentDirectory, setCurrentDirectory] = useAtom(currentDirectoryAtom);
-  const textDisplay = new TextDisplay();
+  const textDisplay = new TextDisplay("placeholder");
   Object.assign(textDisplay, mainTextDisplay);
 
   const handleKeyDown = (event: KeyboardEvent) => {
