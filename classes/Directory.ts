@@ -1,13 +1,16 @@
+import { getColor } from "@/functions/color";
 import { TextDisplay } from "./TextDisplay";
 
 export class Directory_Manager {
   public directories: Directory[] = [];
   public currentDirectory: Directory;
+  public homeDirectory: Directory;
 
   constructor() {
     let root = this.createDirectory("root", "/");
     root.addDirectory("home");
     this.currentDirectory = root.addDirectory("home").addDirectory("user");
+    this.homeDirectory = this.currentDirectory;
   }
 
   public createDirectory(name: string, path: string): Directory {
@@ -55,10 +58,10 @@ export class Directory {
   public ls(): string[] {
     let output: string[] = [];
     this.files.forEach((file) => {
-      output.push(file.name + file.type);
+      output.push(`[${getColor(file.type)}${file.name}${file.type}]`);
     });
     this.directories.forEach((dir) => {
-      output.push(dir.name);
+      output.push(`[${getColor("dir")}${dir.name}]`);
     });
     return output;
   }

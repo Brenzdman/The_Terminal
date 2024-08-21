@@ -3,6 +3,7 @@ import { useAtom } from "jotai";
 import { textDisplayAtom } from "../constants/atoms";
 import { Line } from "@/classes/TextDisplay";
 import { MAX_LINE_LENGTH } from "@/constants/constants";
+import { getColorDiv } from "@/functions/color";
 
 const TextDisplayRenderer: React.FC = () => {
   const [textDisplay] = useAtom(textDisplayAtom);
@@ -28,7 +29,6 @@ const TextDisplayRenderer: React.FC = () => {
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-      console.log("Scroll position updated:", scrollRef.current.scrollTop);
     } else {
       console.log("Scroll ref is null");
     }
@@ -86,12 +86,13 @@ const Renderer: React.FC<{
             if (line.path !== "/")
               content = (
                 <span>
-                  {line.path.slice(0, line.path.length - 1) + "> " + line.text}
+                  {line.path.slice(0, line.path.length - 1) + "> "}
+                  {getColorDiv(line.text)}
                 </span>
               );
-            else content = <span>{line.path + "> " + line.text}</span>;
+            else content = <span>{line.path + "> " + getColorDiv(line.text)}</span>;
           } else {
-            content = <span>{line.text}</span>;
+            content = <span>{getColorDiv(line.text)}</span>;
           }
 
           return <div key={index}>{content}</div>;
