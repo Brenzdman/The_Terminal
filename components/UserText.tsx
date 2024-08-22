@@ -120,6 +120,8 @@ const UserText = () => {
       "help         - Display this help menu.",
       "dir           - List available directories and files in current directory.",
       "cd [dir]     - Change to specified directory.",
+      "mkdir [dir]  - Create a new directory.",
+      "rmdir [dir]  - Remove a directory.",
       "type [file]   - Display the content of a file.",
       "start [file]  - Run a file.",
       "echo [text]  - Output text to the terminal.",
@@ -147,6 +149,13 @@ const UserText = () => {
         textDisplay.setPath(dir.path);
         textDisplay.newLine();
       }
+      // Make new directory
+    } else if (cmd === "mkdir" || cmd === "md") {
+      currentDirectory.addDirectory(segments[1], true, textDisplay);
+
+      // Remove directory
+    } else if (cmd === "rmdir" || cmd === "rd") {
+      currentDirectory.removeDirectory(segments[1], textDisplay);
 
       // Display txt file content
     } else if (cmd === "type") {

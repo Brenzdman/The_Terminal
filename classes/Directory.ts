@@ -16,6 +16,7 @@ export class Directory_Manager {
   public createDirectory(name: string, path: string): Directory {
     let newDir = new Directory(this, name, path);
     this.directories.push(newDir);
+
     return newDir;
   }
 
@@ -61,6 +62,7 @@ export class Directory {
   public files: Dir_File[] = [];
   public directories: Directory[] = [];
   public directoryManager: Directory_Manager;
+  public userMalleable: boolean = false;
   public path: string;
 
   constructor(dm: Directory_Manager, name: string, path: string) {
@@ -80,20 +82,68 @@ export class Directory {
     return output;
   }
 
-  public addFile(file: Dir_File) {
+  public addFile(file: Dir_File, userMalleable = false): void {
     this.files.push(file);
+    file.userMalleable = userMalleable;
   }
 
-  public addDirectory(name: string): Directory {
+  public addDirectory(
+    name: string,
+    userMalleable = false,
+    textDisplay: TextDisplay | null = null
+  ): Directory {
+    for (let i = 0; i < this.directories.length; i++) {
+      const dir = this.directories[i];
+      if (dir.name == name) {
+        textDisplay?.addLines(
+          getColorString("Directory already exists", getColor("error"))
+        );
+        return dir;
+      }
+    }
+
     let newFolder = new Directory(
       this.directoryManager,
       name,
       this.path + name + "/"
     );
+    newFolder.userMalleable = userMalleable;
     this.directories.push(newFolder);
     this.directoryManager.directories.push(newFolder);
 
+    if (textDisplay) {
+      textDisplay.addLines(
+        getColorString("Directory created", getColor("function"))
+      );
+    }
+
     return newFolder;
+  }
+
+  public removeDirectory(name: string, textDisplay: TextDisplay): void {
+    for (let i = 0; i < this.directories.length; i++) {
+      const dir = this.directories[i];
+      if (dir.name != name) {
+        continue;
+      }
+
+      if (!dir.userMalleable) {
+        textDisplay.addLines(
+          getColorString("ACCESS DENIED", getColor("error"))
+        );
+        return;
+      }
+
+      this.directories.splice(i, 1);
+      textDisplay.addLines(
+        getColorString("Directory removed", getColor("function"))
+      );
+      return;
+    }
+
+    textDisplay.addLines(
+      getColorString("Directory not found", getColor("error"))
+    );
   }
 
   public cd(path: string): Directory | null {
@@ -152,6 +202,7 @@ export class Dir_File {
   public content: string = "";
   public type: string = ".txt";
   public onRun: (() => void) | null = null;
+  public userMalleable: boolean = false;
 
   constructor(name: string, type: string, onRun?: () => void) {
     this.name = name;
