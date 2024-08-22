@@ -20,8 +20,14 @@ const UserText = () => {
     } else if (event.key === "Backspace") {
       textDisplay.removeCharacter();
     } else if (event.key === "Enter") {
+      if (textDisplay.autoFillReplace) {
+        const lastLine = textDisplay.getLastLine();
+        lastLine.text = textDisplay.autoFill;
+        lastLine.userGenerated = true;
+      }
+
       addToCmdHistory(textDisplay.getLastLine().text);
-      setCmdIndex(cmdIndex + 1);
+      setCmdIndex(cmdHistory.length);
       getResponseText();
     } else if (event.key === "ArrowLeft") {
       textDisplay.moveCursorLeft();
@@ -29,26 +35,27 @@ const UserText = () => {
       textDisplay.moveCursorRight();
     }
 
-    if (event.key === "ArrowUp") {
+    if (event.key === "ArrowUp" || event.key === "ArrowDown") {
       if (cmdIndex < 0) return;
 
-      setCmdIndex(Math.max(0, cmdIndex - 1));
-      textDisplay.setAutofill(cmdHistory[cmdIndex], true);
+      let newCmdIndex = cmdIndex;
 
-      console.log(cmdHistory[cmdIndex]);
-      console.log(cmdIndex);
-    } else if (event.key === "ArrowDown") {
-      if (cmdIndex < 0) return;
-
-      setCmdIndex(Math.min(cmdHistory.length, cmdIndex + 1));
-      textDisplay.setAutofill(cmdHistory[cmdIndex], true);
-
-      if (cmdIndex === cmdHistory.length) {
-        textDisplay.setAutofill("");
+      // Gets the next or previous command
+      if (event.key === "ArrowUp") {
+        newCmdIndex = Math.max(0, cmdIndex - 1);
+      } else if (event.key === "ArrowDown") {
+        newCmdIndex = Math.min(cmdHistory.length, cmdIndex + 1);
       }
 
-      console.log(cmdHistory[cmdIndex]);
-      console.log(cmdIndex);
+      // Sets the text to the command
+      if (newCmdIndex === cmdHistory.length) {
+        textDisplay.setAutofill("");
+      } else {
+        textDisplay.setAutofill(cmdHistory[newCmdIndex], true);
+      }
+
+      // Update the index with the new calculated value
+      setCmdIndex(newCmdIndex);
     } else {
       setCmdIndex(cmdHistory.length);
     }

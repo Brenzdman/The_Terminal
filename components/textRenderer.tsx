@@ -4,9 +4,13 @@ import { textDisplayAtom } from "../constants/atoms";
 import { Line, TextDisplay } from "@/classes/TextDisplay";
 import { MAX_LINE_LENGTH } from "@/constants/constants";
 import { getColorDiv } from "@/functions/color";
+import { doc } from "firebase/firestore";
 
 const TextDisplayRenderer: React.FC = () => {
   const [mainTextDisplay, setTextDisplay] = useAtom(textDisplayAtom);
+  const [prevLineLength, setPrevLineLength] = useState<number>(
+    mainTextDisplay.lines.length
+  );
 
   const textDisplay = new TextDisplay("placeholder");
   Object.assign(textDisplay, mainTextDisplay);
@@ -24,6 +28,22 @@ const TextDisplayRenderer: React.FC = () => {
       }
     };
 
+    const handleAutoScroll = () => {
+      if (scrollRef.current && prevLineLength !== textDisplay.lines.length) {
+        setPrevLineLength(textDisplay.lines.length);
+        // Temporarily disable smooth scrolling to clear scroll momentum
+        scrollRef.current.style.scrollBehavior = "auto";
+        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+
+        // Re-enable smooth scrolling after updating scrollTop
+        setTimeout(() => {
+          if (scrollRef.current) {
+            scrollRef.current.style.scrollBehavior = "smooth";
+          }
+        }, 0);
+      }
+    };
+
     if (intervalRef.current === null) {
       intervalRef.current = setInterval(() => {
         if (textDisplay.cursorSymbol === " ") {
@@ -35,13 +55,7 @@ const TextDisplayRenderer: React.FC = () => {
       }, 550);
     }
 
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    } else {
-      console.log("Scroll ref is null");
-    }
-
-    document.addEventListener("keydown", handleKeyDown);
+    handleAutoScroll();
 
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
