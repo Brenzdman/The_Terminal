@@ -1,5 +1,6 @@
-import { getColor } from "@/functions/color";
+import { getColor, getColorString } from "@/functions/color";
 import { TextDisplay } from "./TextDisplay";
+import { get } from "http";
 
 export class Directory_Manager {
   public directories: Directory[] = [];
@@ -111,24 +112,24 @@ export class Directory {
     return this.directoryManager.getDirectory(this, path);
   }
 
-  public runFile(requestName: string, textDisplay: TextDisplay): boolean {
-    let ran = false;
+  public runFile(requestName: string, textDisplay: TextDisplay): void {
     for (let i = 0; i < this.files.length; i++) {
       const file = this.files[i];
+      if (file.type !== ".exe") {
+        continue;
+      }
+
       if (file.name + file.type !== requestName && file.name !== requestName) {
         continue;
       }
 
       if (file.onRun !== null) {
+        textDisplay.addLines([`Running ${file.name}${file.type}...`]);
         file.onRun();
-        ran = true;
-      }
-
-      if (ran) {
-        textDisplay.newLine();
+        return;
       }
     }
-    return ran;
+    textDisplay.addLines(getColorString("File not found", getColor("error")));
   }
 
   readFile(name: string, textDisplay: TextDisplay): boolean {

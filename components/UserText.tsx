@@ -121,6 +121,7 @@ const UserText = () => {
       "dir           - List available directories and files in current directory.",
       "cd [dir]     - Change to specified directory.",
       "type [file]   - Display the content of a file.",
+      "start [file]  - Run a file.",
       "echo [text]  - Output text to the terminal.",
       "cls        - Clear the terminal screen.",
       "exit         - Close the terminal.",
@@ -166,11 +167,14 @@ const UserText = () => {
       window.close();
 
       // Run file
+    } else if (cmd === "start") {
+      currentDirectory.runFile(segments[1], textDisplay);
+
+      // Default
     } else if (cmd === "") {
       textDisplay.newLine();
     } else {
-      const ran = currentDirectory.runFile(text, textDisplay);
-      if (!ran) textDisplay.addLines(errorMessage);
+      textDisplay.addLines(errorMessage);
     }
 
     textDisplay.autoFill = "";

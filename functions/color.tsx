@@ -2,6 +2,7 @@ export const exeColor = "#00FFFF";
 export const txtColor = "#32CD32";
 export const dirColor = "#FFFF00";
 export const errorColor = "#FF0000";
+export const functionColor = "#FF00FF";
 
 export const getColor = (type: string) => {
   switch (type) {
@@ -13,6 +14,8 @@ export const getColor = (type: string) => {
       return dirColor;
     case "error":
       return errorColor;
+    case "function":
+      return functionColor;
     default:
       return errorColor;
   }

@@ -3,7 +3,7 @@ import { useAtom } from "jotai";
 import { textDisplayAtom } from "../constants/atoms";
 import { Line, TextDisplay } from "@/classes/TextDisplay";
 import { MAX_LINE_LENGTH } from "@/constants/constants";
-import { getColorDiv } from "@/functions/color";
+import { getColor, getColorDiv, getColorString } from "@/functions/color";
 
 const TextDisplayRenderer: React.FC = () => {
   const [mainTextDisplay, setTextDisplay] = useAtom(textDisplayAtom);
@@ -131,12 +131,22 @@ const Renderer: React.FC<{
             // \ instead of /
             path = "C:" + path.replace(/\//g, "\\");
 
-            let text = path + "> " + line.text;
+            let lineText = line.text;
+
+            const firstSpace = lineText.indexOf(" "); // Find the first space in the remaining text
+            const firstSegment =
+              firstSpace !== -1 ? lineText.slice(0, firstSpace) : lineText;
+
+            lineText =
+              getColorString(firstSegment, getColor("function")) +
+              lineText.slice(firstSegment.length); // Append the rest of the text
+
+            let text = path + "> " + lineText;
 
             // Last Line
             if (index === newLines.length - 1) {
               // Calculates cursor position relative to full text length
-              const adjustedCursorX = cursorX + path.length + 2;
+              const adjustedCursorX = cursorX + path.length + 2 + 9;
 
               if (textDisplay.autoFillReplace) {
                 text = path + "> " + textDisplay.autoFill;
