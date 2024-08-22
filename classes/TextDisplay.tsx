@@ -59,6 +59,7 @@ export class TextDisplay {
       lastLine.text = this.autoFill;
       this.autoFill = "";
       this.autoFillReplace = false;
+      this.cursorX = lastLine.text.length;
     }
 
     lastLine.text =
@@ -72,26 +73,54 @@ export class TextDisplay {
   }
 
   moveCursorLeft() {
-    this.cursorX = Math.max(-1, this.cursorX - 1);
-    this.cursorSymbol = "|";
+    this.moveCursor("left");
   }
 
   moveCursorRight() {
-    const lastLine = this.getLastLine();
-    this.cursorX = Math.min(this.cursorX + 1, lastLine.text.length);
+    this.moveCursor("right");
+  }
+
+  moveCursor(direction: "left" | "right") {
+    if (this.autoFillReplace) {
+      this.setTextToAutofill();
+    }
+
+    if (direction === "left") {
+      this.cursorX = Math.max(0, this.cursorX - 1);
+    } else if (direction === "right") {
+      const lastLine = this.getLastLine();
+      this.cursorX = Math.min(this.cursorX + 1, lastLine.text.length);
+    }
+
     this.cursorSymbol = "|";
   }
 
-  removeCharacter() {
+  setTextToAutofill() {
     const lastLine = this.getLastLine();
-    lastLine.text = lastLine.text.slice(0, -1);
+    lastLine.userGenerated = true;
+    lastLine.text = this.autoFill;
+    this.cursorX = lastLine.text.length;
+    this.autoFill = "";
+    this.autoFillReplace = false;
   }
 
-  getLastLine() {
+  removeCharacter() {
+    if (this.cursorX <= 0) {
+      return;
+    }
+
+    const lastLine = this.getLastLine();
+    lastLine.text =
+      lastLine.text.slice(0, this.cursorX - 1) +
+      lastLine.text.slice(this.cursorX);
+    this.moveCursorLeft();
+  }
+
+  getLastLine(): Line {
     return this.lines[this.lines.length - 1];
   }
 
-  setAutofill(text: string, replace: boolean = false) {
+  setAutofill(text: string, replace: boolean = false): void {
     if (!text) {
       this.autoFill = "";
       this.autoFillReplace = false;

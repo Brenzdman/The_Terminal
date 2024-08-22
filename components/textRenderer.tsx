@@ -4,7 +4,6 @@ import { textDisplayAtom } from "../constants/atoms";
 import { Line, TextDisplay } from "@/classes/TextDisplay";
 import { MAX_LINE_LENGTH } from "@/constants/constants";
 import { getColorDiv } from "@/functions/color";
-import { doc } from "firebase/firestore";
 
 const TextDisplayRenderer: React.FC = () => {
   const [mainTextDisplay, setTextDisplay] = useAtom(textDisplayAtom);
@@ -36,11 +35,11 @@ const TextDisplayRenderer: React.FC = () => {
         scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
 
         // Re-enable smooth scrolling after updating scrollTop
-        setTimeout(() => {
+        requestAnimationFrame(() => {
           if (scrollRef.current) {
             scrollRef.current.style.scrollBehavior = "smooth";
           }
-        }, 0);
+        });
       }
     };
 
@@ -132,15 +131,18 @@ const Renderer: React.FC<{
 
             // Last Line
             if (index === newLines.length - 1) {
-              cursorX += line.path.length + 2;
+              // Calculates cursor position relative to full text length
+              const adjustedCursorX = cursorX + path.length + 2;
 
-              // Adds autoFill to last Line if applicable
               if (textDisplay.autoFillReplace) {
-                text = text.slice(0, cursorX) + textDisplay.autoFill;
+                text = path + "> " + textDisplay.autoFill;
               }
 
               // Adds cursor to last Line
-              text = text.slice(0, cursorX) + cursor + text.slice(cursorX);
+              text =
+                text.slice(0, adjustedCursorX) +
+                cursor +
+                text.slice(adjustedCursorX);
             }
 
             content = <span>{getColorDiv(text)}</span>;

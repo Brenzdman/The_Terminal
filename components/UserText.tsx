@@ -24,10 +24,29 @@ const UserText = () => {
         const lastLine = textDisplay.getLastLine();
         lastLine.text = textDisplay.autoFill;
         lastLine.userGenerated = true;
+        textDisplay.autoFillReplace = false;
       }
 
-      addToCmdHistory(textDisplay.getLastLine().text);
-      setCmdIndex(cmdHistory.length);
+      const cmd = textDisplay.getLastLine().text.trim();
+
+      setCmdHistory((prevHistory) => {
+        console.log("cmd", cmd);
+        if (!cmd) return prevHistory;
+
+        if (cmdHistory.length >= 100) {
+          cmdHistory.shift();
+        }
+
+        if (cmdHistory.includes(cmd)) {
+          cmdHistory.splice(cmdHistory.indexOf(cmd), 1);
+        }
+
+        const newHistory = [...prevHistory, cmd];
+        setCmdIndex(newHistory.length);
+        return newHistory;
+      });
+
+      console.log("cmdHistory", cmdHistory);
       getResponseText();
     } else if (event.key === "ArrowLeft") {
       textDisplay.moveCursorLeft();
@@ -36,6 +55,7 @@ const UserText = () => {
     }
 
     if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+      event.preventDefault();
       if (cmdIndex < 0) return;
 
       let newCmdIndex = cmdIndex;
@@ -47,12 +67,17 @@ const UserText = () => {
         newCmdIndex = Math.min(cmdHistory.length, cmdIndex + 1);
       }
 
+      console.log("cmdIndex", newCmdIndex);
       // Sets the text to the command
       if (newCmdIndex === cmdHistory.length) {
         textDisplay.setAutofill("");
       } else {
         textDisplay.setAutofill(cmdHistory[newCmdIndex], true);
+        console.log(cmdHistory[newCmdIndex]);
       }
+
+      textDisplay.cursorX = textDisplay.autoFill.length;
+      textDisplay.cursorSymbol = "|";
 
       // Update the index with the new calculated value
       setCmdIndex(newCmdIndex);
@@ -61,21 +86,6 @@ const UserText = () => {
     }
 
     setTextDisplay(textDisplay);
-  };
-
-  const addToCmdHistory = (cmd: string) => {
-    cmd = cmd.trim();
-    if (!cmd) return;
-
-    if (cmdHistory.length >= 100) {
-      cmdHistory.shift();
-    }
-
-    if (cmdHistory.includes(cmd)) {
-      cmdHistory.splice(cmdHistory.indexOf(cmd), 1);
-    }
-
-    setCmdHistory([...cmdHistory, cmd]);
   };
 
   const getResponseText = () => {
@@ -133,7 +143,6 @@ const UserText = () => {
       else {
         setCurrentDirectory(dir);
         textDisplay.setPath(dir.path);
-        console.log(currentDirectory);
         textDisplay.newLine();
       }
 
@@ -162,6 +171,8 @@ const UserText = () => {
       const ran = currentDirectory.runFile(text, textDisplay);
       if (!ran) textDisplay.addLines(errorMessage);
     }
+
+    textDisplay.autoFill = "";
     setTextDisplay(textDisplay);
   };
 
