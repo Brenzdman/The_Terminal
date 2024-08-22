@@ -1,8 +1,18 @@
-export const exeColor = "#00FFFF";
-export const txtColor = "#32CD32";
-export const dirColor = "#FFFF00";
-export const errorColor = "#FF0000";
-export const functionColor = "#FF00FF";
+const palette = [
+  "#8BE9FD", // Function Color (Light Blue)
+  "#FFFFFF", // Text Color (White)
+  "#BD93F9", // Directory Color (Light Purple)
+  "#50FA7B", // Executable Color (Light Green)
+  "#FF5555", // Error Color (Light Red)
+];
+
+export const functionColor = palette[0];
+export const txtColor = palette[1];
+export const dirColor = palette[2];
+export const exeColor = palette[3];
+export const errorColor = palette[4];
+
+
 
 export const getColor = (type: string) => {
   switch (type) {
