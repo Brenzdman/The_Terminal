@@ -116,6 +116,14 @@ export class TextDisplay {
     this.moveCursorLeft();
   }
 
+  deleteCharacter() {
+    const lastLine = this.getLastLine();
+    lastLine.text =
+      lastLine.text.slice(0, this.cursorX) +
+      lastLine.text.slice(this.cursorX + 1);
+    this.cursorSymbol = "|";
+  }
+
   getLastLine(): Line {
     return this.lines[this.lines.length - 1];
   }

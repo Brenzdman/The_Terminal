@@ -63,14 +63,7 @@ const TextDisplayRenderer: React.FC = () => {
     };
   }, [textDisplay]);
 
-  return (
-    <Renderer
-      textDisplay={textDisplay}
-      scrollRef={scrollRef}
-      cursor={textDisplay.cursorSymbol}
-      cursorX={cursorX}
-    />
-  );
+  return <Renderer textDisplay={textDisplay} scrollRef={scrollRef} />;
 };
 
 export default TextDisplayRenderer;
@@ -78,99 +71,95 @@ export default TextDisplayRenderer;
 const Renderer: React.FC<{
   textDisplay: TextDisplay;
   scrollRef: React.RefObject<HTMLDivElement>;
-  cursor: string;
-  cursorX: number;
-}> = ({ textDisplay, scrollRef, cursor, cursorX }) => {
-  const linesToText = (textDisplay: TextDisplay) => {
-    const lines = textDisplay.lines;
-    let newLines: Line[] = [];
-    let linesCopy = lines.map((line) => line.copy());
+}> = ({ textDisplay, scrollRef }) => {
+  const cursor = textDisplay.cursorSymbol;
+  const cursorX = textDisplay.cursorX;
+  const lines = textDisplay.lines;
+  let newLines: Line[] = [];
+  let linesCopy = lines.map((line) => line.copy());
 
-    const splitLongLines = (line: Line): Line[] => {
-      let text = line.text;
-      const splitLines: string[] = [];
+  const splitLongLines = (line: Line): Line[] => {
+    let text = line.text;
+    const splitLines: string[] = [];
 
-      while (text.length >= MAX_LINE_LENGTH) {
-        const segment = text.slice(0, MAX_LINE_LENGTH);
-        const lastSpace = segment.lastIndexOf(" ");
+    while (text.length >= MAX_LINE_LENGTH) {
+      const segment = text.slice(0, MAX_LINE_LENGTH);
+      const lastSpace = segment.lastIndexOf(" ");
 
-        if (lastSpace > -1) {
-          splitLines.push(segment.slice(0, lastSpace));
-          text = text.slice(lastSpace + 1);
-        } else {
-          splitLines.push(segment);
-          text = text.slice(MAX_LINE_LENGTH);
-        }
+      if (lastSpace > -1) {
+        splitLines.push(segment.slice(0, lastSpace));
+        text = text.slice(lastSpace + 1);
+      } else {
+        splitLines.push(segment);
+        text = text.slice(MAX_LINE_LENGTH);
       }
+    }
 
-      splitLines.push(text);
-      return splitLines.map((splitText) => {
-        const newLine = new Line(splitText, line.path);
-        newLine.userGenerated = line.userGenerated;
-        return newLine;
-      });
-    };
-
-    linesCopy.forEach((line) => {
-      newLines = newLines.concat(splitLongLines(line));
+    splitLines.push(text);
+    return splitLines.map((splitText) => {
+      const newLine = new Line(splitText, line.path);
+      newLine.userGenerated = line.userGenerated;
+      return newLine;
     });
-
-    return (
-      <div ref={scrollRef} style={divStyle}>
-        {newLines.map((line, index) => {
-          let content;
-          if (line.text === " " && !line.userGenerated) {
-            content = <br />;
-          } else if (line.userGenerated || line.text === "") {
-            let path = line.path;
-            // Removes last "/" if not root
-            if (line.path !== "/") {
-              path = line.path.slice(0, line.path.length - 1);
-            }
-
-            // \ instead of /
-            path = "C:" + path.replace(/\//g, "\\");
-
-            let lineText = line.text;
-
-            const firstSpace = lineText.indexOf(" "); // Find the first space in the remaining text
-            const firstSegment =
-              firstSpace !== -1 ? lineText.slice(0, firstSpace) : lineText;
-
-            lineText =
-              getColorString(firstSegment, getColor("function")) +
-              lineText.slice(firstSegment.length); // Append the rest of the text
-
-            let text = path + "> " + lineText;
-
-            // Last Line
-            if (index === newLines.length - 1) {
-              // Calculates cursor position relative to full text length
-              const adjustedCursorX = cursorX + path.length + 2 + 9;
-
-              if (textDisplay.autoFillReplace) {
-                text = path + "> " + textDisplay.autoFill;
-              }
-
-              // Adds cursor to last Line
-              text =
-                text.slice(0, adjustedCursorX) +
-                cursor +
-                text.slice(adjustedCursorX);
-            }
-
-            content = <span>{getColorDiv(text)}</span>;
-          } else {
-            content = <span>{getColorDiv(line.text)}</span>;
-          }
-
-          return <div key={index}>{content}</div>;
-        })}
-      </div>
-    );
   };
 
-  return linesToText(textDisplay);
+  linesCopy.forEach((line) => {
+    newLines = newLines.concat(splitLongLines(line));
+  });
+
+  return (
+    <div ref={scrollRef} style={divStyle}>
+      {newLines.map((line, index) => {
+        let content;
+        if (line.text === " " && !line.userGenerated) {
+          content = <br />;
+        } else if (line.userGenerated || line.text === "") {
+          let path = line.path;
+          // Removes last "/" if not root
+          if (line.path !== "/") {
+            path = line.path.slice(0, line.path.length - 1);
+          }
+
+          // \ instead of /
+          path = "C:" + path.replace(/\//g, "\\");
+
+          let lineText = line.text;
+
+          const firstSpace = lineText.indexOf(" "); // Find the first space in the remaining text
+          const firstSegment =
+            firstSpace !== -1 ? lineText.slice(0, firstSpace) : lineText;
+
+          lineText =
+            getColorString(firstSegment, getColor("function")) +
+            lineText.slice(firstSegment.length); // Append the rest of the text
+
+          let text = path + "> " + lineText;
+
+          // Last Line
+          if (index === newLines.length - 1) {
+            // Calculates cursor position relative to full text length
+            const adjustedCursorX = cursorX + path.length + 2 + 9;
+
+            if (textDisplay.autoFillReplace) {
+              text = path + "> " + textDisplay.autoFill;
+            }
+
+            // Adds cursor to last Line
+            text =
+              text.slice(0, adjustedCursorX) +
+              cursor +
+              text.slice(adjustedCursorX);
+          }
+
+          content = <span>{getColorDiv(text)}</span>;
+        } else {
+          content = <span>{getColorDiv(line.text)}</span>;
+        }
+
+        return <div key={index}>{content}</div>;
+      })}
+    </div>
+  );
 };
 
 const divStyle: React.CSSProperties = {

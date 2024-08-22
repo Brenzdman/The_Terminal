@@ -19,6 +19,8 @@ const UserText = () => {
       textDisplay.typeCharacter(event.key, true);
     } else if (event.key === "Backspace") {
       textDisplay.removeCharacter();
+    } else if (event.key === "Delete") {
+      textDisplay.deleteCharacter();
     } else if (event.key === "Enter") {
       if (textDisplay.autoFillReplace) {
         const lastLine = textDisplay.getLastLine();

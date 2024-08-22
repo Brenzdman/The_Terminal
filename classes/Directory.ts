@@ -112,9 +112,7 @@ export class Directory {
     this.directoryManager.directories.push(newFolder);
 
     if (textDisplay) {
-      textDisplay.addLines(
-        getColorString("Directory created", getColor("function"))
-      );
+      textDisplay.addLines("Directory created");
     }
 
     return newFolder;
@@ -135,9 +133,8 @@ export class Directory {
       }
 
       this.directories.splice(i, 1);
-      textDisplay.addLines(
-        getColorString("Directory removed", getColor("function"))
-      );
+      textDisplay.addLines("Directory removed");
+
       return;
     }
 
