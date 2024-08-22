@@ -8,7 +8,7 @@ export class Directory_Manager {
 
   constructor() {
     let root = this.createDirectory("root", "/");
-    this.currentDirectory = root.addDirectory("home").addDirectory("user");
+    this.currentDirectory = root.addDirectory("Users").addDirectory("guest");
     this.homeDirectory = this.currentDirectory;
   }
 
@@ -22,14 +22,17 @@ export class Directory_Manager {
     directory: Directory | null,
     path: string
   ): Directory | null {
-    // Finds previous directory
+    // replaces \ with / for windows
+    path = path.replace(/\\/g, "/");
 
+    // Finds home directory
     if (path == "~") {
       return this.homeDirectory;
     }
 
+    // Finds previous directory
     if (path == "..") {
-      let path = directory?.path;
+      path = directory!.path;
 
       // Gets second to "/" from the end
       let lastSlash = path?.lastIndexOf("/", path.length - 2);
@@ -39,8 +42,6 @@ export class Directory_Manager {
       }
 
       path = path?.slice(0, lastSlash! + 1);
-
-      return this.getDirectory(this.currentDirectory, path!);
     }
 
     for (let i = 0; i < this.directories.length; i++) {
@@ -110,11 +111,11 @@ export class Directory {
     return this.directoryManager.getDirectory(this, path);
   }
 
-  public runFile(name: string, textDisplay: TextDisplay): boolean {
+  public runFile(requestName: string, textDisplay: TextDisplay): boolean {
     let ran = false;
     for (let i = 0; i < this.files.length; i++) {
       const file = this.files[i];
-      if (file.name + file.type !== name && file.name !== name) {
+      if (file.name + file.type !== requestName && file.name !== requestName) {
         continue;
       }
 

@@ -118,26 +118,27 @@ const UserText = () => {
       "Available commands:",
       "-------------------",
       "help         - Display this help menu.",
-      "ls           - List available directories and files.",
+      "dir           - List available directories and files in current directory.",
       "cd [dir]     - Change to specified directory.",
-      "cat [file]   - Display the content of a file.",
+      "type [file]   - Display the content of a file.",
       "echo [text]  - Output text to the terminal.",
-      "clear        - Clear the terminal screen.",
+      "cls        - Clear the terminal screen.",
       "exit         - Close the terminal.",
     ];
     // End messages
     // Commands
 
     // Help
-    if (segments[0] === "help") {
+    const cmd = segments[0].toLowerCase();
+    if (cmd === "help") {
       textDisplay.addLines(helpScreen);
 
       // List directories and files
-    } else if (segments[0] === "ls") {
+    } else if (cmd === "ls" || cmd === "dir") {
       textDisplay.addLines(currentDirectory.ls());
 
       // Change directory
-    } else if (segments[0] === "cd") {
+    } else if (cmd === "cd") {
       const dir = currentDirectory.cd(segments[1]);
       if (!dir) textDisplay.addLines(badCd(segments[1]));
       else {
@@ -147,25 +148,25 @@ const UserText = () => {
       }
 
       // Display txt file content
-    } else if (segments[0] === "cat") {
+    } else if (cmd === "type") {
       const ran = currentDirectory.readFile(segments[1], textDisplay);
       if (!ran) textDisplay.addLines(badCat(segments[1]));
 
       // Echo text to terminal
-    } else if (segments[0] === "echo") {
+    } else if (cmd === "echo") {
       textDisplay.addLines([text.slice(5)]);
 
       // Clear terminal screen
-    } else if (segments[0] === "clear") {
+    } else if (cmd === "cls" || cmd === "clear") {
       textDisplay.clear();
 
       // Exit terminal
-    } else if (segments[0] === "exit") {
+    } else if (cmd === "exit") {
       window.open("about:blank", "_self");
       window.close();
 
       // Run file
-    } else if (segments[0] === "") {
+    } else if (cmd === "") {
       textDisplay.newLine();
     } else {
       const ran = currentDirectory.runFile(text, textDisplay);

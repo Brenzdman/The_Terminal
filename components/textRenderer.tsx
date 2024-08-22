@@ -127,6 +127,10 @@ const Renderer: React.FC<{
             if (line.path !== "/") {
               path = line.path.slice(0, line.path.length - 1);
             }
+
+            // \ instead of /
+            path = "C:" + path.replace(/\//g, "\\");
+
             let text = path + "> " + line.text;
 
             // Last Line
