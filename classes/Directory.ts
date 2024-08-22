@@ -8,7 +8,6 @@ export class Directory_Manager {
 
   constructor() {
     let root = this.createDirectory("root", "/");
-    root.addDirectory("home");
     this.currentDirectory = root.addDirectory("home").addDirectory("user");
     this.homeDirectory = this.currentDirectory;
   }
@@ -115,7 +114,7 @@ export class Directory {
     let ran = false;
     for (let i = 0; i < this.files.length; i++) {
       const file = this.files[i];
-      if (file.name + file.type !== name) {
+      if (file.name + file.type !== name && file.name !== name) {
         continue;
       }
 

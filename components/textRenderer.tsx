@@ -1,16 +1,21 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useAtom } from "jotai";
 import { textDisplayAtom } from "../constants/atoms";
-import { Line } from "@/classes/TextDisplay";
+import { Line, TextDisplay } from "@/classes/TextDisplay";
 import { MAX_LINE_LENGTH } from "@/constants/constants";
 import { getColorDiv } from "@/functions/color";
 
 const TextDisplayRenderer: React.FC = () => {
-  const [textDisplay] = useAtom(textDisplayAtom);
-  const lines = textDisplay.lines;
+  const [mainTextDisplay, setTextDisplay] = useAtom(textDisplayAtom);
+
+  const textDisplay = new TextDisplay("placeholder");
+  Object.assign(textDisplay, mainTextDisplay);
+  const cursorX = textDisplay.cursorX;
 
   // ref to scroll
   const scrollRef = useRef<HTMLDivElement>(null);
+  // cursor blink
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -19,31 +24,52 @@ const TextDisplayRenderer: React.FC = () => {
       }
     };
 
-    document.addEventListener("keydown", handleKeyDown);
+    if (intervalRef.current === null) {
+      intervalRef.current = setInterval(() => {
+        if (textDisplay.cursorSymbol === " ") {
+          textDisplay.cursorSymbol = "|";
+        } else {
+          textDisplay.cursorSymbol = " ";
+        }
+        setTextDisplay(textDisplay);
+      }, 550);
+    }
 
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
-
-  useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     } else {
       console.log("Scroll ref is null");
     }
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    };
   }, [textDisplay]);
 
-  return <Renderer lines={lines} scrollRef={scrollRef} />;
+  return (
+    <Renderer
+      textDisplay={textDisplay}
+      scrollRef={scrollRef}
+      cursor={textDisplay.cursorSymbol}
+      cursorX={cursorX}
+    />
+  );
 };
 
 export default TextDisplayRenderer;
 
 const Renderer: React.FC<{
-  lines: Line[];
+  textDisplay: TextDisplay;
   scrollRef: React.RefObject<HTMLDivElement>;
-}> = ({ lines, scrollRef }) => {
-  const linesToText = (lines: Line[]) => {
+  cursor: string;
+  cursorX: number;
+}> = ({ textDisplay, scrollRef, cursor, cursorX }) => {
+  const linesToText = (textDisplay: TextDisplay) => {
+    const lines = textDisplay.lines;
     let newLines: Line[] = [];
     let linesCopy = lines.map((line) => line.copy());
 
@@ -83,10 +109,24 @@ const Renderer: React.FC<{
           if (line.text === " " && !line.userGenerated) {
             content = <br />;
           } else if (line.userGenerated || line.text === "") {
-            let text = line.path + "> " + line.text;
+            let path = line.path;
+            // Removes last "/" if not root
             if (line.path !== "/") {
-              text =
-                line.path.slice(0, line.path.length - 1) + "> " + line.text;
+              path = line.path.slice(0, line.path.length - 1);
+            }
+            let text = path + "> " + line.text;
+
+            // Last Line
+            if (index === newLines.length - 1) {
+              cursorX += line.path.length + 2;
+
+              // Adds autoFill to last Line if applicable
+              if (textDisplay.autoFillReplace) {
+                text = text.slice(0, cursorX) + textDisplay.autoFill;
+              }
+
+              // Adds cursor to last Line
+              text = text.slice(0, cursorX) + cursor + text.slice(cursorX);
             }
 
             content = <span>{getColorDiv(text)}</span>;
@@ -100,7 +140,7 @@ const Renderer: React.FC<{
     );
   };
 
-  return linesToText(lines);
+  return linesToText(textDisplay);
 };
 
 const divStyle: React.CSSProperties = {

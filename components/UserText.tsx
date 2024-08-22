@@ -1,10 +1,9 @@
 "use client";
 import { useAtom } from "jotai";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { currentDirectoryAtom, textDisplayAtom } from "../constants/atoms";
 import { TextDisplay } from "@/classes/TextDisplay";
 import { getColor, getColorString } from "@/functions/color";
-import { get } from "http";
 
 const UserText = () => {
   const [mainTextDisplay, setTextDisplay] = useAtom(textDisplayAtom);
@@ -12,21 +11,69 @@ const UserText = () => {
   const textDisplay = new TextDisplay("placeholder");
   Object.assign(textDisplay, mainTextDisplay);
 
+  const [cmdHistory, setCmdHistory] = useState<string[]>([]);
+  const [cmdIndex, setCmdIndex] = useState<number>(-1);
+
   const handleKeyDown = (event: KeyboardEvent) => {
     if (event.key.length === 1) {
       textDisplay.typeCharacter(event.key, true);
     } else if (event.key === "Backspace") {
       textDisplay.removeCharacter();
     } else if (event.key === "Enter") {
+      addToCmdHistory(textDisplay.getLastLine().text);
+      setCmdIndex(cmdIndex + 1);
       getResponseText();
+    } else if (event.key === "ArrowLeft") {
+      textDisplay.moveCursorLeft();
+    } else if (event.key === "ArrowRight") {
+      textDisplay.moveCursorRight();
+    }
+
+    if (event.key === "ArrowUp") {
+      if (cmdIndex < 0) return;
+
+      setCmdIndex(Math.max(0, cmdIndex - 1));
+      textDisplay.setAutofill(cmdHistory[cmdIndex], true);
+
+      console.log(cmdHistory[cmdIndex]);
+      console.log(cmdIndex);
+    } else if (event.key === "ArrowDown") {
+      if (cmdIndex < 0) return;
+
+      setCmdIndex(Math.min(cmdHistory.length, cmdIndex + 1));
+      textDisplay.setAutofill(cmdHistory[cmdIndex], true);
+
+      if (cmdIndex === cmdHistory.length) {
+        textDisplay.setAutofill("");
+      }
+
+      console.log(cmdHistory[cmdIndex]);
+      console.log(cmdIndex);
+    } else {
+      setCmdIndex(cmdHistory.length);
     }
 
     setTextDisplay(textDisplay);
   };
 
+  const addToCmdHistory = (cmd: string) => {
+    cmd = cmd.trim();
+    if (!cmd) return;
+
+    if (cmdHistory.length >= 100) {
+      cmdHistory.shift();
+    }
+
+    if (cmdHistory.includes(cmd)) {
+      cmdHistory.splice(cmdHistory.indexOf(cmd), 1);
+    }
+
+    setCmdHistory([...cmdHistory, cmd]);
+  };
+
   const getResponseText = () => {
-    const lastLine = textDisplay.lines[textDisplay.lines.length - 1].text;
-    const text = lastLine.trim();
+    const lastLine = textDisplay.getLastLine();
+    const text = lastLine.text.trim();
 
     let segments = text.split(" ");
 
