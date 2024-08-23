@@ -152,7 +152,7 @@ const Renderer: React.FC<{
 
             // Adds cursor to last Line
 
-            if (cursorX < lineText.length - 8) {
+            if (cursorX < lineText.length - 9) {
               console.log("cursorX", cursorX);
               console.log("lineText", lineText);
               lineText = insertColorString(lineText, cursor, cursorX);
