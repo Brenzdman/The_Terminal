@@ -1,9 +1,9 @@
 const palette = [
-  "#8BE9FD", // Function Color (Light Blue)
-  "#FFFFFF", // Text Color (White)
-  "#BD93F9", // Directory Color (Light Purple)
-  "#50FA7B", // Executable Color (Light Green)
-  "#FF5555", // Error Color (Light Red)
+  "#5FA8FF", // Function Color (Medium Blue)
+  "#7AD7F0", // Text Color (Light Cyan)
+  "#9A76FF", // Directory Color (Medium Purple)
+  "#66CCFF", // Executable Color (Light Blue)
+  "#FF5555", // Error Color (Red)
 ];
 
 export const functionColor = palette[0];
@@ -11,8 +11,6 @@ export const txtColor = palette[1];
 export const dirColor = palette[2];
 export const exeColor = palette[3];
 export const errorColor = palette[4];
-
-
 
 export const getColor = (type: string) => {
   switch (type) {
@@ -33,6 +31,31 @@ export const getColor = (type: string) => {
 
 export const getColorString = (text: string, color: string): string => {
   return `[${color}${text}]`;
+};
+
+export const insertColorString = (
+  text: string,
+  insert: string,
+  index: number
+): string => {
+  const colorMatch = text.match(/^\[(#[0-9a-fA-F]{6})/);
+  if (!colorMatch) {
+    throw new Error("Invalid color string format: " + text);
+  }
+
+  const color = colorMatch[1];
+
+  // Calculate the adjusted index based on the format "[#FFFFFFtext]"
+  const adjustedIndex = index + color.length + 1; // 1 for the '[' character
+
+  if (adjustedIndex < color.length + 1 || adjustedIndex > text.length - 1) {
+    throw new Error("Index out of bounds: " + index + " for text: " + text);
+  }
+
+  const beforeInsert = text.slice(0, adjustedIndex);
+  const afterInsert = text.slice(adjustedIndex, text.length - 1);
+
+  return `${beforeInsert}]${insert}${getColorString(afterInsert, color)}`;
 };
 
 export const getColorDiv = (text: string): React.ReactElement => {
@@ -66,7 +89,7 @@ export const getColorDiv = (text: string): React.ReactElement => {
       }
     }
 
-    // Accumulate characters into the default string
+    // Add characters to the default string
     string += char;
     i++;
   }

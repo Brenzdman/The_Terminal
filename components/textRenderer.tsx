@@ -3,7 +3,12 @@ import { useAtom } from "jotai";
 import { textDisplayAtom } from "../constants/atoms";
 import { Line, TextDisplay } from "@/classes/TextDisplay";
 import { MAX_LINE_LENGTH } from "@/constants/constants";
-import { getColor, getColorDiv, getColorString } from "@/functions/color";
+import {
+  getColor,
+  getColorDiv,
+  getColorString,
+  insertColorString,
+} from "@/functions/color";
 
 const TextDisplayRenderer: React.FC = () => {
   const [mainTextDisplay, setTextDisplay] = useAtom(textDisplayAtom);
@@ -141,14 +146,23 @@ const Renderer: React.FC<{
             const adjustedCursorX = cursorX + path.length + 2 + 9;
 
             if (textDisplay.autoFillReplace) {
-              text = path + "> " + textDisplay.autoFill;
+              lineText = textDisplay.autoFill;
+              text = path + "> " + lineText;
             }
 
             // Adds cursor to last Line
-            text =
-              text.slice(0, adjustedCursorX) +
-              cursor +
-              text.slice(adjustedCursorX);
+
+            if (cursorX < lineText.length - 8) {
+              console.log("cursorX", cursorX);
+              console.log("lineText", lineText);
+              lineText = insertColorString(lineText, cursor, cursorX);
+              text = path + "> " + lineText;
+            } else {
+              text =
+                text.slice(0, adjustedCursorX) +
+                cursor +
+                text.slice(adjustedCursorX);
+            }
           }
 
           content = <span>{getColorDiv(text)}</span>;
