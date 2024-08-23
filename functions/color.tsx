@@ -49,7 +49,8 @@ export const insertColorString = (
   const adjustedIndex = index + color.length + 1; // 1 for the '[' character
 
   if (adjustedIndex < color.length + 1 || adjustedIndex > text.length - 1) {
-    throw new Error("Index out of bounds: " + index + " for text: " + text);
+    console.error("Index out of bounds: " + index + " for text: " + text);
+    return text;
   }
 
   const beforeInsert = text.slice(0, adjustedIndex);

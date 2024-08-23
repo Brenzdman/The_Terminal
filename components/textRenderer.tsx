@@ -112,66 +112,98 @@ const Renderer: React.FC<{
     newLines = newLines.concat(splitLongLines(line));
   });
 
+  const formatPath = (path: string): string => {
+    // Removes last "/" if not root and replaces "/" with "\"
+    return path === "/"
+      ? "C:\\"
+      : "C:" + path.slice(0, -1).replace(/\//g, "\\");
+  };
+
+  const formatLineText = (lineText: string): string => {
+    const firstSpace = lineText.indexOf(" ");
+    const firstSegment =
+      firstSpace !== -1 ? lineText.slice(0, firstSpace) : lineText;
+    return (
+      getColorString(firstSegment, getColor("function")) +
+      lineText.slice(firstSegment.length)
+    );
+  };
+
+  const renderLastLine = (
+    path: string,
+    lineText: string,
+    cursorX: number,
+    cursor: string,
+    autoFillReplace: boolean,
+    autoFill: string
+  ): string => {
+    // Adjusts cursor position for color codes
+    const adjustedCursorX = cursorX + 9;
+
+    if (autoFillReplace) {
+      lineText = autoFill;
+    }
+
+    let firstSpace = lineText.indexOf(" ");
+    firstSpace = firstSpace === -1 ? lineText.length : firstSpace;
+    // Checks if color code needs to be modified for cursor
+    if (cursorX < firstSpace - 8) {
+      let firstSegment = lineText.slice(0, firstSpace);
+      firstSegment = insertColorString(firstSegment, cursor, cursorX);
+      const remainingText = lineText.slice(firstSpace);
+
+      lineText = firstSegment + remainingText;
+    } else {
+      lineText =
+        lineText.slice(0, adjustedCursorX) +
+        cursor +
+        lineText.slice(adjustedCursorX);
+    }
+
+    return path + "> " + lineText;
+  };
+
+  const renderLineContent = (
+    line: Line, // Replace 'any' with the appropriate type
+    index: number,
+    cursorX: number,
+    cursor: string,
+    textDisplay: TextDisplay, // Replace 'any' with the appropriate type
+    newLines: Line[] // Replace 'any[]' with the appropriate type
+  ): React.ReactElement => {
+    let content;
+
+    if (line.text === " " && !line.userGenerated) {
+      content = <br />;
+    } else if (line.userGenerated || line.text === "") {
+      const path = formatPath(line.path);
+      let lineText = formatLineText(line.text);
+      let text = path + "> " + lineText;
+
+      if (index === newLines.length - 1) {
+        text = renderLastLine(
+          path,
+          lineText,
+          cursorX,
+          cursor,
+          textDisplay.autoFillReplace,
+          textDisplay.autoFill
+        );
+      }
+
+      content = <span>{getColorDiv(text)}</span>;
+    } else {
+      content = <span>{getColorDiv(line.text)}</span>;
+    }
+
+    return <div key={index}>{content}</div>;
+  };
+
   return (
     <div ref={scrollRef} style={divStyle}>
-      {newLines.map((line, index) => {
-        let content;
-        if (line.text === " " && !line.userGenerated) {
-          content = <br />;
-        } else if (line.userGenerated || line.text === "") {
-          let path = line.path;
-          // Removes last "/" if not root
-          if (line.path !== "/") {
-            path = line.path.slice(0, line.path.length - 1);
-          }
-
-          // \ instead of /
-          path = "C:" + path.replace(/\//g, "\\");
-
-          let lineText = line.text;
-
-          const firstSpace = lineText.indexOf(" "); // Find the first space in the remaining text
-          const firstSegment =
-            firstSpace !== -1 ? lineText.slice(0, firstSpace) : lineText;
-
-          lineText =
-            getColorString(firstSegment, getColor("function")) +
-            lineText.slice(firstSegment.length); // Append the rest of the text
-
-          let text = path + "> " + lineText;
-
-          // Last Line
-          if (index === newLines.length - 1) {
-            // Calculates cursor position relative to full text length
-            const adjustedCursorX = cursorX + path.length + 2 + 9;
-
-            if (textDisplay.autoFillReplace) {
-              lineText = textDisplay.autoFill;
-              text = path + "> " + lineText;
-            }
-
-            // Adds cursor to last Line
-
-            if (cursorX < lineText.length - 9) {
-              console.log("cursorX", cursorX);
-              console.log("lineText", lineText);
-              lineText = insertColorString(lineText, cursor, cursorX);
-              text = path + "> " + lineText;
-            } else {
-              text =
-                text.slice(0, adjustedCursorX) +
-                cursor +
-                text.slice(adjustedCursorX);
-            }
-          }
-
-          content = <span>{getColorDiv(text)}</span>;
-        } else {
-          content = <span>{getColorDiv(line.text)}</span>;
-        }
-
-        return <div key={index}>{content}</div>;
-      })}
+      {newLines.map((line, index) =>
+        renderLineContent(line, index, cursorX, cursor, textDisplay, newLines)
+      )}
     </div>
   );
 };
