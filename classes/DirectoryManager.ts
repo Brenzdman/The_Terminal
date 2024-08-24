@@ -74,12 +74,6 @@ export class Directory_Manager {
       path = path + "/";
     }
 
-    console.log("Looking for directory: " + path);
-    console.log("Current directory: " + directory?.path);
-
-    for (let i = 0; i < this.directories.length; i++) {
-      console.log("Directory: " + this.directories[i].path);
-    }
     // Look for relative directory
     const relativeDir = directory?.directories.find(
       (dir) => directory?.path + path === dir.path

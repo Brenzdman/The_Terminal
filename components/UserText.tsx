@@ -1,3 +1,5 @@
+// Collaborates heavily with userText.tsx and DirectoryManager.ts
+
 "use client";
 import { useAtom } from "jotai";
 import React, { useEffect, useState } from "react";
@@ -154,15 +156,15 @@ const UserText = () => {
       }
       // Make new directory
     } else if (cmd === "mkdir" || cmd === "md") {
-      currentDirectory.addDirectory(segments[1], true, textDisplay);
+      currentDirectory.addDirectory(segments[1], true);
 
       // Remove directory
     } else if (cmd === "rmdir" || cmd === "rd") {
-      currentDirectory.removeDirectory(segments[1], textDisplay);
+      currentDirectory.removeDirectory(segments[1]);
 
       // Display txt file content
     } else if (cmd === "type") {
-      const ran = currentDirectory.readFile(segments[1], textDisplay);
+      const ran = currentDirectory.readFile(segments[1]);
       if (!ran) textDisplay.addLines(badCat(segments[1]));
 
       // Echo text to terminal
@@ -180,7 +182,7 @@ const UserText = () => {
 
       // Run file
     } else if (cmd === "start") {
-      currentDirectory.runFile(segments[1], textDisplay);
+      currentDirectory.runFile(segments[1]);
 
       // Default
     } else if (cmd === "") {

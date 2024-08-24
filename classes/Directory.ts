@@ -1,5 +1,6 @@
+// Collaborates heavily with userText.tsx and DirectoryManager.ts
+
 import { getColor, getColorString } from "@/functions/color";
-import { TextDisplay } from "./TextDisplay";
 import { Directory_Manager } from "./DirectoryManager";
 
 export class Directory {
@@ -38,25 +39,23 @@ export class Directory {
     file.userMalleable = userMalleable;
   }
 
-  public addDirectory(
-    name: string,
-    userMalleable = false,
-    textDisplay: TextDisplay | null = null
-  ): Directory {
+  public addDirectory(name: string, userMalleable = false): Directory {
     name = name?.trim();
+    const dir = this.directoryManager.getDirectory(this, name);
+    const textDisplay = this.directoryManager.textDisplay;
+
     if (!name) {
-      textDisplay?.addLines(
+      textDisplay.addLines(
         getColorString("Invalid directory name", getColor("error"))
       );
       return this;
     }
 
-    const existingDir = this.directories.find((dir) => dir.name === name);
-    if (existingDir) {
-      textDisplay?.addLines(
+    if (dir) {
+      textDisplay.addLines(
         getColorString("Directory already exists", getColor("error"))
       );
-      return existingDir;
+      return dir;
     }
 
     let newFolder = new Directory(
@@ -72,27 +71,24 @@ export class Directory {
     return newFolder;
   }
 
-  public removeDirectory(
-    path: string,
-    textDisplay: TextDisplay | null = null
-  ): void {
+  public removeDirectory(path: string): void {
     const dir = this.directoryManager.getDirectory(this, path);
-
+    const textDisplay = this.directoryManager.textDisplay;
     if (!dir) {
-      textDisplay?.addLines(
+      textDisplay.addLines(
         getColorString("Directory not found", getColor("error"))
       );
       return;
     }
 
     if (!dir.userMalleable) {
-      textDisplay?.addLines(getColorString("ACCESS DENIED", getColor("error")));
+      textDisplay.addLines(getColorString("ACCESS DENIED", getColor("error")));
       return;
     }
 
     this.directories.splice(this.directories.indexOf(dir), 1);
     this.directoryManager.removeDirectoryFromList(dir);
-    textDisplay?.addLines("Directory removed");
+    textDisplay.addLines("Directory removed");
     return;
   }
 
@@ -113,7 +109,8 @@ export class Directory {
     return dir;
   }
 
-  public runFile(requestName: string, textDisplay: TextDisplay): void {
+  public runFile(requestName: string): void {
+    const textDisplay = this.directoryManager.textDisplay;
     for (let i = 0; i < this.files.length; i++) {
       const file = this.files[i];
       if (file.type !== ".exe") {
@@ -133,7 +130,8 @@ export class Directory {
     textDisplay.addLines(getColorString("File not found", getColor("error")));
   }
 
-  readFile(name: string, textDisplay: TextDisplay): boolean {
+  readFile(name: string): boolean {
+    const textDisplay = this.directoryManager.textDisplay;
     let ran = false;
     for (let i = 0; i < this.files.length; i++) {
       const file = this.files[i];
