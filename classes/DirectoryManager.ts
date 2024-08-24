@@ -1,6 +1,6 @@
 // Used to manage a terminal's directories
 
-import { Directory } from "./Directory";
+import { Dir_File, Directory } from "./Directory";
 import { TextDisplay } from "./TextDisplay";
 
 export class Directory_Manager {
@@ -12,7 +12,7 @@ export class Directory_Manager {
 
   constructor() {
     const root = this.createDirectory("root", "/");
-    this.currentDirectory = root.addDirectory("Users").addDirectory("guest");
+    this.currentDirectory = root.makeDirectory("Users").makeDirectory("guest");
     this.homeDirectory = this.currentDirectory;
     this.currentPath = this.currentDirectory.path;
 
@@ -39,6 +39,21 @@ export class Directory_Manager {
     this.directories.splice(this.directories.indexOf(directory), 1);
   }
 
+  private sterilizePath(path: string): string {
+    // Replaces \ with / for windows
+    path = path?.replace(/\\/g, "/");
+
+    // Replaces C:/ with /
+    path = path?.replace(/^C:/, "/");
+
+    // Adds "/" to the end  if not present
+    if (!path?.endsWith("/")) {
+      path = path + "/";
+    }
+
+    return path;
+  }
+
   public getDirectory(
     directory: Directory | undefined,
     path: string
@@ -48,6 +63,11 @@ export class Directory_Manager {
 
     // Replaces C:/ with /
     path = path?.replace(/^C:/, "/");
+
+    // Checks for empty path
+    if (!path || path == ".") {
+      return directory;
+    }
 
     // Finds home directory
     if (path == "~") {
@@ -96,5 +116,37 @@ export class Directory_Manager {
       return absoluteDir;
     }
     return undefined;
+  }
+
+  public getFile(
+    directory: Directory | undefined,
+    path: string
+  ): Dir_File | undefined {
+    // Sterilizes path
+    // Replaces \ with / for windows
+    path = path?.replace(/\\/g, "/");
+
+    // Replaces C:/ with /
+    path = path?.replace(/^C:/, "/");
+
+    // Adds "/" to the end  if not present
+    if (!path?.endsWith("/")) {
+      path = path + "/";
+    }
+
+    // Looks for the relative Directory if applicable
+    if (path.includes("/")) {
+      const directoryPath = path.slice(0, path.lastIndexOf("/") + 1);
+      const directory = this.getDirectory(this.currentDirectory, directoryPath);
+      if (directory) {
+        return directory.files.find(
+          (file) =>
+            file.name + file.type === path.slice(path.lastIndexOf("/") + 1)
+        );
+      }
+    }
+
+    // Looks for the file from the current directory
+    return directory?.files.find((file) => file.name + file.type === path);
   }
 }

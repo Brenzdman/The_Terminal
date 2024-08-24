@@ -18,7 +18,7 @@ export function generateDirectory(): Directory_Manager {
   testFile.content = "Hello World!";
   currentDirectory.addFile(testFile);
 
-  currentDirectory.addDirectory("newDir");
+  currentDirectory.makeDirectory("newDir");
 
   return directoryManager;
 }

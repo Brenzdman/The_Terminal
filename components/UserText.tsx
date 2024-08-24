@@ -6,16 +6,15 @@ import React, { useEffect, useState } from "react";
 import { DIRECTORY_MANAGER } from "../constants/atoms";
 import { getColor, getColorString } from "@/functions/color";
 import { Directory_Manager } from "@/classes/DirectoryManager";
+import { dir } from "console";
 
 const UserText = () => {
   const [directoryManager, setDirectoryManager] = useAtom(DIRECTORY_MANAGER);
-  const currentDirectory = directoryManager.currentDirectory;
-  const textDisplay = directoryManager.textDisplay;
-
   const [cmdHistory, setCmdHistory] = useState<string[]>([]);
   const [cmdIndex, setCmdIndex] = useState<number>(-1);
 
   const handleKeyDown = (event: KeyboardEvent) => {
+    const textDisplay = directoryManager.textDisplay;
     if (event.key.length === 1) {
       textDisplay.typeCharacter(event.key, true);
     } else if (event.key === "Backspace") {
@@ -87,12 +86,16 @@ const UserText = () => {
       setCmdIndex(cmdHistory.length);
     }
 
-    const updateDirectory = new Directory_Manager();
-    Object.assign(updateDirectory, directoryManager);
-    setDirectoryManager(updateDirectory);
+    const updatedDirectoryManager = new Directory_Manager();
+    Object.assign(updatedDirectoryManager, {
+      ...directoryManager,
+    });
+    setDirectoryManager(updatedDirectoryManager);
   };
 
   const getResponseText = () => {
+    const textDisplay = directoryManager.textDisplay;
+    let currentDirectory = directoryManager.currentDirectory;
     const lastLine = textDisplay.getLastLine();
     const text = lastLine.text.trim();
 
@@ -109,13 +112,6 @@ const UserText = () => {
       return getColorString(`cat: file '${fileName}' not found.`, errorColor);
     };
 
-    const badCd = (dirName: string) => {
-      return getColorString(
-        `cd: no such file or directory: ${dirName}`,
-        errorColor
-      );
-    };
-
     const helpScreen = [
       "HELP MENU",
       " ",
@@ -129,6 +125,7 @@ const UserText = () => {
       "type [file]   - Display the content of a txt file.",
       "start [file]  - Run a exe file.",
       "echo [text]  - Output text to the terminal.",
+      "ren [file/dir] [newName] - Rename a file.",
       "cls        - Clear the terminal screen.",
       "exit         - Close the terminal.",
     ];
@@ -142,23 +139,21 @@ const UserText = () => {
 
       // List directories and files
     } else if (cmd === "ls" || cmd === "dir") {
-      console.log(currentDirectory.path + " " + currentDirectory.name);
       textDisplay.addLines(currentDirectory.ls());
 
       // Change directory
     } else if (cmd === "cd") {
-      const dir = currentDirectory.cd(segments[1]);
-      if (!dir) textDisplay.addLines(badCd(segments[1]));
-      else {
-        directoryManager.currentDirectory = dir;
-        directoryManager.currentPath = dir.path;
-        textDisplay.newLine();
-      }
+      currentDirectory.cd(segments[1]);
+
+      // DeSync Fix
+      directoryManager.currentDirectory =
+        currentDirectory.directoryManager.currentDirectory;
+
       // Make new directory
     } else if (cmd === "mkdir" || cmd === "md") {
-      currentDirectory.addDirectory(segments[1], true);
+      currentDirectory.makeDirectory(segments[1], true);
 
-      // Remove directory
+      // Remove directoryA
     } else if (cmd === "rmdir" || cmd === "rd") {
       currentDirectory.removeDirectory(segments[1]);
 
@@ -171,6 +166,9 @@ const UserText = () => {
     } else if (cmd === "echo") {
       textDisplay.addLines([text.slice(5)]);
 
+      // Rename file
+    } else if (cmd === "ren") {
+      currentDirectory.rename(segments[1], segments[2]);
       // Clear terminal screen
     } else if (cmd === "cls" || cmd === "clear") {
       textDisplay.clear();
@@ -193,9 +191,13 @@ const UserText = () => {
 
     textDisplay.autoFill = "";
 
-    const updateDirectory = new Directory_Manager();
-    Object.assign(updateDirectory, directoryManager);
-    setDirectoryManager(updateDirectory);
+    const updatedDirectoryManager = new Directory_Manager();
+    Object.assign(updatedDirectoryManager, {
+      ...directoryManager,
+      currentDirectory: currentDirectory,
+      currentPath: currentDirectory.path,
+    });
+    setDirectoryManager(updatedDirectoryManager);
   };
 
   useEffect(() => {
@@ -204,7 +206,7 @@ const UserText = () => {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [textDisplay, cmdHistory, cmdIndex]);
+  }, [directoryManager, cmdHistory, cmdIndex]);
 
   return <div>{}</div>;
 };

@@ -2,7 +2,6 @@
 
 import { getColor, getColorString } from "@/functions/color";
 import { Directory_Manager } from "./DirectoryManager";
-import { dir } from "console";
 
 export class Directory {
   public name: string;
@@ -40,16 +39,22 @@ export class Directory {
     file.userMalleable = userMalleable;
   }
 
-  public addDirectory(name: string, userMalleable = false): Directory {
+  public validName(name: string): boolean {
+    const textDisplay = this.directoryManager.textDisplay;
+    if (!name || !/^[a-zA-Z0-9_()\-]*$/.test(name)) {
+      textDisplay.addLines(getColorString("Invalid name", getColor("error")));
+      return false;
+    }
+    return true;
+  }
+
+  public makeDirectory(name: string, userMalleable = false): Directory {
     name = name?.trim();
     const dir = this.directoryManager.getDirectory(this, name);
     const textDisplay = this.directoryManager.textDisplay;
 
     // if name includes characters other than letters, numbers, _, (), or -
-    if (!name || !/^[a-zA-Z0-9_()\-]*$/.test(name)) {
-      textDisplay.addLines(
-        getColorString("Invalid directory name", getColor("error"))
-      );
+    if (!this.validName(name)) {
       return this;
     }
 
@@ -94,20 +99,54 @@ export class Directory {
     return;
   }
 
-  public cd(path: string): Directory | undefined {
-    if (!path || path == ".") {
-      return this;
+  public rename(oldName: string, newName: string): void {
+    const textDisplay = this.directoryManager.textDisplay;
+
+    const dir = this.directoryManager.getDirectory(this, oldName);
+    const file = this.directoryManager.getFile(this, oldName);
+
+    if (!this.validName(newName)) {
+      return;
     }
+
+    if ((dir && !dir.userMalleable) || (file && !file.userMalleable)) {
+      textDisplay.addLines(getColorString("ACCESS DENIED", getColor("error")));
+      return;
+    }
+
+    if (file) {
+      file.name = newName;
+      textDisplay.addLines("File renamed");
+      return;
+    } else if (dir) {
+      dir.name = newName;
+      dir.path = dir.path.replace(new RegExp(oldName + "/"), newName + "/");
+      textDisplay.addLines("Directory renamed");
+      return;
+    }
+
+    textDisplay.addLines(getColorString("File not found", getColor("error")));
+    return;
+  }
+
+  public cd(path: string): void {
+    const textDisplay = this.directoryManager.textDisplay;
 
     const dir = this.directoryManager.getDirectory(this, path);
     if (!dir) {
-      return undefined;
+      textDisplay.addLines(
+        getColorString(
+          `cd: no such file or directory at '${path}'`,
+          getColor("error")
+        )
+      );
+      return;
     }
 
     this.directoryManager.currentDirectory = dir;
     this.directoryManager.currentPath = dir.path;
 
-    return dir;
+    textDisplay.newLine();
   }
 
   public runFile(requestName: string): void {
