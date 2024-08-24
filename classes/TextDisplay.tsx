@@ -1,22 +1,24 @@
+import { Directory_Manager } from "./DirectoryManager";
 import { Line } from "./Line";
 export class TextDisplay {
   lines: Line[] = [];
-  currentPath: string;
   cursorX: number = 0;
   cursorSymbol: string = "|";
   autoFill: string = "";
   autoFillReplace: boolean = false;
+  directoryManager: Directory_Manager;
 
-  constructor(currentPath: string, lines?: string[]) {
-    this.currentPath = currentPath;
+  constructor(directoryManager: Directory_Manager, lines?: string[]) {
+    this.directoryManager = directoryManager;
     if (lines) {
       this.addLines(lines);
     } else {
-      this.lines.push(new Line("", this.currentPath));
+      this.lines.push(new Line("", this.directoryManager.currentPath));
     }
   }
 
   addLines(lines: string[] | string) {
+    const path = this.directoryManager.currentPath;
     if (typeof lines === "string") {
       lines = lines.split("\n");
     }
@@ -26,11 +28,11 @@ export class TextDisplay {
     }
 
     lines.forEach((line) => {
-      this.lines.push(new Line(line, this.currentPath));
+      this.lines.push(new Line(line, path));
     });
 
-    this.lines.push(new Line(" ", this.currentPath));
-    this.lines.push(new Line("", this.currentPath));
+    this.lines.push(new Line(" ", path));
+    this.lines.push(new Line("", path));
   }
 
   typeCharacter(letter: string, userGenerated: boolean = true) {
@@ -50,7 +52,7 @@ export class TextDisplay {
       lastLine.text.slice(this.cursorX);
 
     lastLine.userGenerated = userGenerated;
-    lastLine.path = this.currentPath;
+    lastLine.path = this.directoryManager.currentPath;
     this.moveCursorRight();
   }
 
@@ -125,17 +127,12 @@ export class TextDisplay {
   }
 
   newLine() {
-    const newLine = new Line("", this.currentPath);
+    const newLine = new Line("", this.directoryManager.currentPath);
     this.lines.push(newLine);
     this.cursorX = 0;
   }
 
   clear() {
-    this.lines = [new Line("", this.currentPath)];
-  }
-
-  setPath(path: string) {
-    this.currentPath = path;
-    console.log(this.currentPath);
+    this.lines = [new Line("", this.directoryManager.currentPath)];
   }
 }

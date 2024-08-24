@@ -43,7 +43,7 @@ export class Directory {
     userMalleable = false,
     textDisplay: TextDisplay | null = null
   ): Directory {
-    name = name.trim();
+    name = name?.trim();
     if (!name) {
       textDisplay?.addLines(
         getColorString("Invalid directory name", getColor("error"))
@@ -105,6 +105,10 @@ export class Directory {
     if (!dir) {
       return undefined;
     }
+
+    console.log("Changing directory to " + dir.name);
+    this.directoryManager.currentDirectory = dir;
+    this.directoryManager.currentPath = dir.path;
 
     return dir;
   }

@@ -6,6 +6,7 @@ import { TextDisplay } from "./TextDisplay";
 export class Directory_Manager {
   public directories: Directory[] = [];
   public currentDirectory: Directory;
+  public currentPath: string = "/";
   public homeDirectory: Directory;
   public textDisplay: TextDisplay;
 
@@ -13,6 +14,7 @@ export class Directory_Manager {
     const root = this.createDirectory("root", "/");
     this.currentDirectory = root.addDirectory("Users").addDirectory("guest");
     this.homeDirectory = this.currentDirectory;
+    this.currentPath = this.currentDirectory.path;
 
     const welcomeMessage = [
       "Welcome to the Terminal.",
@@ -20,7 +22,7 @@ export class Directory_Manager {
     ];
 
     this.textDisplay = new TextDisplay(
-      this.currentDirectory.path,
+      this,
       welcomeMessage
     );
   }
@@ -41,7 +43,10 @@ export class Directory_Manager {
     path: string
   ): Directory | undefined {
     // replaces \ with / for windows
-    path = path.replace(/\\/g, "/");
+    path = path?.replace(/\\/g, "/");
+
+    // Replaces C:/ with /
+    path = path?.replace(/^C:/, "/");
 
     // Finds home directory
     if (path == "~") {
@@ -63,22 +68,25 @@ export class Directory_Manager {
     }
 
     // Look for relative directory
-    if (directory) {
-      for (let i = 0; i < directory.directories.length; i++) {
-        const dir = directory.directories[i];
-        if (dir.name == path) {
-          return dir;
-        }
-      }
+    const relativeDir = directory?.directories.find((dir) => dir.name === path);
+    if (relativeDir) {
+      return relativeDir;
     }
 
-    // Looks for directory from path
-    for (let i = 0; i < this.directories.length; i++) {
-      const dir = this.directories[i];
-      console.log(dir.path);
-      if (dir.path === path || dir.path === path + "/") {
-        return dir;
-      }
+    // Looks for directory with directory.path + path, alt relative path
+    const relativeDirAlt = directory?.directories.find(
+      (dir) => directory.path + dir.path === path
+    );
+    if (relativeDirAlt) {
+      return relativeDirAlt;
+    }
+
+    // Looks for directory from absolute path
+    const absoluteDir = this.directories.find(
+      (dir) => dir.path === path || dir.path === path + "/"
+    );
+    if (absoluteDir) {
+      return absoluteDir;
     }
     return undefined;
   }

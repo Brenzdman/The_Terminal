@@ -140,6 +140,7 @@ const UserText = () => {
 
       // List directories and files
     } else if (cmd === "ls" || cmd === "dir") {
+      console.log(currentDirectory.path + " " + currentDirectory.name);
       textDisplay.addLines(currentDirectory.ls());
 
       // Change directory
@@ -147,8 +148,8 @@ const UserText = () => {
       const dir = currentDirectory.cd(segments[1]);
       if (!dir) textDisplay.addLines(badCd(segments[1]));
       else {
-        // setCurrentDirectory(dir);
-        textDisplay.setPath(dir.path);
+        directoryManager.currentDirectory = dir;
+        directoryManager.currentPath = dir.path;
         textDisplay.newLine();
       }
       // Make new directory
