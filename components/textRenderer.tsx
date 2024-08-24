@@ -1,14 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useAtom } from "jotai";
 import { textDisplayAtom } from "../constants/atoms";
-import { Line, TextDisplay } from "@/classes/TextDisplay";
-import { MAX_LINE_LENGTH } from "@/constants/constants";
+import { TextDisplay } from "@/classes/TextDisplay";
 import {
   getColor,
   getColorDiv,
   getColorString,
   insertColorString,
 } from "@/functions/color";
+import { Line } from "@/classes/Line";
 
 const TextDisplayRenderer: React.FC = () => {
   const [mainTextDisplay, setTextDisplay] = useAtom(textDisplayAtom);
@@ -80,37 +80,9 @@ const Renderer: React.FC<{
   const cursor = textDisplay.cursorSymbol;
   const cursorX = textDisplay.cursorX;
   const lines = textDisplay.lines;
-  let newLines: Line[] = [];
-  let linesCopy = lines.map((line) => line.copy());
+  let newLines = lines.map((line) => line.copy());
 
-  const splitLongLines = (line: Line): Line[] => {
-    let text = line.text;
-    const splitLines: string[] = [];
 
-    while (text.length >= MAX_LINE_LENGTH) {
-      const segment = text.slice(0, MAX_LINE_LENGTH);
-      const lastSpace = segment.lastIndexOf(" ");
-
-      if (lastSpace > -1) {
-        splitLines.push(segment.slice(0, lastSpace));
-        text = text.slice(lastSpace + 1);
-      } else {
-        splitLines.push(segment);
-        text = text.slice(MAX_LINE_LENGTH);
-      }
-    }
-
-    splitLines.push(text);
-    return splitLines.map((splitText) => {
-      const newLine = new Line(splitText, line.path);
-      newLine.userGenerated = line.userGenerated;
-      return newLine;
-    });
-  };
-
-  linesCopy.forEach((line) => {
-    newLines = newLines.concat(splitLongLines(line));
-  });
 
   const formatPath = (path: string): string => {
     // Removes last "/" if not root and replaces "/" with "\"
@@ -137,16 +109,22 @@ const Renderer: React.FC<{
     autoFillReplace: boolean,
     autoFill: string
   ): string => {
-    // Adjusts cursor position for color codes
-    const adjustedCursorX = cursorX + 9;
-
     if (autoFillReplace) {
       lineText = autoFill;
     }
 
+    // Remove color codes and count \n characters before the cursor position
+    const lineTextWithoutColors = lineText.replace(/\x1b\[[0-9;]*m/g, "");
+    const newlineCount = (
+      lineTextWithoutColors.slice(0, cursorX).match(/\n/g) || []
+    ).length;
+
+    // Adjust cursor position for color codes and newlines
+    const adjustedCursorX = cursorX + 9 - newlineCount;
+
     let firstSpace = lineText.indexOf(" ");
     firstSpace = firstSpace === -1 ? lineText.length : firstSpace;
-    // Checks if color code needs to be modified for cursor
+
     if (cursorX < firstSpace - 8) {
       let firstSegment = lineText.slice(0, firstSpace);
       firstSegment = insertColorString(firstSegment, cursor, cursorX);
@@ -162,6 +140,7 @@ const Renderer: React.FC<{
 
     return path + "> " + lineText;
   };
+
 
   const renderLineContent = (
     line: Line, // Replace 'any' with the appropriate type
