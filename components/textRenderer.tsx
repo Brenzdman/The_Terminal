@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useAtom } from "jotai";
-import { textDisplayAtom } from "../constants/atoms";
 import { TextDisplay } from "@/classes/TextDisplay";
 import {
   getColor,
@@ -9,16 +8,16 @@ import {
   insertColorString,
 } from "@/functions/color";
 import { Line } from "@/classes/Line";
+import { DIRECTORY_MANAGER } from "@/constants/atoms";
+import { Directory_Manager } from "@/classes/DirectoryManager";
 
 const TextDisplayRenderer: React.FC = () => {
-  const [mainTextDisplay, setTextDisplay] = useAtom(textDisplayAtom);
-  const [prevLineLength, setPrevLineLength] = useState<number>(
-    mainTextDisplay.lines.length
-  );
+  const [directoryManager, setDirectoryManager] = useAtom(DIRECTORY_MANAGER);
+  const textDisplay = directoryManager.textDisplay;
 
-  const textDisplay = new TextDisplay("placeholder");
-  Object.assign(textDisplay, mainTextDisplay);
-  const cursorX = textDisplay.cursorX;
+  const [prevLineLength, setPrevLineLength] = useState<number>(
+    textDisplay.lines.length
+  );
 
   // ref to scroll
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -55,7 +54,9 @@ const TextDisplayRenderer: React.FC = () => {
         } else {
           textDisplay.cursorSymbol = " ";
         }
-        setTextDisplay(textDisplay);
+        const updateDirectory = new Directory_Manager();
+        Object.assign(updateDirectory, directoryManager);
+        setDirectoryManager(updateDirectory);
       }, 550);
     }
 
@@ -66,7 +67,7 @@ const TextDisplayRenderer: React.FC = () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
       intervalRef.current = null;
     };
-  }, [textDisplay]);
+  }, [directoryManager]);
 
   return <Renderer textDisplay={textDisplay} scrollRef={scrollRef} />;
 };
@@ -81,8 +82,6 @@ const Renderer: React.FC<{
   const cursorX = textDisplay.cursorX;
   const lines = textDisplay.lines;
   let newLines = lines.map((line) => line.copy());
-
-
 
   const formatPath = (path: string): string => {
     // Removes last "/" if not root and replaces "/" with "\"
@@ -140,7 +139,6 @@ const Renderer: React.FC<{
 
     return path + "> " + lineText;
   };
-
 
   const renderLineContent = (
     line: Line, // Replace 'any' with the appropriate type

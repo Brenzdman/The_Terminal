@@ -1,15 +1,14 @@
 "use client";
 import { useAtom } from "jotai";
 import React, { useEffect, useState } from "react";
-import { currentDirectoryAtom, textDisplayAtom } from "../constants/atoms";
-import { TextDisplay } from "@/classes/TextDisplay";
+import { DIRECTORY_MANAGER } from "../constants/atoms";
 import { getColor, getColorString } from "@/functions/color";
+import { Directory_Manager } from "@/classes/DirectoryManager";
 
 const UserText = () => {
-  const [mainTextDisplay, setTextDisplay] = useAtom(textDisplayAtom);
-  const [currentDirectory, setCurrentDirectory] = useAtom(currentDirectoryAtom);
-  const textDisplay = new TextDisplay("placeholder");
-  Object.assign(textDisplay, mainTextDisplay);
+  const [directoryManager, setDirectoryManager] = useAtom(DIRECTORY_MANAGER);
+  const currentDirectory = directoryManager.currentDirectory;
+  const textDisplay = directoryManager.textDisplay;
 
   const [cmdHistory, setCmdHistory] = useState<string[]>([]);
   const [cmdIndex, setCmdIndex] = useState<number>(-1);
@@ -32,23 +31,22 @@ const UserText = () => {
       const cmd = textDisplay.getLastLine().text.trim();
 
       setCmdHistory((prevHistory) => {
-        console.log("cmd", cmd);
         if (!cmd) return prevHistory;
 
-        if (cmdHistory.length >= 100) {
-          cmdHistory.shift();
+        const newHistory = [...prevHistory];
+        if (newHistory.length >= 100) {
+          newHistory.shift();
         }
 
-        if (cmdHistory.includes(cmd)) {
-          cmdHistory.splice(cmdHistory.indexOf(cmd), 1);
+        if (newHistory.includes(cmd)) {
+          newHistory.splice(newHistory.indexOf(cmd), 1);
         }
 
-        const newHistory = [...prevHistory, cmd];
+        newHistory.push(cmd);
         setCmdIndex(newHistory.length);
         return newHistory;
       });
 
-      console.log("cmdHistory", cmdHistory);
       getResponseText();
     } else if (event.key === "ArrowLeft") {
       textDisplay.moveCursorLeft();
@@ -87,7 +85,9 @@ const UserText = () => {
       setCmdIndex(cmdHistory.length);
     }
 
-    setTextDisplay(textDisplay);
+    const updateDirectory = new Directory_Manager();
+    Object.assign(updateDirectory, directoryManager);
+    setDirectoryManager(updateDirectory);
   };
 
   const getResponseText = () => {
@@ -147,7 +147,7 @@ const UserText = () => {
       const dir = currentDirectory.cd(segments[1]);
       if (!dir) textDisplay.addLines(badCd(segments[1]));
       else {
-        setCurrentDirectory(dir);
+        // setCurrentDirectory(dir);
         textDisplay.setPath(dir.path);
         textDisplay.newLine();
       }
@@ -189,7 +189,10 @@ const UserText = () => {
     }
 
     textDisplay.autoFill = "";
-    setTextDisplay(textDisplay);
+
+    const updateDirectory = new Directory_Manager();
+    Object.assign(updateDirectory, directoryManager);
+    setDirectoryManager(updateDirectory);
   };
 
   useEffect(() => {
@@ -198,7 +201,7 @@ const UserText = () => {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [textDisplay]);
+  }, [textDisplay, cmdHistory, cmdIndex]);
 
   return <div>{}</div>;
 };

@@ -45,7 +45,7 @@ export const insertColorString = (
 
   const color = colorMatch[1];
 
-  // Calculate the adjusted index based on the format "[#FFFFFFtext]"
+  // Calculate the adjusted index based on the format "[#FFFFFF text]"
   const adjustedIndex = index + color.length + 1; // 1 for the '[' character
 
   if (adjustedIndex < color.length + 1 || adjustedIndex > text.length - 1) {

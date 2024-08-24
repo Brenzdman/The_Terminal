@@ -1,5 +1,7 @@
-import { Dir_File, Directory_Manager } from "@/classes/Directory";
+import { Dir_File } from "@/classes/Directory";
 import { start } from "./start";
+import { Directory_Manager } from "@/classes/DirectoryManager";
+import { TextDisplay } from "@/classes/TextDisplay";
 
 export function generateDirectory(): Directory_Manager {
   let directoryManager = new Directory_Manager();

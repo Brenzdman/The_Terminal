@@ -1,61 +1,6 @@
 import { getColor, getColorString } from "@/functions/color";
 import { TextDisplay } from "./TextDisplay";
-import { get } from "http";
-
-export class Directory_Manager {
-  public directories: Directory[] = [];
-  public currentDirectory: Directory;
-  public homeDirectory: Directory;
-
-  constructor() {
-    let root = this.createDirectory("root", "/");
-    this.currentDirectory = root.addDirectory("Users").addDirectory("guest");
-    this.homeDirectory = this.currentDirectory;
-  }
-
-  public createDirectory(name: string, path: string): Directory {
-    let newDir = new Directory(this, name, path);
-    this.directories.push(newDir);
-
-    return newDir;
-  }
-
-  public getDirectory(
-    directory: Directory | null,
-    path: string
-  ): Directory | null {
-    // replaces \ with / for windows
-    path = path.replace(/\\/g, "/");
-
-    // Finds home directory
-    if (path == "~") {
-      return this.homeDirectory;
-    }
-
-    // Finds previous directory
-    if (path == "..") {
-      path = directory!.path;
-
-      // Gets second to "/" from the end
-      let lastSlash = path?.lastIndexOf("/", path.length - 2);
-
-      if (lastSlash === -1) {
-        path = "/";
-      }
-
-      path = path?.slice(0, lastSlash! + 1);
-    }
-
-    for (let i = 0; i < this.directories.length; i++) {
-      const dir = this.directories[i];
-      console.log(dir.path);
-      if (dir.path === path || dir.path === path + "/") {
-        return dir;
-      }
-    }
-    return null;
-  }
-}
+import { Directory_Manager } from "./DirectoryManager";
 
 export class Directory {
   public name: string;
@@ -71,15 +16,21 @@ export class Directory {
     this.directoryManager = dm;
   }
 
+  public toString(): string {
+    return `[${getColor("dir")}${this.name}]`;
+  }
+
+  // Lists all files and directories in the current directory
   public ls(): string[] {
-    let output: string[] = [];
-    this.files.forEach((file) => {
-      output.push(`[${getColor(file.type)}${file.name}${file.type}]`);
-    });
-    this.directories.forEach((dir) => {
-      output.push(`[${getColor("dir")}${dir.name}]`);
-    });
-    return output;
+    const sortedDirs = this.directories.sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
+    const sortedFiles = this.files.sort((a, b) => a.name.localeCompare(b.name));
+
+    const dirStrings = sortedDirs.map((dir) => dir.toString());
+    const fileStrings = sortedFiles.map((file) => file.toString());
+
+    return [...dirStrings, ...fileStrings];
   }
 
   public addFile(file: Dir_File, userMalleable = false): void {
@@ -92,14 +43,20 @@ export class Directory {
     userMalleable = false,
     textDisplay: TextDisplay | null = null
   ): Directory {
-    for (let i = 0; i < this.directories.length; i++) {
-      const dir = this.directories[i];
-      if (dir.name == name) {
-        textDisplay?.addLines(
-          getColorString("Directory already exists", getColor("error"))
-        );
-        return dir;
-      }
+    name = name.trim();
+    if (!name) {
+      textDisplay?.addLines(
+        getColorString("Invalid directory name", getColor("error"))
+      );
+      return this;
+    }
+
+    const existingDir = this.directories.find((dir) => dir.name === name);
+    if (existingDir) {
+      textDisplay?.addLines(
+        getColorString("Directory already exists", getColor("error"))
+      );
+      return existingDir;
     }
 
     let newFolder = new Directory(
@@ -109,54 +66,47 @@ export class Directory {
     );
     newFolder.userMalleable = userMalleable;
     this.directories.push(newFolder);
-    this.directoryManager.directories.push(newFolder);
+    this.directoryManager.addDirectoryToList(newFolder);
 
-    if (textDisplay) {
-      textDisplay.addLines("Directory created");
-    }
-
+    textDisplay?.addLines("Directory created");
     return newFolder;
   }
 
-  public removeDirectory(name: string, textDisplay: TextDisplay): void {
-    for (let i = 0; i < this.directories.length; i++) {
-      const dir = this.directories[i];
-      if (dir.name != name) {
-        continue;
-      }
+  public removeDirectory(
+    name: string,
+    textDisplay: TextDisplay | null = null
+  ): void {
+    let existingDir = this.directories.find((dir) => dir.name === name);
+    if (!existingDir) {
+      existingDir = this.directoryManager.getDirectory(this, name);
 
-      if (!dir.userMalleable) {
-        textDisplay.addLines(
-          getColorString("ACCESS DENIED", getColor("error"))
-        );
-        return;
-      }
-
-      this.directories.splice(i, 1);
-      textDisplay.addLines("Directory removed");
-
+      textDisplay?.addLines(
+        getColorString("Directory not found", getColor("error"))
+      );
       return;
     }
 
-    textDisplay.addLines(
-      getColorString("Directory not found", getColor("error"))
-    );
+    if (!existingDir.userMalleable) {
+      textDisplay?.addLines(getColorString("ACCESS DENIED", getColor("error")));
+      return;
+    }
+
+    this.directories.splice(this.directories.indexOf(existingDir), 1);
+    textDisplay?.addLines("Directory removed");
+    return;
   }
 
-  public cd(path: string): Directory | null {
-    console.log(path);
+  public cd(path: string): Directory | undefined {
     if (!path || path == ".") {
       return this;
     }
 
-    for (let i = 0; i < this.directories.length; i++) {
-      const dir = this.directories[i];
-      if (dir.name == path) {
-        return dir;
-      }
+    const dir = this.directoryManager.getDirectory(this, path);
+    if (!dir) {
+      return undefined;
     }
 
-    return this.directoryManager.getDirectory(this, path);
+    return dir;
   }
 
   public runFile(requestName: string, textDisplay: TextDisplay): void {
@@ -205,5 +155,9 @@ export class Dir_File {
     this.name = name;
     this.type = type;
     this.onRun = onRun || null;
+  }
+
+  toString(): string {
+    return `[${getColor(this.type)}${this.name}${this.type}]`;
   }
 }
