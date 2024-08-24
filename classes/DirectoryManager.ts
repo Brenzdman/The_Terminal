@@ -51,8 +51,17 @@ export class Directory_Manager {
       path = path + "/";
     }
 
+    // Removes duplicate "/"s if present
+    for (let i = 0; i < path.length - 1; i++) {
+      if (path[i] === "/" && path[i + 1] === "/") {
+        path = path.slice(0, i) + path.slice(i + 1);
+        i--;
+      }
+    }
+
     if (file) {
       path = path.slice(0, -1);
+      path = path.replace(/^\/+/, "");
     }
 
     return path;
@@ -63,6 +72,7 @@ export class Directory_Manager {
     path: string
   ): Directory | undefined {
     // Checks for empty path
+
     if (!path || path == ".") {
       return directory;
     }
@@ -88,6 +98,7 @@ export class Directory_Manager {
 
     // replaces \ with / for windows
     path = this.sterilizePath(path);
+    console.log(path);
 
     // Look for relative directory
     const relativeDir = directory?.directories.find(
@@ -133,6 +144,8 @@ export class Directory_Manager {
 
     // Looks for the file from the current directory
     console.log(path);
-    return directory?.files.find((file) => file.name + file.type === path || file.name === path);
+    return directory?.files.find(
+      (file) => file.name + file.type === path || file.name === path
+    );
   }
 }
