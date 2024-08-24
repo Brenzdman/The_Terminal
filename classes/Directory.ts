@@ -2,6 +2,7 @@
 
 import { getColor, getColorString } from "@/functions/color";
 import { Directory_Manager } from "./DirectoryManager";
+import { get } from "http";
 
 export class Directory {
   public name: string;
@@ -23,9 +24,13 @@ export class Directory {
 
   // Lists all files and directories in the current directory
   public ls(path: string | undefined): string[] {
-    let dir: Directory = this;
+    let dir: Directory | undefined = this;
     if (path) {
-      dir = this.directoryManager.getDirectory(this, path) || this;
+      dir = this.directoryManager.getDirectory(this, path);
+    }
+
+    if (!dir) {
+      return [getColorString(`No directory at '${path}'`, getColor("error"))];
     }
 
     const sortedDirs = dir.directories.sort((a, b) =>
@@ -44,7 +49,7 @@ export class Directory {
     file.userMalleable = userMalleable;
   }
 
-  public validName(name: string): boolean {
+  private validName(name: string): boolean {
     const textDisplay = this.directoryManager.textDisplay;
     if (!name || !/^[a-zA-Z0-9_()\-]*$/.test(name)) {
       textDisplay.addLines(getColorString("Invalid name", getColor("error")));
@@ -53,39 +58,68 @@ export class Directory {
     return true;
   }
 
-  public makeDirectory(name: string, userMalleable = false): Directory {
-    name = name?.trim();
-    const dir = this.directoryManager.getDirectory(this, name);
+  private splitPathName(pathName: string): [Directory, string] {
+    const path = pathName.slice(0, pathName.lastIndexOf("/") + 1);
+
+    let name = pathName;
+    if (path) {
+      name = pathName.slice(pathName.lastIndexOf("/") + 1);
+    }
+
+    // Gets relative directory if applicable
+    const pathDir = this.directoryManager.getDirectory(this, path) || this;
+
+    return pathDir ? [pathDir, name] : [this, pathName];
+  }
+
+  public makeDirectory(pathName: string, userMalleable = false): Directory {
     const textDisplay = this.directoryManager.textDisplay;
+    const [pathDir, name] = this.splitPathName(pathName);
+
+    if (pathDir === this && name !== pathName) {
+      textDisplay.addLines(getColorString("Invalid path", getColor("error")));
+    }
+
+    const existingDir = this.directoryManager.getDirectory(pathDir, name);
 
     // if name includes characters other than letters, numbers, _, (), or -
     if (!this.validName(name)) {
       return this;
     }
 
-    if (dir) {
+    if (existingDir) {
       textDisplay.addLines(
-        getColorString("Directory already exists", getColor("error"))
+        getColorString(
+          `Directory already exists at ${existingDir.path}`,
+          getColor("error")
+        )
       );
-      return dir;
+      return existingDir;
     }
 
     let newFolder = new Directory(
-      this.directoryManager,
+      pathDir.directoryManager,
       name,
-      this.path + name + "/"
+      pathDir.path + name + "/"
     );
     newFolder.userMalleable = userMalleable;
-    this.directories.push(newFolder);
-    this.directoryManager.addDirectoryToList(newFolder);
+    pathDir.directories.push(newFolder);
+    pathDir.directoryManager.addDirectoryToList(newFolder);
 
     textDisplay?.addLines("Directory created");
     return newFolder;
   }
 
-  public removeDirectory(path: string): void {
-    const dir = this.directoryManager.getDirectory(this, path);
+  public removeDirectory(pathName: string): void {
     const textDisplay = this.directoryManager.textDisplay;
+    const [pathDir, name] = this.splitPathName(pathName);
+
+    if (pathDir === this && name !== pathName) {
+      textDisplay.addLines(getColorString("Invalid path", getColor("error")));
+    }
+
+    const dir = this.directoryManager.getDirectory(pathDir, name);
+
     if (!dir) {
       textDisplay.addLines(
         getColorString("Directory not found", getColor("error"))

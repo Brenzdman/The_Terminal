@@ -5,12 +5,15 @@ import { TextDisplay } from "./TextDisplay";
 
 export class Directory_Manager {
   public directories: Directory[] = [];
-  public currentDirectory: Directory;
+  public currentDirectory: Directory = new Directory(this, "root", "/");
   public currentPath: string = "/";
-  public homeDirectory: Directory;
-  public textDisplay: TextDisplay;
+  public homeDirectory: Directory = this.currentDirectory;
+  public textDisplay: TextDisplay = new TextDisplay(this);
 
-  constructor() {
+  constructor(init: boolean = false) {
+    if (!init) {
+      return;
+    }
     const root = this.createDirectory("root", "/");
     this.currentDirectory = root.makeDirectory("Users").makeDirectory("guest");
     this.homeDirectory = this.currentDirectory;
@@ -39,7 +42,12 @@ export class Directory_Manager {
     this.directories.splice(this.directories.indexOf(directory), 1);
   }
 
-  private sterilizePath(path: string, file: boolean = false): string {
+  public sterilizePath(
+    path: string,
+    directory: Directory | undefined,
+    file: boolean = false
+  ): string {
+    path = path.trim();
     // Replaces \ with / for windows
     path = path?.replace(/\\/g, "/");
 
@@ -62,6 +70,34 @@ export class Directory_Manager {
     if (file) {
       path = path.slice(0, -1);
       path = path.replace(/^\/+/, "");
+    }
+
+    // handles ../ and similar
+    let startPath = path.slice(0, path.indexOf("/") + 1);
+    let isDotsOnly = /^[.]+$/.test(startPath.slice(0, -1));
+    let numBack = 0;
+
+    while (isDotsOnly && startPath.includes("../")) {
+      numBack++;
+      startPath = startPath.slice(1);
+      isDotsOnly = /^[.]+$/.test(startPath.slice(0, -1));
+    }
+
+    if (numBack > 0) {
+      let currentPath = directory?.path || "bad path";
+
+      for (let i = 0; i < numBack; i++) {
+        let lastSlash = currentPath.lastIndexOf("/", currentPath.length - 2);
+
+        if (lastSlash === -1 || currentPath.length === 1) {
+          currentPath = "bad path";
+          break;
+        }
+
+        currentPath = currentPath.slice(0, lastSlash + 1);
+      }
+
+      path = currentPath;
     }
 
     return path;
@@ -96,9 +132,7 @@ export class Directory_Manager {
       path = path?.slice(0, lastSlash! + 1);
     }
 
-    // replaces \ with / for windows
-    path = this.sterilizePath(path);
-    console.log(path);
+    path = this.sterilizePath(path, directory);
 
     // Look for relative directory
     const relativeDir = directory?.directories.find(
@@ -128,7 +162,7 @@ export class Directory_Manager {
     directory: Directory | undefined,
     path: string
   ): Dir_File | undefined {
-    path = this.sterilizePath(path, true);
+    path = this.sterilizePath(path, directory, true);
 
     // Looks for the relative Directory if applicable
     if (path.includes("/")) {

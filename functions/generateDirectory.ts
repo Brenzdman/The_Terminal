@@ -1,10 +1,9 @@
 import { Dir_File } from "@/classes/Directory";
 import { start } from "./start";
 import { Directory_Manager } from "@/classes/DirectoryManager";
-import { TextDisplay } from "@/classes/TextDisplay";
 
 export function generateDirectory(): Directory_Manager {
-  let directoryManager = new Directory_Manager();
+  let directoryManager = new Directory_Manager(true);
   let currentDirectory = directoryManager.currentDirectory;
 
   if (!currentDirectory) {
