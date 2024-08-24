@@ -138,11 +138,16 @@ export class Directory {
     return;
   }
 
-  public rename(oldName: string, newName: string): void {
+  public rename(pathName: string, newName: string): void {
     const textDisplay = this.directoryManager.textDisplay;
+    const [pathDir, name] = this.splitPathName(pathName);
 
-    const dir = this.directoryManager.getDirectory(this, oldName);
-    const file = this.directoryManager.getFile(this, oldName);
+    if (pathDir === this && name !== pathName) {
+      textDisplay.addLines(getColorString("Invalid path", getColor("error")));
+    }
+
+    const dir = this.directoryManager.getDirectory(pathDir, name);
+    const file = this.directoryManager.getFile(pathDir, name);
 
     if (!this.validName(newName)) {
       return;
@@ -159,7 +164,7 @@ export class Directory {
       return;
     } else if (dir) {
       dir.name = newName;
-      dir.path = dir.path.replace(new RegExp(oldName + "/"), newName + "/");
+      dir.path = dir.path.replace(new RegExp(pathName + "/"), newName + "/");
       textDisplay.addLines("Directory renamed");
       return;
     }
