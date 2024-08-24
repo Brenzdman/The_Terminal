@@ -22,11 +22,16 @@ export class Directory {
   }
 
   // Lists all files and directories in the current directory
-  public ls(): string[] {
-    const sortedDirs = this.directories.sort((a, b) =>
+  public ls(path: string | undefined): string[] {
+    let dir: Directory = this;
+    if (path) {
+      dir = this.directoryManager.getDirectory(this, path) || this;
+    }
+
+    const sortedDirs = dir.directories.sort((a, b) =>
       a.name.localeCompare(b.name)
     );
-    const sortedFiles = this.files.sort((a, b) => a.name.localeCompare(b.name));
+    const sortedFiles = dir.files.sort((a, b) => a.name.localeCompare(b.name));
 
     const dirStrings = sortedDirs.map((dir) => dir.toString());
     const fileStrings = sortedFiles.map((file) => file.toString());
@@ -149,21 +154,27 @@ export class Directory {
     textDisplay.newLine();
   }
 
-  public runFile(requestName: string): void {
-    const textDisplay = this.directoryManager.textDisplay;
-
-    // Alt way to run files in subdirectories
+  private filePathToFile(filePath: string): Dir_File | undefined {
     let dir: Directory = this;
-    if (requestName.includes("/") || requestName.includes("\\")) {
-      dir = this.directoryManager.getDirectory(this, requestName) || this;
+    let dirPath = this.path;
+    let fileName = filePath;
+
+    if (filePath.includes("/") || filePath.includes("\\")) {
+      dirPath += filePath.slice(0, filePath.lastIndexOf("/") + 1);
+      fileName = filePath.slice(filePath.lastIndexOf("/") + 1);
     }
 
-    // Check if the file exists in dir
-    const file = dir.files.find(
+    dir = this.directoryManager.getDirectory(this, dirPath) || this;
+
+    return dir.files.find(
       (dirFile) =>
-        dirFile.name + dirFile.type == requestName ||
-        dirFile.name == requestName
+        dirFile.name + dirFile.type == fileName || dirFile.name == fileName
     );
+  }
+
+  public runFile(requestName: string): void {
+    const textDisplay = this.directoryManager.textDisplay;
+    const file = this.filePathToFile(requestName);
 
     if (file) {
       if (file.onRun) {
@@ -176,19 +187,18 @@ export class Directory {
     textDisplay.addLines(getColorString("File not found", getColor("error")));
   }
 
-  readFile(name: string): boolean {
+  readFile(name: string): void {
     const textDisplay = this.directoryManager.textDisplay;
-    let ran = false;
-    for (let i = 0; i < this.files.length; i++) {
-      const file = this.files[i];
-      if (file.name + file.type !== name || file.type !== ".txt") {
-        continue;
-      }
+    const file = this.filePathToFile(name);
 
-      textDisplay.addLines([file.content]);
-      ran = true;
+    if (!file) {
+      textDisplay.addLines(
+        getColorString(`File '${name}' found`, getColor("error"))
+      );
+      return;
     }
-    return ran;
+
+    textDisplay.addLines(file.content);
   }
 }
 

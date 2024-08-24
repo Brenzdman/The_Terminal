@@ -6,7 +6,7 @@ import React, { useEffect, useState } from "react";
 import { DIRECTORY_MANAGER } from "../constants/atoms";
 import { getColor, getColorString } from "@/functions/color";
 import { Directory_Manager } from "@/classes/DirectoryManager";
-import { dir } from "console";
+import { getDetailedHelp } from "@/functions/help";
 
 const UserText = () => {
   const [directoryManager, setDirectoryManager] = useAtom(DIRECTORY_MANAGER);
@@ -108,41 +108,17 @@ const UserText = () => {
       errorColor
     );
 
-    const badCat = (fileName: string) => {
-      return getColorString(`cat: file '${fileName}' not found.`, errorColor);
-    };
-
-    const helpScreen = [
-      "HELP MENU",
-      " ",
-      "Available commands:",
-      "-------------------",
-      "help         - Display this help menu.",
-      "dir           - List available directories and files in current directory.",
-      "cd [dir]     - Change to specified directory.",
-      "mkdir [dir]  - Create a new directory",
-      "rmdir [dir]  - Remove a directory.",
-      "type [file]   - Display the content of a txt file.",
-      "start [file]  - Run a exe file.",
-      "echo [text]  - Output text to the terminal.",
-      "ren [file/dir] [newName] - Rename a file.",
-      "cls        - Clear the terminal screen.",
-      "exit         - Close the terminal.",
-    ];
-    // End messages
-    // Commands
-
     // Help
     const cmd = segments[0].toLowerCase();
     if (cmd === "help") {
-      textDisplay.addLines(helpScreen);
+      textDisplay.addLines(getDetailedHelp(segments[1]));
 
       // List directories and files
     } else if (cmd === "ls" || cmd === "dir") {
-      textDisplay.addLines(currentDirectory.ls());
+      textDisplay.addLines(currentDirectory.ls(segments[1]));
 
       // Change directory
-    } else if (cmd === "cd") {
+    } else if (cmd === "cd" || cmd === "chdir") {
       currentDirectory.cd(segments[1]);
 
       // DeSync Fix
@@ -159,15 +135,14 @@ const UserText = () => {
 
       // Display txt file content
     } else if (cmd === "type") {
-      const ran = currentDirectory.readFile(segments[1]);
-      if (!ran) textDisplay.addLines(badCat(segments[1]));
+      currentDirectory.readFile(segments[1]);
 
       // Echo text to terminal
     } else if (cmd === "echo") {
       textDisplay.addLines([text.slice(5)]);
 
       // Rename file
-    } else if (cmd === "ren") {
+    } else if (cmd === "ren" || cmd === "rename") {
       currentDirectory.rename(segments[1], segments[2]);
       // Clear terminal screen
     } else if (cmd === "cls" || cmd === "clear") {
