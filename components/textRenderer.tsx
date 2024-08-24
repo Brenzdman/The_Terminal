@@ -110,7 +110,7 @@ const Renderer: React.FC<{
     autoFill: string
   ): string => {
     if (autoFillReplace) {
-      lineText = autoFill;
+      lineText = formatLineText(autoFill);
     }
 
     // Remove color codes and count \n characters before the cursor position
