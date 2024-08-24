@@ -2,6 +2,7 @@
 
 import { getColor, getColorString } from "@/functions/color";
 import { Directory_Manager } from "./DirectoryManager";
+import { dir } from "console";
 
 export class Directory {
   public name: string;
@@ -44,7 +45,8 @@ export class Directory {
     const dir = this.directoryManager.getDirectory(this, name);
     const textDisplay = this.directoryManager.textDisplay;
 
-    if (!name) {
+    // if name includes characters other than letters, numbers, _, (), or -
+    if (!name || !/^[a-zA-Z0-9_()\-]*$/.test(name)) {
       textDisplay.addLines(
         getColorString("Invalid directory name", getColor("error"))
       );
@@ -102,7 +104,6 @@ export class Directory {
       return undefined;
     }
 
-    console.log("Changing directory to " + dir.name);
     this.directoryManager.currentDirectory = dir;
     this.directoryManager.currentPath = dir.path;
 
@@ -111,22 +112,28 @@ export class Directory {
 
   public runFile(requestName: string): void {
     const textDisplay = this.directoryManager.textDisplay;
-    for (let i = 0; i < this.files.length; i++) {
-      const file = this.files[i];
-      if (file.type !== ".exe") {
-        continue;
-      }
 
-      if (file.name + file.type !== requestName && file.name !== requestName) {
-        continue;
-      }
+    // Alt way to run files in subdirectories
+    let dir: Directory = this;
+    if (requestName.includes("/") || requestName.includes("\\")) {
+      dir = this.directoryManager.getDirectory(this, requestName) || this;
+    }
 
-      if (file.onRun !== null) {
+    // Check if the file exists in dir
+    const file = dir.files.find(
+      (dirFile) =>
+        dirFile.name + dirFile.type == requestName ||
+        dirFile.name == requestName
+    );
+
+    if (file) {
+      if (file.onRun) {
         textDisplay.addLines([`Running ${file.name}${file.type}...`]);
         file.onRun();
         return;
       }
     }
+
     textDisplay.addLines(getColorString("File not found", getColor("error")));
   }
 
