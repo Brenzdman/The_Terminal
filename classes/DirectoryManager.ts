@@ -21,10 +21,7 @@ export class Directory_Manager {
       "Type 'help' to see a list of available commands.",
     ];
 
-    this.textDisplay = new TextDisplay(
-      this,
-      welcomeMessage
-    );
+    this.textDisplay = new TextDisplay(this, welcomeMessage);
   }
 
   public createDirectory(name: string, path: string): Directory {
@@ -67,24 +64,36 @@ export class Directory_Manager {
       path = path?.slice(0, lastSlash! + 1);
     }
 
+    // Sterilizes path
+    // Adds "/" to the end  if not present
+    if (!path?.endsWith("/")) {
+      path = path + "/";
+    }
+
+    console.log("Looking for directory: " + path);
+    console.log("Current directory: " + directory?.path);
+
+    for (let i = 0; i < this.directories.length; i++) {
+      console.log("Directory: " + this.directories[i].path);
+    }
     // Look for relative directory
-    const relativeDir = directory?.directories.find((dir) => dir.name === path);
+    const relativeDir = directory?.directories.find(
+      (dir) => directory?.path + path === dir.path
+    );
     if (relativeDir) {
       return relativeDir;
     }
 
-    // Looks for directory with directory.path + path, alt relative path
-    const relativeDirAlt = directory?.directories.find(
-      (dir) => directory.path + dir.path === path
+    // Looks for directory from relative absolute path
+    const altRelativeDir = this.directories.find(
+      (dir) => dir.path === directory?.path + path
     );
-    if (relativeDirAlt) {
-      return relativeDirAlt;
+    if (altRelativeDir) {
+      return altRelativeDir;
     }
 
     // Looks for directory from absolute path
-    const absoluteDir = this.directories.find(
-      (dir) => dir.path === path || dir.path === path + "/"
-    );
+    const absoluteDir = this.directories.find((dir) => dir.path === path);
     if (absoluteDir) {
       return absoluteDir;
     }
