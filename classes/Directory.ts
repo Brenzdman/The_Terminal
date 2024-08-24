@@ -73,25 +73,25 @@ export class Directory {
   }
 
   public removeDirectory(
-    name: string,
+    path: string,
     textDisplay: TextDisplay | null = null
   ): void {
-    let existingDir = this.directories.find((dir) => dir.name === name);
-    if (!existingDir) {
-      existingDir = this.directoryManager.getDirectory(this, name);
+    const dir = this.directoryManager.getDirectory(this, path);
 
+    if (!dir) {
       textDisplay?.addLines(
         getColorString("Directory not found", getColor("error"))
       );
       return;
     }
 
-    if (!existingDir.userMalleable) {
+    if (!dir.userMalleable) {
       textDisplay?.addLines(getColorString("ACCESS DENIED", getColor("error")));
       return;
     }
 
-    this.directories.splice(this.directories.indexOf(existingDir), 1);
+    this.directories.splice(this.directories.indexOf(dir), 1);
+    this.directoryManager.removeDirectoryFromList(dir);
     textDisplay?.addLines("Directory removed");
     return;
   }

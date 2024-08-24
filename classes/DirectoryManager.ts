@@ -35,6 +35,10 @@ export class Directory_Manager {
     this.directories.push(directory);
   }
 
+  public removeDirectoryFromList(directory: Directory): void {
+    this.directories.splice(this.directories.indexOf(directory), 1);
+  }
+
   public getDirectory(
     directory: Directory | undefined,
     path: string
