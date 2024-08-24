@@ -85,7 +85,7 @@ export function getDetailedHelp(
       description: "Rename a file or directory.",
       aliases: ["ren","rename"],
       usage: "ren [file/dir] [newName]",
-      examples: ["ren old_name.txt new_name.txt", "ren old_folder new_folder"],
+      examples: ["ren path/to/dir name", "ren file name"],
     };
   } else if (command === "cls" || command === "clear") {
     help = {

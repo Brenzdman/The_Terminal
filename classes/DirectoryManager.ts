@@ -39,7 +39,7 @@ export class Directory_Manager {
     this.directories.splice(this.directories.indexOf(directory), 1);
   }
 
-  private sterilizePath(path: string): string {
+  private sterilizePath(path: string, file: boolean = false): string {
     // Replaces \ with / for windows
     path = path?.replace(/\\/g, "/");
 
@@ -49,6 +49,10 @@ export class Directory_Manager {
     // Adds "/" to the end  if not present
     if (!path?.endsWith("/")) {
       path = path + "/";
+    }
+
+    if (file) {
+      path = path.slice(0, -1);
     }
 
     return path;
@@ -113,7 +117,7 @@ export class Directory_Manager {
     directory: Directory | undefined,
     path: string
   ): Dir_File | undefined {
-    path = this.sterilizePath(path);
+    path = this.sterilizePath(path, true);
 
     // Looks for the relative Directory if applicable
     if (path.includes("/")) {
@@ -128,6 +132,7 @@ export class Directory_Manager {
     }
 
     // Looks for the file from the current directory
-    return directory?.files.find((file) => file.name + file.type === path);
+    console.log(path);
+    return directory?.files.find((file) => file.name + file.type === path || file.name === path);
   }
 }
