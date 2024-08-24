@@ -44,7 +44,7 @@ export class Directory_Manager {
     path = path?.replace(/\\/g, "/");
 
     // Replaces C:/ with /
-    path = path?.replace(/^C:/, "/");
+    path = path.replace(/^([Cc]:\/)/, "/");
 
     // Adds "/" to the end  if not present
     if (!path?.endsWith("/")) {
@@ -58,12 +58,6 @@ export class Directory_Manager {
     directory: Directory | undefined,
     path: string
   ): Directory | undefined {
-    // replaces \ with / for windows
-    path = path?.replace(/\\/g, "/");
-
-    // Replaces C:/ with /
-    path = path?.replace(/^C:/, "/");
-
     // Checks for empty path
     if (!path || path == ".") {
       return directory;
@@ -88,11 +82,8 @@ export class Directory_Manager {
       path = path?.slice(0, lastSlash! + 1);
     }
 
-    // Sterilizes path
-    // Adds "/" to the end  if not present
-    if (!path?.endsWith("/")) {
-      path = path + "/";
-    }
+    // replaces \ with / for windows
+    path = this.sterilizePath(path);
 
     // Look for relative directory
     const relativeDir = directory?.directories.find(
@@ -122,17 +113,7 @@ export class Directory_Manager {
     directory: Directory | undefined,
     path: string
   ): Dir_File | undefined {
-    // Sterilizes path
-    // Replaces \ with / for windows
-    path = path?.replace(/\\/g, "/");
-
-    // Replaces C:/ with /
-    path = path?.replace(/^C:/, "/");
-
-    // Adds "/" to the end  if not present
-    if (!path?.endsWith("/")) {
-      path = path + "/";
-    }
+    path = this.sterilizePath(path);
 
     // Looks for the relative Directory if applicable
     if (path.includes("/")) {
