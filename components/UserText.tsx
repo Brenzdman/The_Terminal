@@ -139,7 +139,7 @@ const UserText = () => {
 
       // Echo text to terminal
     } else if (cmd === "echo") {
-      textDisplay.addLines([text.slice(5)]);
+      currentDirectory.echo(segments.slice(1));
 
       // Rename file
     } else if (cmd === "ren" || cmd === "rename") {

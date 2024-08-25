@@ -2,7 +2,6 @@
 
 import { getColor, getColorString } from "@/functions/color";
 import { Directory_Manager } from "./DirectoryManager";
-import { get } from "http";
 
 export class Directory {
   public name: string;
@@ -173,6 +172,45 @@ export class Directory {
     return;
   }
 
+  public echo(segments: string[]): void {
+    const textManager = this.directoryManager.textDisplay;
+    if (segments.length >= 2) {
+      const pathSegment = segments[segments.length - 1];
+      const previousSegment = segments[segments.length - 2];
+      if (previousSegment == ">") {
+        if (pathSegment.includes(".txt")) {
+          let [pathDir, name] = this.splitPathName(pathSegment);
+          name = pathSegment.slice(0, pathSegment.length - 4);
+
+          if (!this.validName(name)) {
+            return;
+          }
+
+          let file = this.directoryManager.getFile(pathDir, name);
+
+          if (!file) {
+            file = new Dir_File(name, ".txt");
+            pathDir.addFile(file, true);
+          }
+
+          file.content = segments.slice(0, segments.length - 2);
+          textManager.addLines(`Text echoed to ${file.name}.txt`);
+          return;
+        } else {
+          textManager.addLines(
+            getColorString(
+              "echo > only works with txt files.",
+              getColor("error")
+            )
+          );
+          return;
+        }
+      }
+    }
+
+    textManager.addLines(segments);
+  }
+
   public cd(path: string): void {
     const textDisplay = this.directoryManager.textDisplay;
 
@@ -193,19 +231,8 @@ export class Directory {
     textDisplay.newLine();
   }
 
-  private filePathToFile(filePath: string): Dir_File | undefined {
-    let dir: Directory = this;
-    let dirPath = this.path;
-    let fileName = filePath;
-
-    if (filePath.includes("/") || filePath.includes("\\")) {
-      dirPath += filePath.slice(0, filePath.lastIndexOf("/") + 1);
-      fileName = filePath.slice(filePath.lastIndexOf("/") + 1);
-    }
-
-    dir = this.directoryManager.getDirectory(this, dirPath) || this;
-
-    return dir.files.find(
+  private getFile(fileName: string): Dir_File | undefined {
+    return this.files.find(
       (dirFile) =>
         dirFile.name + dirFile.type == fileName || dirFile.name == fileName
     );
@@ -213,7 +240,8 @@ export class Directory {
 
   public runFile(requestName: string): void {
     const textDisplay = this.directoryManager.textDisplay;
-    const file = this.filePathToFile(requestName);
+    const [dir, name] = this.splitPathName(requestName);
+    const file = dir.getFile(name);
 
     if (file) {
       if (file.onRun) {
@@ -226,13 +254,17 @@ export class Directory {
     textDisplay.addLines(getColorString("File not found", getColor("error")));
   }
 
-  readFile(name: string): void {
+  readFile(requestName: string): void {
     const textDisplay = this.directoryManager.textDisplay;
-    const file = this.filePathToFile(name);
+    const [dir, name] = this.splitPathName(requestName);
+    const file = dir.getFile(name);
 
     if (!file) {
       textDisplay.addLines(
-        getColorString(`File '${name}' found`, getColor("error"))
+        getColorString(
+          `File '${name}' not found at path ${dir.path}`,
+          getColor("error")
+        )
       );
       return;
     }
@@ -243,7 +275,7 @@ export class Directory {
 
 export class Dir_File {
   public name: string;
-  public content: string = "";
+  public content: string[] = [];
   public type: string = ".txt";
   public onRun: (() => void) | null = null;
   public userMalleable: boolean = false;
