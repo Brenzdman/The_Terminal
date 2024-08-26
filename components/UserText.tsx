@@ -115,7 +115,7 @@ const UserText = () => {
 
       // List directories and files
     } else if (cmd === "ls" || cmd === "dir") {
-      textDisplay.addLines(currentDirectory.ls(segments[1]));
+      currentDirectory.ls(segments[1]);
 
       // Change directory
     } else if (cmd === "cd" || cmd === "chdir") {

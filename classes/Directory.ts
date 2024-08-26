@@ -2,6 +2,18 @@
 
 import { getColor, getColorString } from "@/functions/color";
 import { Directory_Manager } from "./DirectoryManager";
+import {
+  accessDenied,
+  dirAlreadyExists,
+  fileAlreadyExists,
+  invalidFileType,
+  invalidName,
+  invalidPath,
+  noDirAtPath,
+  noDirOrFileAtPath,
+  noFileAtPath,
+} from "@/functions/messages";
+import { dir } from "console";
 
 export class Directory {
   public name: string;
@@ -22,14 +34,17 @@ export class Directory {
   }
 
   // Lists all files and directories in the current directory
-  public ls(path: string | undefined): string[] {
+  public ls(path: string | undefined): void {
+    const textDisplay = this.directoryManager.textDisplay;
     let dir: Directory | undefined = this;
+
     if (path) {
       dir = this.directoryManager.getDirectory(this, path);
-    }
 
-    if (!dir) {
-      return [getColorString(`No directory at '${path}'`, getColor("error"))];
+      if (!dir) {
+        textDisplay.addLines(noDirAtPath(path));
+        return;
+      }
     }
 
     const sortedDirs = dir.directories.sort((a, b) =>
@@ -40,7 +55,7 @@ export class Directory {
     const dirStrings = sortedDirs.map((dir) => dir.toString());
     const fileStrings = sortedFiles.map((file) => file.toString());
 
-    return [...dirStrings, ...fileStrings];
+    textDisplay.addLines([...dirStrings, ...fileStrings]);
   }
 
   public addFile(
@@ -59,20 +74,13 @@ export class Directory {
     name = name.slice(0, name.length - 4);
 
     if (!this.validName(name)) {
-      console.log(`Invalid name: ${pathDir.path}`);
-      console.log(`Invalid name: ${name}`);
       return;
     }
 
     let file = this.directoryManager.getFile(pathDir, pathSegment);
 
     if (file) {
-      textDisplay.addLines(
-        getColorString(
-          `File already exists at ${file.name}${file.type}`,
-          getColor("error")
-        )
-      );
+      textDisplay.addLines(fileAlreadyExists(file));
 
       return file;
     }
@@ -87,7 +95,7 @@ export class Directory {
   private validName(name: string): boolean {
     const textDisplay = this.directoryManager.textDisplay;
     if (!name || !/^[a-zA-Z0-9_()\-]*$/.test(name)) {
-      textDisplay.addLines(getColorString("Invalid name", getColor("error")));
+      textDisplay.addLines(invalidName(name));
       return false;
     }
     return true;
@@ -116,7 +124,7 @@ export class Directory {
     const [pathDir, name] = this.splitPathName(pathName);
 
     if (pathDir === this && name !== pathName) {
-      textDisplay.addLines(getColorString("Invalid path", getColor("error")));
+      textDisplay.addLines(invalidPath(pathName));
     }
 
     const existingDir = this.directoryManager.getDirectory(pathDir, name);
@@ -127,12 +135,7 @@ export class Directory {
     }
 
     if (existingDir) {
-      textDisplay.addLines(
-        getColorString(
-          `Directory already exists at ${existingDir.path}`,
-          getColor("error")
-        )
-      );
+      textDisplay.addLines(dirAlreadyExists(existingDir.path));
       return existingDir;
     }
 
@@ -154,20 +157,18 @@ export class Directory {
     const [pathDir, name] = this.splitPathName(pathName);
 
     if (pathDir === this && name !== pathName) {
-      textDisplay.addLines(getColorString("Invalid path", getColor("error")));
+      textDisplay.addLines(invalidPath(pathName));
     }
 
     const dir = this.directoryManager.getDirectory(pathDir, name);
 
     if (!dir) {
-      textDisplay.addLines(
-        getColorString("Directory not found", getColor("error"))
-      );
+      textDisplay.addLines(noDirAtPath(pathName));
       return;
     }
 
     if (!dir.userMalleable) {
-      textDisplay.addLines(getColorString("ACCESS DENIED", getColor("error")));
+      textDisplay.addLines(accessDenied());
       return;
     }
 
@@ -182,7 +183,7 @@ export class Directory {
     const [pathDir, name] = this.splitPathName(pathName);
 
     if (pathDir === this && name !== pathName) {
-      textDisplay.addLines(getColorString("Invalid path", getColor("error")));
+      textDisplay.addLines(invalidPath(pathName));
     }
 
     const dir = this.directoryManager.getDirectory(pathDir, name);
@@ -193,7 +194,7 @@ export class Directory {
     }
 
     if ((dir && !dir.userMalleable) || (file && !file.userMalleable)) {
-      textDisplay.addLines(getColorString("ACCESS DENIED", getColor("error")));
+      textDisplay.addLines(accessDenied());
       return;
     }
 
@@ -208,7 +209,7 @@ export class Directory {
       return;
     }
 
-    textDisplay.addLines(getColorString("File not found", getColor("error")));
+    textDisplay.addLines(noDirOrFileAtPath(pathName));
     return;
   }
 
@@ -220,13 +221,13 @@ export class Directory {
 
     const sourceFile = sourceDir.getFile(fileName);
     if (!sourceFile) {
-      textDisplay.addLines(getColorString("File not found", getColor("error")));
+      textDisplay.addLines(noFileAtPath(fileName));
       return;
     }
 
     if (sourceFile.type != ".txt") {
       textDisplay.addLines(
-        getColorString("Can only copy .txt files", getColor("error"))
+        invalidFileType()
       );
       return;
     }
@@ -235,7 +236,6 @@ export class Directory {
     // if destination path only
     if (!destinationName) {
       const newPath = destinationPath + sourceFile.name + sourceFile.type;
-      console.log(newPath);
       destinationFile = this.addFile(newPath, true);
     }
 
@@ -251,8 +251,7 @@ export class Directory {
     }
 
     if (!destinationFile.userMalleable) {
-      console.log(destinationFile);
-      textDisplay.addLines(getColorString("ACCESS DENIED", getColor("error")));
+      textDisplay.addLines(accessDenied());
       return;
     }
 
@@ -276,7 +275,7 @@ export class Directory {
 
           if (!file.userMalleable) {
             textManager.addLines(
-              getColorString("ACCESS DENIED", getColor("error"))
+              accessDenied()
             );
             return;
           }
@@ -286,10 +285,7 @@ export class Directory {
           return;
         } else {
           textManager.addLines(
-            getColorString(
-              "echo > only works with txt files.",
-              getColor("error")
-            )
+            invalidFileType()
           );
           return;
         }
@@ -304,12 +300,7 @@ export class Directory {
 
     const dir = this.directoryManager.getDirectory(this, path);
     if (!dir) {
-      textDisplay.addLines(
-        getColorString(
-          `cd: no such file or directory at '${path}'`,
-          getColor("error")
-        )
-      );
+      textDisplay.addLines(noDirOrFileAtPath(path));
       return;
     }
 
@@ -339,7 +330,7 @@ export class Directory {
       }
     }
 
-    textDisplay.addLines(getColorString("File not found", getColor("error")));
+    textDisplay.addLines(noFileAtPath(requestName));
   }
 
   readFile(requestName: string): void {
@@ -349,10 +340,7 @@ export class Directory {
 
     if (!file) {
       textDisplay.addLines(
-        getColorString(
-          `File '${name}' not found at path ${dir.path}`,
-          getColor("error")
-        )
+        noFileAtPath(requestName)
       );
       return;
     }
