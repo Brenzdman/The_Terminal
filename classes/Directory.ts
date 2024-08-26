@@ -119,7 +119,11 @@ export class Directory {
     return pathDir ? [pathDir, name] : [this, pathName];
   }
 
-  public makeDirectory(pathName: string, userMalleable = false): Directory {
+  public makeDirectory(
+    pathName: string,
+    userMalleable = false,
+    suppressDialog: boolean = false
+  ): Directory {
     const textDisplay = this.directoryManager.textDisplay;
     const [pathDir, name] = this.splitPathName(pathName);
 
@@ -148,7 +152,7 @@ export class Directory {
     pathDir.directories.push(newFolder);
     pathDir.directoryManager.addDirectoryToList(newFolder);
 
-    textDisplay?.addLines("Directory created");
+    if (!suppressDialog) textDisplay?.addLines("Directory created");
     return newFolder;
   }
 
@@ -377,6 +381,10 @@ export class Directory {
 
     dir.files.splice(dir.files.indexOf(file), 1);
     textDisplay.addLines(`File ${file.name}${file.type} deleted`);
+  }
+
+  clear(): void {
+    this.directoryManager.textDisplay.clear();
   }
 }
 

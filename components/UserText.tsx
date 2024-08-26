@@ -157,7 +157,7 @@ const UserText = () => {
       currentDirectory.deleteFile(segments[1]);
       // Clear terminal screen
     } else if (cmd === "cls" || cmd === "clear") {
-      textDisplay.clear();
+      currentDirectory.clear();
 
       // Exit terminal
     } else if (cmd === "exit") {
