@@ -213,7 +213,15 @@ export class Directory {
     return;
   }
 
-  public copy(sourcePath: string, destinationPath: string): void {
+  public move(sourcePath: string, destinationPath: string): void {
+    this.copy(sourcePath, destinationPath, true);
+  }
+
+  public copy(
+    sourcePath: string,
+    destinationPath: string,
+    move: boolean = false
+  ): void {
     const textDisplay = this.directoryManager.textDisplay;
     const [sourceDir, fileName] = this.splitPathName(sourcePath);
     const [destinationDir, destinationName] =
@@ -225,10 +233,13 @@ export class Directory {
       return;
     }
 
+    if (!sourceFile.userMalleable && move) {
+      textDisplay.addLines(accessDenied());
+      return;
+    }
+
     if (sourceFile.type != ".txt") {
-      textDisplay.addLines(
-        invalidFileType()
-      );
+      textDisplay.addLines(invalidFileType());
       return;
     }
 
@@ -256,6 +267,13 @@ export class Directory {
     }
 
     destinationFile.content = sourceFile.content;
+
+    if (move) {
+      sourceDir.files.splice(sourceDir.files.indexOf(sourceFile), 1);
+      textDisplay.addLines(`File moved to ${destinationFile.name}.txt`);
+      return;
+    }
+
     textDisplay.addLines(`File copied to ${destinationFile.name}.txt`);
   }
 
@@ -274,9 +292,7 @@ export class Directory {
           }
 
           if (!file.userMalleable) {
-            textManager.addLines(
-              accessDenied()
-            );
+            textManager.addLines(accessDenied());
             return;
           }
 
@@ -284,9 +300,7 @@ export class Directory {
           textManager.addLines(`Text echoed to ${file.name}.txt`);
           return;
         } else {
-          textManager.addLines(
-            invalidFileType()
-          );
+          textManager.addLines(invalidFileType());
           return;
         }
       }
@@ -339,13 +353,30 @@ export class Directory {
     const file = dir.getFile(name);
 
     if (!file) {
-      textDisplay.addLines(
-        noFileAtPath(requestName)
-      );
+      textDisplay.addLines(noFileAtPath(requestName));
       return;
     }
 
     textDisplay.addLines(file.content);
+  }
+
+  deleteFile(requestName: string): void {
+    const textDisplay = this.directoryManager.textDisplay;
+    const [dir, name] = this.splitPathName(requestName);
+    const file = dir.getFile(name);
+
+    if (!file) {
+      textDisplay.addLines(noFileAtPath(requestName));
+      return;
+    }
+
+    if (!file.userMalleable) {
+      textDisplay.addLines(accessDenied());
+      return;
+    }
+
+    dir.files.splice(dir.files.indexOf(file), 1);
+    textDisplay.addLines(`File ${file.name}${file.type} deleted`);
   }
 }
 

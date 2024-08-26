@@ -147,6 +147,14 @@ const UserText = () => {
       // Copy file
     } else if (cmd === "copy") {
       currentDirectory.copy(segments[1], segments[2]);
+
+      // Move file
+    } else if (cmd === "move") {
+      currentDirectory.move(segments[1], segments[2]);
+
+      // Delete file
+    } else if (cmd === "del") {
+      currentDirectory.deleteFile(segments[1]);
       // Clear terminal screen
     } else if (cmd === "cls" || cmd === "clear") {
       textDisplay.clear();
