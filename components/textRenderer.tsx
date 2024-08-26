@@ -19,34 +19,37 @@ const TextDisplayRenderer: React.FC = () => {
     textDisplay.lines.length
   );
 
+  const [prevScrollHeight, setPrevScrollHeight] = useState<number>(0);
+
   // ref to scroll
   const scrollRef = useRef<HTMLDivElement>(null);
   // cursor blink
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === " ") {
+      event.preventDefault();
+    }
+  };
+
+  const handleAutoScroll = () => {
+    if (scrollRef.current && prevLineLength !== textDisplay.lines.length) {
+      setPrevLineLength(textDisplay.lines.length);
+      // Temporarily disable smooth scrolling to clear scroll momentum
+      scrollRef.current.style.scrollBehavior = "auto";
+
+      scrollRef.current.scrollTop = prevScrollHeight - window.innerHeight * 0.4;
+      setPrevScrollHeight(scrollRef.current.scrollHeight);
+      // Re-enable smooth scrolling after updating scrollTop
+      requestAnimationFrame(() => {
+        if (scrollRef.current) {
+          scrollRef.current.style.scrollBehavior = "smooth";
+        }
+      });
+    }
+  };
+
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === " ") {
-        event.preventDefault();
-      }
-    };
-
-    const handleAutoScroll = () => {
-      if (scrollRef.current && prevLineLength !== textDisplay.lines.length) {
-        setPrevLineLength(textDisplay.lines.length);
-        // Temporarily disable smooth scrolling to clear scroll momentum
-        scrollRef.current.style.scrollBehavior = "auto";
-        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-
-        // Re-enable smooth scrolling after updating scrollTop
-        requestAnimationFrame(() => {
-          if (scrollRef.current) {
-            scrollRef.current.style.scrollBehavior = "smooth";
-          }
-        });
-      }
-    };
-
     if (intervalRef.current === null) {
       intervalRef.current = setInterval(() => {
         if (textDisplay.cursorSymbol === " ") {
@@ -141,12 +144,12 @@ const Renderer: React.FC<{
   };
 
   const renderLineContent = (
-    line: Line, // Replace 'any' with the appropriate type
+    line: Line,
     index: number,
     cursorX: number,
     cursor: string,
-    textDisplay: TextDisplay, // Replace 'any' with the appropriate type
-    newLines: Line[] // Replace 'any[]' with the appropriate type
+    textDisplay: TextDisplay,
+    newLines: Line[]
   ): React.ReactElement => {
     let content;
 
