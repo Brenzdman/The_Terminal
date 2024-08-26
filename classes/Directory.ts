@@ -193,6 +193,13 @@ export class Directory {
             pathDir.addFile(file, true);
           }
 
+          if (!file.userMalleable) {
+            textManager.addLines(
+              getColorString("ACCESS DENIED", getColor("error"))
+            );
+            return;
+          }
+
           file.content = segments.slice(0, segments.length - 2);
           textManager.addLines(`Text echoed to ${file.name}.txt`);
           return;
