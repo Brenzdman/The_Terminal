@@ -14,7 +14,7 @@ export function generateDirectory(): Directory_Manager {
   currentDirectory.addFile(startFile);
 
   const testFile = new Dir_File("test", ".txt");
-  testFile.content = "Hello World!";
+  testFile.content = ["Hello World!"];
   currentDirectory.addFile(testFile);
 
   currentDirectory.makeDirectory("newDir");
