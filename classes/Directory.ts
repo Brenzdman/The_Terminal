@@ -43,9 +43,37 @@ export class Directory {
     return [...dirStrings, ...fileStrings];
   }
 
-  public addFile(file: Dir_File, userMalleable = false): void {
-    this.files.push(file);
+  public addFile(
+    pathSegment: string,
+    userMalleable = false
+  ): Dir_File | undefined {
+    const textDisplay = this.directoryManager.textDisplay;
+    let [pathDir, name] = this.splitPathName(pathSegment);
+    name = pathSegment.slice(0, pathSegment.length - 4);
+    const type = pathSegment.slice(pathSegment.length - 4);
+
+    if (!this.validName(name)) {
+      return;
+    }
+
+    let file = this.directoryManager.getFile(pathDir, pathSegment);
+
+    if (file) {
+      textDisplay.addLines(
+        getColorString(
+          `File already exists at ${file.name}${file.type}`,
+          getColor("error")
+        )
+      );
+
+      return file;
+    }
+
+    file = new Dir_File(name, type);
     file.userMalleable = userMalleable;
+    pathDir.files.push(file);
+
+    return file;
   }
 
   private validName(name: string): boolean {
@@ -172,6 +200,46 @@ export class Directory {
     return;
   }
 
+  public copy(sourcePath: string, destinationPath: string): void {
+    const textDisplay = this.directoryManager.textDisplay;
+    const [sourceDir, fileName] = this.splitPathName(sourcePath);
+    const [destinationDir, destinationName] =
+      this.splitPathName(destinationPath);
+
+    const sourceFile = sourceDir.getFile(fileName);
+    if (!sourceFile) {
+      textDisplay.addLines(getColorString("File not found", getColor("error")));
+      return;
+    }
+
+    if (sourceFile.type != ".txt") {
+      textDisplay.addLines(
+        getColorString("Can only copy .txt files", getColor("error"))
+      );
+      return;
+    }
+
+    let destinationFile = destinationDir.getFile(destinationName);
+
+    if (!destinationFile) {
+      // Attempts to make a new file if one doesn't exist
+      destinationFile = this.addFile(destinationPath, true);
+
+      if (!destinationFile) {
+        return;
+      }
+    }
+
+    if (!destinationFile.userMalleable) {
+      console.log(destinationFile);
+      textDisplay.addLines(getColorString("ACCESS DENIED", getColor("error")));
+      return;
+    }
+
+    destinationFile.content = sourceFile.content;
+    textDisplay.addLines(`File copied to ${destinationFile.name}.txt`);
+  }
+
   public echo(segments: string[]): void {
     const textManager = this.directoryManager.textDisplay;
     if (segments.length >= 2) {
@@ -179,18 +247,11 @@ export class Directory {
       const previousSegment = segments[segments.length - 2];
       if (previousSegment == ">") {
         if (pathSegment.includes(".txt")) {
-          let [pathDir, name] = this.splitPathName(pathSegment);
-          name = pathSegment.slice(0, pathSegment.length - 4);
-
-          if (!this.validName(name)) {
-            return;
-          }
-
-          let file = this.directoryManager.getFile(pathDir, name);
+          let file = this.getFile(pathSegment);
 
           if (!file) {
-            file = new Dir_File(name, ".txt");
-            pathDir.addFile(file, true);
+            file = this.addFile(pathSegment, true);
+            if (!file) return;
           }
 
           if (!file.userMalleable) {

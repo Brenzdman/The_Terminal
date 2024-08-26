@@ -144,6 +144,9 @@ const UserText = () => {
       // Rename file
     } else if (cmd === "ren" || cmd === "rename") {
       currentDirectory.rename(segments[1], segments[2]);
+      // Copy file
+    } else if (cmd === "copy") {
+      currentDirectory.copy(segments[1], segments[2]);
       // Clear terminal screen
     } else if (cmd === "cls" || cmd === "clear") {
       textDisplay.clear();

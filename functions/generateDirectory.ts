@@ -1,5 +1,3 @@
-import { Dir_File } from "@/classes/Directory";
-import { start } from "./start";
 import { Directory_Manager } from "@/classes/DirectoryManager";
 
 export function generateDirectory(): Directory_Manager {
@@ -10,12 +8,10 @@ export function generateDirectory(): Directory_Manager {
     throw new Error("Directory not found!");
   }
 
-  const startFile = new Dir_File("start", ".exe", start);
-  currentDirectory.addFile(startFile);
+  currentDirectory.addFile("start.exe");
 
-  const testFile = new Dir_File("test", ".txt");
-  testFile.content = ["Hello World!"];
-  currentDirectory.addFile(testFile);
+  const testFile = currentDirectory.addFile("test.txt");
+  testFile!.content = ["Hello World!"];
 
   currentDirectory.makeDirectory("newDir");
 
