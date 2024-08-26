@@ -11,7 +11,10 @@ export function generateDirectory(): Directory_Manager {
   currentDirectory.addFile("start.exe");
 
   const testFile = currentDirectory.addFile("test.txt");
-  testFile!.content = ["Hello World!"];
+
+  if (testFile) {
+    testFile.content = ["Hello World!"];
+  }
 
   currentDirectory.makeDirectory("newDir");
 

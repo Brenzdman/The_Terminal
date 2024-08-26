@@ -49,10 +49,18 @@ export class Directory {
   ): Dir_File | undefined {
     const textDisplay = this.directoryManager.textDisplay;
     let [pathDir, name] = this.splitPathName(pathSegment);
-    name = pathSegment.slice(0, pathSegment.length - 4);
-    const type = pathSegment.slice(pathSegment.length - 4);
+
+    // Gets file type
+    if (name.slice(name.length - 4, name.length - 3) != ".") {
+      name += ".txt";
+    }
+
+    const type = name.slice(name.length - 4, name.length);
+    name = name.slice(0, name.length - 4);
 
     if (!this.validName(name)) {
+      console.log(`Invalid name: ${pathDir.path}`);
+      console.log(`Invalid name: ${name}`);
       return;
     }
 
@@ -86,6 +94,10 @@ export class Directory {
   }
 
   private splitPathName(pathName: string): [Directory, string] {
+    if (!pathName) {
+      return [this, ""];
+    }
+
     const path = pathName.slice(0, pathName.lastIndexOf("/") + 1);
 
     let name = pathName;
@@ -219,7 +231,15 @@ export class Directory {
       return;
     }
 
-    let destinationFile = destinationDir.getFile(destinationName);
+    let destinationFile;
+    // if destination path only
+    if (!destinationName) {
+      const newPath = destinationPath + sourceFile.name + sourceFile.type;
+      console.log(newPath);
+      destinationFile = this.addFile(newPath, true);
+    }
+
+    destinationFile = destinationDir.getFile(destinationName);
 
     if (!destinationFile) {
       // Attempts to make a new file if one doesn't exist
