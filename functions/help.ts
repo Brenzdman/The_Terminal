@@ -1,6 +1,6 @@
 const mainHelpScreen = [
   `HELP MENU`,
-  ``,
+  ` `,
   `Available commands:`,
   `-------------------`,
   `help  [cmd]                 - Display this help menu or explain a specific command`,
