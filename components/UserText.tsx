@@ -13,6 +13,22 @@ const UserText = () => {
   const [cmdHistory, setCmdHistory] = useState<string[]>([]);
   const [cmdIndex, setCmdIndex] = useState<number>(-1);
 
+  const handleRightClick = (event: MouseEvent) => {
+    event.preventDefault();
+
+    const pasteText = navigator.clipboard.readText();
+    pasteText.then((text) => {
+      const textDisplay = directoryManager.textDisplay;
+      textDisplay.typeCharacter(text, true);
+
+      const updatedDirectoryManager = new Directory_Manager();
+      Object.assign(updatedDirectoryManager, {
+        ...directoryManager,
+      });
+      setDirectoryManager(updatedDirectoryManager);
+    });
+  };
+
   const handleKeyDown = (event: KeyboardEvent) => {
     const textDisplay = directoryManager.textDisplay;
     if (event.key.length === 1) {
@@ -188,9 +204,11 @@ const UserText = () => {
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("contextmenu", handleRightClick);
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("contextmenu", handleRightClick);
     };
   }, [directoryManager, cmdHistory, cmdIndex]);
 
