@@ -111,24 +111,29 @@ export class TextDisplay {
     this.cursorSymbol = "|";
   }
 
-  ctrlDelete(direction: string) {
+  ctrlDelete(direction: string, deleteChar = true) {
     const lastLine = this.getLastLine();
 
     const breakList = [" ", "/", ".", "-", "_"];
 
-    console.log(`${this.cursorX} ${lastLine.text.length}`);
-
-    if (direction === "Backspace") {
+    if (direction === "Left") {
       while (this.cursorX > 0) {
-        this.removeCharacter();
+        if (deleteChar) {
+          this.removeCharacter();
+        } else {
+          this.moveCursorLeft();
+        }
         const char = lastLine.text[this.cursorX - 1];
         if (breakList.includes(char)) {
-          break;
-        }
+          break;        }
       }
-    } else if (direction === "Delete") {
+    } else if (direction === "Right") {
       while (this.cursorX < lastLine.text.length) {
-        this.deleteCharacter();
+        if (deleteChar) {
+          this.deleteCharacter();
+        } else {
+          this.moveCursorRight();
+        }
         const char = lastLine.text[this.cursorX];
         if (breakList.includes(char)) {
           break;

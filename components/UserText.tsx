@@ -12,7 +12,6 @@ const UserText = () => {
   const [directoryManager, setDirectoryManager] = useAtom(DIRECTORY_MANAGER);
   const [cmdHistory, setCmdHistory] = useState<string[]>([]);
   const [cmdIndex, setCmdIndex] = useState<number>(-1);
-  const [ctrlDown, setCtrlDown] = useState<boolean>(false);
 
   const handleRightClick = (event: MouseEvent) => {
     event.preventDefault();
@@ -36,16 +35,14 @@ const UserText = () => {
     if (event.key.length === 1) {
       textDisplay.typeCharacter(event.key, true);
     } else if (event.key === "Backspace") {
-      if (ctrlDown) {
-        textDisplay.ctrlDelete("Backspace");
+      if (event.getModifierState("Control")) {
+        textDisplay.ctrlDelete("Left");
       } else {
         textDisplay.removeCharacter();
       }
-    } else if (event.key === "Control") {
-      setCtrlDown(true);
     } else if (event.key === "Delete") {
-      if (ctrlDown) {
-        textDisplay.ctrlDelete("Delete");
+      if (event.getModifierState("Control")) {
+        textDisplay.ctrlDelete("Right");
       } else {
         textDisplay.deleteCharacter();
       }
@@ -78,9 +75,17 @@ const UserText = () => {
 
       getResponseText();
     } else if (event.key === "ArrowLeft") {
-      textDisplay.moveCursorLeft();
+      if (event.getModifierState("Control")) {
+        textDisplay.ctrlDelete("Left", false);
+      } else {
+        textDisplay.moveCursorLeft();
+      }
     } else if (event.key === "ArrowRight") {
-      textDisplay.moveCursorRight();
+      if (event.getModifierState("Control")) {
+        textDisplay.ctrlDelete("Right", false);
+      } else {
+        textDisplay.moveCursorRight();
+      }
     }
 
     if (event.key === "ArrowUp" || event.key === "ArrowDown") {
@@ -119,12 +124,6 @@ const UserText = () => {
       ...directoryManager,
     });
     setDirectoryManager(updatedDirectoryManager);
-  };
-
-  const handleKeyUp = (event: KeyboardEvent) => {
-    if (event.key === "Control") {
-      setCtrlDown(false);
-    }
   };
 
   const getResponseText = () => {
@@ -223,12 +222,10 @@ const UserText = () => {
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("contextmenu", handleRightClick);
-    window.addEventListener("keyup", handleKeyUp);
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("contextmenu", handleRightClick);
-      window.removeEventListener("keyup", handleKeyUp);
     };
   }, [directoryManager, cmdHistory, cmdIndex]);
 
