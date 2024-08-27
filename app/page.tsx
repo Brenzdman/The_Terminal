@@ -8,6 +8,11 @@ import UserText from "@/components/UserText";
 export default function Home() {
   return (
     <div>
+      <meta
+        name="google-site-verification"
+        content="hhhgfqTYYPQugAs6cLEnyHM7z1sMIaKjdCIxFysX58M"
+      />
+
       <ASCII />
       <FullscreenButton />
       <UserText />
