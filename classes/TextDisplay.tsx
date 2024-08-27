@@ -53,7 +53,10 @@ export class TextDisplay {
 
     lastLine.userGenerated = userGenerated;
     lastLine.path = this.directoryManager.currentPath;
-    this.moveCursorRight();
+
+    for (let i = 0; i < letter.length; i++) {
+      this.moveCursorRight();
+    }
   }
 
   moveCursorLeft() {
@@ -106,6 +109,32 @@ export class TextDisplay {
       lastLine.text.slice(0, this.cursorX) +
       lastLine.text.slice(this.cursorX + 1);
     this.cursorSymbol = "|";
+  }
+
+  ctrlDelete(direction: string) {
+    const lastLine = this.getLastLine();
+
+    const breakList = [" ", "/", ".", "-", "_"];
+
+    console.log(`${this.cursorX} ${lastLine.text.length}`);
+
+    if (direction === "Backspace") {
+      while (this.cursorX > 0) {
+        this.removeCharacter();
+        const char = lastLine.text[this.cursorX - 1];
+        if (breakList.includes(char)) {
+          break;
+        }
+      }
+    } else if (direction === "Delete") {
+      while (this.cursorX < lastLine.text.length) {
+        this.deleteCharacter();
+        const char = lastLine.text[this.cursorX];
+        if (breakList.includes(char)) {
+          break;
+        }
+      }
+    }
   }
 
   getLastLine(): Line {

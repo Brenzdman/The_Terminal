@@ -12,6 +12,7 @@ const UserText = () => {
   const [directoryManager, setDirectoryManager] = useAtom(DIRECTORY_MANAGER);
   const [cmdHistory, setCmdHistory] = useState<string[]>([]);
   const [cmdIndex, setCmdIndex] = useState<number>(-1);
+  const [ctrlDown, setCtrlDown] = useState<boolean>(false);
 
   const handleRightClick = (event: MouseEvent) => {
     event.preventDefault();
@@ -31,12 +32,23 @@ const UserText = () => {
 
   const handleKeyDown = (event: KeyboardEvent) => {
     const textDisplay = directoryManager.textDisplay;
+
     if (event.key.length === 1) {
       textDisplay.typeCharacter(event.key, true);
     } else if (event.key === "Backspace") {
-      textDisplay.removeCharacter();
+      if (ctrlDown) {
+        textDisplay.ctrlDelete("Backspace");
+      } else {
+        textDisplay.removeCharacter();
+      }
+    } else if (event.key === "Control") {
+      setCtrlDown(true);
     } else if (event.key === "Delete") {
-      textDisplay.deleteCharacter();
+      if (ctrlDown) {
+        textDisplay.ctrlDelete("Delete");
+      } else {
+        textDisplay.deleteCharacter();
+      }
     } else if (event.key === "Enter") {
       if (textDisplay.autoFillReplace) {
         const lastLine = textDisplay.getLastLine();
@@ -107,6 +119,12 @@ const UserText = () => {
       ...directoryManager,
     });
     setDirectoryManager(updatedDirectoryManager);
+  };
+
+  const handleKeyUp = (event: KeyboardEvent) => {
+    if (event.key === "Control") {
+      setCtrlDown(false);
+    }
   };
 
   const getResponseText = () => {
@@ -205,10 +223,12 @@ const UserText = () => {
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("contextmenu", handleRightClick);
+    window.addEventListener("keyup", handleKeyUp);
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("contextmenu", handleRightClick);
+      window.removeEventListener("keyup", handleKeyUp);
     };
   }, [directoryManager, cmdHistory, cmdIndex]);
 

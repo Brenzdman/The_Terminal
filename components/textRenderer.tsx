@@ -173,7 +173,6 @@ const Renderer: React.FC<{
 
         adjustedCursorX += path.length + 2; // 2 for "> "
 
-        console.log(cursorX, adjustedCursorX);
         const segment1 = text.slice(0, adjustedCursorX);
         const segment2 = text.slice(adjustedCursorX, adjustedCursorX + 1);
         const segment3 = text.slice(adjustedCursorX + 1);
