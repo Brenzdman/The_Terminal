@@ -186,9 +186,9 @@ const Renderer: React.FC<{
                 position: "absolute",
                 top: 0,
                 zIndex: 1,
-                // transform: "translateX(-50%)",
-                transform: "translateX(-50%) scaleX(0.5)", // Adjust scaleX to make it skinnier
-                display: "inline-block", // Ensure the transform applies correctly
+                transform: "translateX(-50%) scaleX(0.5)",
+                display: "inline-block", 
+                color: "#ffffff",
               }}
             >
               {segment2}

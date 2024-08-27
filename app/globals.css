@@ -33,11 +33,11 @@ body {
   }
 }
 
-@import url("https://fonts.googleapis.com/css2?family=Cascadia+Code:wght@400;700&display=swap");
+@import url("https://fonts.cdnfonts.com/css/cascadia-code");
 
 span {
   font-family: "Cascadia Code", "Courier New", Courier, monospace;
-  color: #cfcfcf;
+  color: #c9c9c9;
   white-space: pre; /* Preserve whitespace */
 }
 
