@@ -110,7 +110,7 @@ const Renderer: React.FC<{
     cursor: string,
     autoFillReplace: boolean,
     autoFill: string
-  ): string => {
+  ): [string, number] => {
     if (autoFillReplace) {
       lineText = formatLineText(autoFill);
     }
@@ -140,7 +140,7 @@ const Renderer: React.FC<{
         lineText.slice(adjustedCursorX);
     }
 
-    return path + "> " + lineText;
+    return [path + "> " + lineText, adjustedCursorX];
   };
 
   const renderLineContent = (
@@ -160,8 +160,9 @@ const Renderer: React.FC<{
       let lineText = formatLineText(line.text);
       let text = path + "> " + lineText;
 
+      // If last line:
       if (index === newLines.length - 1) {
-        text = renderLastLine(
+        let [text, adjustedCursorX] = renderLastLine(
           path,
           lineText,
           cursorX,
@@ -169,6 +170,34 @@ const Renderer: React.FC<{
           textDisplay.autoFillReplace,
           textDisplay.autoFill
         );
+
+        adjustedCursorX += path.length + 2; // 2 for "> "
+
+        console.log(cursorX, adjustedCursorX);
+        const segment1 = text.slice(0, adjustedCursorX);
+        const segment2 = text.slice(adjustedCursorX, adjustedCursorX + 1);
+        const segment3 = text.slice(adjustedCursorX + 1);
+
+        const content = (
+          <div style={{ position: "relative" }}>
+            <span>{getColorDiv(segment1)}</span>
+            <span
+              style={{
+                position: "absolute",
+                top: 0,
+                zIndex: 1,
+                // transform: "translateX(-50%)",
+                transform: "translateX(-50%) scaleX(0.5)", // Adjust scaleX to make it skinnier
+                display: "inline-block", // Ensure the transform applies correctly
+              }}
+            >
+              {segment2}
+            </span>
+            <span>{getColorDiv(segment3)}</span>
+          </div>
+        );
+
+        return <div key={index}>{content}</div>;
       }
 
       content = <span>{getColorDiv(text)}</span>;

@@ -101,7 +101,7 @@ export const getColorDiv = (text: string): React.ReactElement => {
   }
 
   return (
-    <div>
+    <div style={{ display: "inline" }}>
       {segments.map(({ text, color }, index) =>
         color ? (
           <span key={`color-${index}`} style={{ color }}>
