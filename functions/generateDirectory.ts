@@ -16,7 +16,7 @@ export function generateDirectory(): Directory_Manager {
     testFile.content = ["Hello World!"];
   }
 
-  //currentDirectory.makeDirectory("newDir", true, true);
+  currentDirectory.makeDirectory("newDir", true, true);
 
   return directoryManager;
 }

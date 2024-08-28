@@ -1,6 +1,14 @@
 // Collaborates heavily with userText.tsx and DirectoryManager.ts
-
 "use client";
+
+declare global {
+  interface Window {
+    electron: {
+      invoke: (arg0: string, arg1: string) => any;
+    };
+  }
+}
+
 import { useAtom } from "jotai";
 import React, { useEffect, useState } from "react";
 import { DIRECTORY_MANAGER } from "../constants/atoms";
@@ -28,6 +36,35 @@ const UserText = () => {
       setDirectoryManager(updatedDirectoryManager);
     });
   };
+
+  let ipcRenderer: { invoke: (arg0: string, arg1: string) => any };
+  if (typeof window !== "undefined" && window.require) {
+    ipcRenderer = window.require("electron").ipcRenderer;
+  }
+
+  async function handleLsCommand() {
+    if (!window.electron) {
+      return;
+    }
+
+    const textDisplay = directoryManager.textDisplay;
+    const directoryPath = "C:/Users/brend/OneDrive/Desktop/home";
+    console.log(`Listing directory: ${directoryPath}`); // Log the path
+
+    try {
+      const files = await window.electron.invoke(
+        "list-directory",
+        directoryPath
+      );
+      files.forEach((file: { isDirectory: any; name: any }) => {
+        textDisplay.addLines(
+          `${file.isDirectory ? "[DIR]" : "[FILE]"} ${file.name}`
+        );
+      });
+    } catch (error) {
+      textDisplay.addLines(`Failed to list directory contents: ${error}`);
+    }
+  }
 
   const handleKeyDown = (event: KeyboardEvent) => {
     const textDisplay = directoryManager.textDisplay;
@@ -148,6 +185,7 @@ const UserText = () => {
 
       // List directories and files
     } else if (cmd === "ls" || cmd === "dir") {
+      handleLsCommand();
       currentDirectory.ls(segments[1]);
 
       // Change directory

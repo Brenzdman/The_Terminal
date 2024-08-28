@@ -6,9 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "electron": "electron electron/main.js"
   },
   "dependencies": {
+    "electron": "^32.0.1",
     "jotai": "^2.9.3",
     "next": "14.2.5",
     "react": "^18",
