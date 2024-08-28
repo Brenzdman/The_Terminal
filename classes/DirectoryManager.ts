@@ -15,9 +15,15 @@ export class Directory_Manager {
       return;
     }
     const root = this.createDirectory("root", "/");
-    this.currentDirectory = root.makeDirectory("Users").makeDirectory("guest");
-    this.homeDirectory = this.currentDirectory;
-    this.currentPath = this.currentDirectory.path;
+    const home = root.makeDirectory("Users").makeDirectory("guest");
+    this.currentDirectory = home;
+    this.homeDirectory = home;
+    this.currentPath = home.path;
+
+    home.makeDirectory("Documents", false, true);
+    home.makeDirectory("Downloads", false, true);
+    home.makeDirectory("Pictures", false, true);
+    home.makeDirectory("Music", false, true);
 
     const welcomeMessage = [
       "Welcome to the Terminal.",
