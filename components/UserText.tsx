@@ -1,25 +1,24 @@
 // Collaborates heavily with userText.tsx and DirectoryManager.ts
 "use client";
 
-declare global {
-  interface Window {
-    electron: {
-      invoke: (arg0: string, arg1: string) => any;
-    };
-  }
-}
-
 import { useAtom } from "jotai";
 import React, { useEffect, useState } from "react";
 import { DIRECTORY_MANAGER } from "../constants/atoms";
 import { getColor, getColorString } from "@/functions/color";
 import { Directory_Manager } from "@/classes/DirectoryManager";
 import { getDetailedHelp } from "@/functions/help";
+import { startElectron } from "@/electron/electronFunctions";
 
 const UserText = () => {
   const [directoryManager, setDirectoryManager] = useAtom(DIRECTORY_MANAGER);
   const [cmdHistory, setCmdHistory] = useState<string[]>([]);
   const [cmdIndex, setCmdIndex] = useState<number>(-1);
+  const [startedElectron, setStartedElectron] = useState<boolean>(false);
+
+  if (!startedElectron) {
+    startElectron(directoryManager);
+    setStartedElectron(true);
+  }
 
   const handleRightClick = (event: MouseEvent) => {
     event.preventDefault();
@@ -37,33 +36,13 @@ const UserText = () => {
     });
   };
 
-  let ipcRenderer: { invoke: (arg0: string, arg1: string) => any };
-  if (typeof window !== "undefined" && window.require) {
-    ipcRenderer = window.require("electron").ipcRenderer;
-  }
-
   async function handleLsCommand() {
     if (!window.electron) {
       return;
     }
 
     const textDisplay = directoryManager.textDisplay;
-    const directoryPath = "C:/Users/brend/OneDrive/Desktop/home";
-    console.log(`Listing directory: ${directoryPath}`); // Log the path
-
-    try {
-      const files = await window.electron.invoke(
-        "list-directory",
-        directoryPath
-      );
-      files.forEach((file: { isDirectory: any; name: any }) => {
-        textDisplay.addLines(
-          `${file.isDirectory ? "[DIR]" : "[FILE]"} ${file.name}`
-        );
-      });
-    } catch (error) {
-      textDisplay.addLines(`Failed to list directory contents: ${error}`);
-    }
+    textDisplay.addLines(`test`);
   }
 
   const handleKeyDown = (event: KeyboardEvent) => {

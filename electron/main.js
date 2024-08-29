@@ -9,29 +9,36 @@ function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
-      nodeIntegration: false,
+      nodeIntegration: false, 
     },
   });
 
-
-  mainWindow.loadURL("http://localhost:3000"); // or your production URL
+  mainWindow.loadURL("http://localhost:3000");
 }
 
-// Function to list directory contents
-function listDirectory(directoryPath) {
-  return fs.readdirSync(directoryPath).map((file) => {
-    const filePath = path.join(directoryPath, file);
-    const stats = fs.statSync(filePath);
-    return {
-      name: file,
-      isDirectory: stats.isDirectory(),
-    };
+app.whenReady().then(() => {
+  createWindow();
+
+  app.on("activate", function () {
+    if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
-}
-
-// IPC listener for 'list-directory' event
-ipcMain.handle("list-directory", (event, directoryPath) => {
-  return listDirectory(directoryPath);
 });
 
-app.on("ready", createWindow);
+app.on("window-all-closed", function () {
+  if (process.platform !== "darwin") app.quit();
+});
+
+// IPC handler for listing directory contents
+ipcMain.handle("list-directory", async (event, directoryPath) => {
+  try {
+    const files = await fs.promises.readdir(directoryPath, {
+      withFileTypes: true,
+    });
+    return files.map((file) => ({
+      name: file.name,
+      isDirectory: file.isDirectory(),
+    }));
+  } catch (error) {
+    throw new Error(`Unable to read directory: ${error.message}`);
+  }
+});
