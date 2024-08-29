@@ -14,22 +14,32 @@ if (typeof window !== "undefined" && window.require) {
 }
 
 export async function startElectron(directoryManager: Directory_Manager) {
-  if (!window.electron) {
+  await getFiles("/", directoryManager);
+}
+
+async function getFiles(
+  directoryPath: string,
+  directoryManager: Directory_Manager
+) {
+  if (typeof window == "undefined" || !window.electron) {
     return;
   }
 
   const textDisplay = directoryManager.textDisplay;
-  const directoryPath = "C:/";
-  console.log(`Listing directory: ${directoryPath}`); // Log the path
+  const directory = directoryManager.currentDirectory;
 
   try {
     const files = await window.electron.invoke("list-directory", directoryPath);
     files.forEach((file: { isDirectory: any; name: any }) => {
-      textDisplay.addLines(
-        `${file.isDirectory ? "[DIR]" : "[FILE]"} ${file.name}`
-      );
+      if (file.isDirectory) {
+        directory.makeDirectory(file.name, true, true);
+      } else if (file.name.includes(".")) {
+        directory.addFile(file.name, true);
+      }
     });
   } catch (error) {
-    textDisplay.addLines(`Failed to list directory contents: ${error}`);
+    textDisplay.addLines(
+      `Failed to list directory, run as administrator at your own risk for access. `
+    );
   }
 }

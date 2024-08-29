@@ -1,6 +1,17 @@
 import { Directory_Manager } from "@/classes/DirectoryManager";
 
 export function generateDirectory(): Directory_Manager {
+  try {
+    if (window.electron) {
+      return new Directory_Manager(true);
+      
+    }
+  } catch (e) {
+    if (!(e instanceof ReferenceError)) {
+      throw e;
+    }
+  }
+
   let directoryManager = new Directory_Manager(true);
   let currentDirectory = directoryManager.currentDirectory;
 

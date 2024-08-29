@@ -10,8 +10,16 @@ export class Directory_Manager {
   public homeDirectory: Directory = this.currentDirectory;
   public textDisplay: TextDisplay = new TextDisplay(this);
 
-  constructor(init: boolean = false) {
+  constructor(init: boolean = false, electron: boolean = false) {
     if (!init) {
+      return;
+    }
+
+    if (electron) {
+      const root = this.createDirectory("root", "/");
+      this.currentDirectory = root;
+      this.homeDirectory = root;
+      this.currentPath = home.path;
       return;
     }
     const root = this.createDirectory("root", "/");

@@ -1,6 +1,6 @@
 // Collaborates heavily with userText.tsx and DirectoryManager.ts
 
-import { getColor, getColorString } from "@/functions/color";
+import { getColor } from "@/functions/color";
 import { Directory_Manager } from "./DirectoryManager";
 import {
   accessDenied,
@@ -94,7 +94,16 @@ export class Directory {
 
   private validName(name: string): boolean {
     const textDisplay = this.directoryManager.textDisplay;
-    if (!name || !/^[a-zA-Z0-9_()\-]*$/.test(name)) {
+    const invalidChars = /[\\/:*?"<>|]/;
+    const reservedNames = /^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/i;
+
+    if (
+      !name ||
+      invalidChars.test(name) ||
+      reservedNames.test(name) ||
+      name.endsWith(" ") ||
+      name.endsWith(".")
+    ) {
       textDisplay.addLines(invalidName(name));
       return false;
     }
