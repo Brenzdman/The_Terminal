@@ -36,14 +36,14 @@ export async function desktopLs(
     const files = await window.electron.invoke("list-directory", path);
     files.forEach((file: { isDirectory: any; name: any }) => {
       if (file.isDirectory) {
-        directory.makeDirectory(file.name, true, true);
+        directory.makeDirectory(file.name, false, true);
       } else if (file.name.includes(".")) {
-        directory.addFile(file.name, true, true);
+        directory.addFile(file.name, false, true);
       }
     });
   } catch (error) {
     textDisplay.addLines(
-      `Failed to list directory at path:${path}, run as administrator at your own risk for access. `
+      `Failed to list directory at path:${path}, run as administrator to view.`
     );
   }
 }

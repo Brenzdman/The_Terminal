@@ -192,13 +192,13 @@ const UserText = () => {
 
       // Make new directory
     } else if (cmd === "mkdir" || cmd === "md") {
-      segments.forEach((segment) => {
+      segments.slice(1).forEach((segment) => {
         currentDirectory.makeDirectory(segment, true);
       });
 
       // Remove directoryA
     } else if (cmd === "rmdir" || cmd === "rd") {
-      segments.forEach((segment) => {
+      segments.slice(1).forEach((segment) => {
         currentDirectory.removeDirectory(segment);
       });
 
@@ -245,6 +245,9 @@ const UserText = () => {
     }
 
     textDisplay.autoFill = "";
+    if (textDisplay.getLastLine().text !== "") {
+      textDisplay.newLine();
+    }
 
     const updatedDirectoryManager = new Directory_Manager();
     Object.assign(updatedDirectoryManager, {

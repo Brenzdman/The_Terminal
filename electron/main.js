@@ -4,16 +4,21 @@ const path = require("path");
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 0,
+    height: 0,
+    title: "The Terminal", // Set the window title here
+    icon: path.join(__dirname, "assets", "app/favicon.ico"),
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
-      nodeIntegration: false, 
+      nodeIntegration: false,
     },
   });
 
+  
   mainWindow.loadURL("http://localhost:3000");
+  mainWindow.setMenuBarVisibility(false);
+  mainWindow.maximize();
 }
 
 app.whenReady().then(() => {

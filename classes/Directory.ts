@@ -179,7 +179,6 @@ export class Directory {
     }
 
     const dir = this.directoryManager.getDirectory(pathDir, name);
-
     if (!dir) {
       textDisplay.addLines(noDirAtPath(pathName));
       return;

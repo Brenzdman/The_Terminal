@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 
 const ButtonStyle: React.CSSProperties = {
   position: "fixed",
@@ -12,9 +12,22 @@ const ButtonStyle: React.CSSProperties = {
 };
 
 const FullscreenButton: React.FC = () => {
+  const [isFullscreen, setIsFullscreen] = React.useState(false);
+  useEffect(() => {
+    if (document.fullscreenElement) {
+      setIsFullscreen(true);
+    } else {
+      setIsFullscreen(false);
+    }
+  }, []);
+
   const handleClick = () => {
-    if (document.documentElement.requestFullscreen) {
+    if (document.documentElement.requestFullscreen && !isFullscreen) {
       document.documentElement.requestFullscreen();
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen();
+      setIsFullscreen(false);
     }
   };
 
