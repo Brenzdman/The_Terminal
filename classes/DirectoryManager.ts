@@ -19,19 +19,19 @@ export class Directory_Manager {
       const root = this.createDirectory("root", "/");
       this.currentDirectory = root;
       this.homeDirectory = root;
+      this.currentPath = root.path;
+    } else {
+      const root = this.createDirectory("root", "/");
+      const home = root.makeDirectory("Users").makeDirectory("guest");
+      this.currentDirectory = home;
+      this.homeDirectory = home;
       this.currentPath = home.path;
-      return;
-    }
-    const root = this.createDirectory("root", "/");
-    const home = root.makeDirectory("Users").makeDirectory("guest");
-    this.currentDirectory = home;
-    this.homeDirectory = home;
-    this.currentPath = home.path;
 
-    home.makeDirectory("Documents", false, true);
-    home.makeDirectory("Downloads", false, true);
-    home.makeDirectory("Pictures", false, true);
-    home.makeDirectory("Music", false, true);
+      home.makeDirectory("Documents", false, true);
+      home.makeDirectory("Downloads", false, true);
+      home.makeDirectory("Pictures", false, true);
+      home.makeDirectory("Music", false, true);
+    }
 
     const welcomeMessage = [
       "Welcome to the Terminal.",
@@ -191,7 +191,6 @@ export class Directory_Manager {
     }
 
     // Looks for the file from the current directory
-    console.log(path);
     return directory?.files.find(
       (file) => file.name + file.type === path || file.name === path
     );

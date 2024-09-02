@@ -3,21 +3,21 @@
 
 import { useAtom } from "jotai";
 import React, { useEffect, useState } from "react";
-import { DIRECTORY_MANAGER } from "../constants/atoms";
+import { DIRECTORY_MANAGER } from "./DirectoryAtom";
 import { getColor, getColorString } from "@/functions/color";
 import { Directory_Manager } from "@/classes/DirectoryManager";
 import { getDetailedHelp } from "@/functions/help";
-import { startElectron } from "@/electron/electronFunctions";
+import { desktopLs } from "@/electron/electronFunctions";
 
 const UserText = () => {
   const [directoryManager, setDirectoryManager] = useAtom(DIRECTORY_MANAGER);
   const [cmdHistory, setCmdHistory] = useState<string[]>([]);
   const [cmdIndex, setCmdIndex] = useState<number>(-1);
-  const [startedElectron, setStartedElectron] = useState<boolean>(false);
-
-  if (!startedElectron) {
-    startElectron(directoryManager);
-    setStartedElectron(true);
+  const [desktopInitialized, setDesktopInitialized] = useState(false);
+  // Desktop setup
+  if (!desktopInitialized) {
+    desktopLs("/", directoryManager);
+    setDesktopInitialized(true);
   }
 
   const handleRightClick = (event: MouseEvent) => {
@@ -35,15 +35,6 @@ const UserText = () => {
       setDirectoryManager(updatedDirectoryManager);
     });
   };
-
-  async function handleLsCommand() {
-    if (!window.electron) {
-      return;
-    }
-
-    const textDisplay = directoryManager.textDisplay;
-    textDisplay.addLines(`test`);
-  }
 
   const handleKeyDown = (event: KeyboardEvent) => {
     const textDisplay = directoryManager.textDisplay;
@@ -148,7 +139,32 @@ const UserText = () => {
     const lastLine = textDisplay.getLastLine();
     const text = lastLine.text.trim();
 
-    let segments = text.split(" ");
+    const getSegments = (text: string): string[] => {
+      let segments: string[] = [];
+
+      let lineBreak = false;
+      let currentSegment = "";
+
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        if (char === " " && !lineBreak) {
+          segments.push(currentSegment);
+          currentSegment = "";
+        } else if (char === '"') {
+          lineBreak = !lineBreak;
+        } else {
+          currentSegment += char;
+        }
+
+        if (i === text.length - 1) {
+          segments.push(currentSegment);
+        }
+      }
+
+      return segments;
+    };
+
+    let segments = getSegments(text);
 
     // Messages
     const errorColor = getColor("error");
@@ -164,12 +180,11 @@ const UserText = () => {
 
       // List directories and files
     } else if (cmd === "ls" || cmd === "dir") {
-      handleLsCommand();
       currentDirectory.ls(segments[1]);
 
       // Change directory
     } else if (cmd === "cd" || cmd === "chdir") {
-      currentDirectory.cd(segments[1]);
+      currentDirectory.cd(segments.slice(1).join(" "));
 
       // DeSync Fix
       directoryManager.currentDirectory =

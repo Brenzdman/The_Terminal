@@ -8,10 +8,10 @@ import {
   insertColorString,
 } from "@/functions/color";
 import { Line } from "@/classes/Line";
-import { DIRECTORY_MANAGER } from "@/constants/atoms";
 import { Directory_Manager } from "@/classes/DirectoryManager";
+import { DIRECTORY_MANAGER } from "./DirectoryAtom";
 
-const TextDisplayRenderer: React.FC = () => {
+const TextRenderer: React.FC = () => {
   const [directoryManager, setDirectoryManager] = useAtom(DIRECTORY_MANAGER);
   const textDisplay = directoryManager.textDisplay;
 
@@ -75,7 +75,7 @@ const TextDisplayRenderer: React.FC = () => {
   return <Renderer textDisplay={textDisplay} scrollRef={scrollRef} />;
 };
 
-export default TextDisplayRenderer;
+export default TextRenderer;
 
 const Renderer: React.FC<{
   textDisplay: TextDisplay;
@@ -186,7 +186,7 @@ const Renderer: React.FC<{
                 top: 0,
                 zIndex: 1,
                 transform: "translateX(-50%) scaleX(0.5)",
-                display: "inline-block", 
+                display: "inline-block",
                 color: "#ffffff",
               }}
             >

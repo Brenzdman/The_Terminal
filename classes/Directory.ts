@@ -13,7 +13,7 @@ import {
   noDirOrFileAtPath,
   noFileAtPath,
 } from "@/functions/messages";
-import { dir } from "console";
+import { desktopLs } from "@/electron/electronFunctions";
 
 export class Directory {
   public name: string;
@@ -60,7 +60,8 @@ export class Directory {
 
   public addFile(
     pathSegment: string,
-    userMalleable = false
+    userMalleable = false,
+    suppressDialog: boolean = false
   ): Dir_File | undefined {
     const textDisplay = this.directoryManager.textDisplay;
     let [pathDir, name] = this.splitPathName(pathSegment);
@@ -80,7 +81,9 @@ export class Directory {
     let file = this.directoryManager.getFile(pathDir, pathSegment);
 
     if (file) {
-      textDisplay.addLines(fileAlreadyExists(file));
+      if (!suppressDialog) {
+        textDisplay.addLines(fileAlreadyExists(file));
+      }
 
       return file;
     }
@@ -148,7 +151,9 @@ export class Directory {
     }
 
     if (existingDir) {
-      textDisplay.addLines(dirAlreadyExists(existingDir.path));
+      if (!suppressDialog) {
+        textDisplay.addLines(dirAlreadyExists(existingDir.path));
+      }
       return existingDir;
     }
 
@@ -333,6 +338,8 @@ export class Directory {
 
     this.directoryManager.currentDirectory = dir;
     this.directoryManager.currentPath = dir.path;
+
+    desktopLs(path, this.directoryManager);
 
     textDisplay.newLine();
   }
