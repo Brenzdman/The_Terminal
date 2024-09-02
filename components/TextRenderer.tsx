@@ -187,6 +187,7 @@ const Renderer: React.FC<{
                 zIndex: 1,
                 transform: "translateX(-50%) scaleX(0.5)",
                 display: "inline-block",
+
                 color: "#ffffff",
               }}
             >
