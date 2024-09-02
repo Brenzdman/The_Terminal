@@ -148,6 +148,7 @@ export class Directory_Manager {
 
     path = this.sterilizePath(path, directory);
 
+    console.log("Path: ", path);
     // Look for relative directory
     const relativeDir = directory?.directories.find(
       (dir) => directory?.path + path === dir.path

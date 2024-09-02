@@ -25,8 +25,7 @@ export async function desktopLs(
 
   const textDisplay = directoryManager.textDisplay;
   const directory = directoryManager.currentDirectory;
-  const path = directoryManager.getDirectory(directory, directoryPath)?.path;
-  
+  const path = directoryManager.getDirectory(directory, directory.path)?.path;
 
   if (!path) {
     textDisplay.addLines(`Directory not found: ${path}`);

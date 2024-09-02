@@ -192,11 +192,15 @@ const UserText = () => {
 
       // Make new directory
     } else if (cmd === "mkdir" || cmd === "md") {
-      currentDirectory.makeDirectory(segments[1], true);
+      segments.forEach((segment) => {
+        currentDirectory.makeDirectory(segment, true);
+      });
 
       // Remove directoryA
     } else if (cmd === "rmdir" || cmd === "rd") {
-      currentDirectory.removeDirectory(segments[1]);
+      segments.forEach((segment) => {
+        currentDirectory.removeDirectory(segment);
+      });
 
       // Display txt file content
     } else if (cmd === "type") {
