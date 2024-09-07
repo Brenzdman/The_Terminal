@@ -10,28 +10,21 @@ export class Directory_Manager {
   public homeDirectory: Directory = this.currentDirectory;
   public textDisplay: TextDisplay = new TextDisplay(this);
 
-  constructor(init: boolean = false, electron: boolean = false) {
+  constructor(init: boolean = false) {
     if (!init) {
       return;
     }
 
-    if (electron) {
-      const root = this.createDirectory("root", "/");
-      this.currentDirectory = root;
-      this.homeDirectory = root;
-      this.currentPath = root.path;
-    } else {
-      const root = this.createDirectory("root", "/");
-      const home = root.makeDirectory("Users").makeDirectory("guest");
-      this.currentDirectory = home;
-      this.homeDirectory = home;
-      this.currentPath = home.path;
+    const root = this.createDirectory("root", "/");
+    const home = root.makeDirectory("Users").makeDirectory("guest");
+    this.currentDirectory = home;
+    this.homeDirectory = home;
+    this.currentPath = home.path;
 
-      home.makeDirectory("Documents", false, true);
-      home.makeDirectory("Downloads", false, true);
-      home.makeDirectory("Pictures", false, true);
-      home.makeDirectory("Music", false, true);
-    }
+    home.makeDirectory("Documents", false, true);
+    home.makeDirectory("Downloads", false, true);
+    home.makeDirectory("Pictures", false, true);
+    home.makeDirectory("Music", false, true);
 
     const welcomeMessage = [
       "Welcome to the Terminal.",

@@ -13,7 +13,6 @@ import {
   noDirOrFileAtPath,
   noFileAtPath,
 } from "@/functions/messages";
-import { desktopLs } from "@/electron/electronFunctions";
 
 export class Directory {
   public name: string;
@@ -337,9 +336,6 @@ export class Directory {
 
     this.directoryManager.currentDirectory = dir;
     this.directoryManager.currentPath = dir.path;
-
-    desktopLs(path, this.directoryManager);
-
     textDisplay.newLine();
   }
 

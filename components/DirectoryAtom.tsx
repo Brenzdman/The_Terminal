@@ -3,7 +3,7 @@ import { atom, useAtom } from "jotai";
 import { useEffect, useState } from "react";
 
 // Atoms
-const directoryManager = new Directory_Manager(true, true);
+const directoryManager = new Directory_Manager(true);
 export const DIRECTORY_MANAGER = atom(directoryManager);
 
 export function DirectoryAtom({ children }: { children: React.ReactNode }) {
@@ -11,16 +11,6 @@ export function DirectoryAtom({ children }: { children: React.ReactNode }) {
   const [isInitialized, setIsInitialized] = useState(false);
 
   const generateDirectory = (): Directory_Manager => {
-    try {
-      if (window.electron) {
-        return new Directory_Manager(true, true);
-      }
-    } catch (e) {
-      if (!(e instanceof ReferenceError)) {
-        throw e;
-      }
-    }
-
     let directoryManager = new Directory_Manager(true);
     let currentDirectory = directoryManager.currentDirectory;
 

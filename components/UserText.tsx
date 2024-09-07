@@ -7,18 +7,11 @@ import { DIRECTORY_MANAGER } from "./DirectoryAtom";
 import { getColor, getColorString } from "@/functions/color";
 import { Directory_Manager } from "@/classes/DirectoryManager";
 import { getDetailedHelp } from "@/functions/help";
-import { desktopLs } from "@/electron/electronFunctions";
 
 const UserText = () => {
   const [directoryManager, setDirectoryManager] = useAtom(DIRECTORY_MANAGER);
   const [cmdHistory, setCmdHistory] = useState<string[]>([]);
   const [cmdIndex, setCmdIndex] = useState<number>(-1);
-  const [desktopInitialized, setDesktopInitialized] = useState(false);
-  // Desktop setup
-  if (!desktopInitialized) {
-    desktopLs("/", directoryManager);
-    setDesktopInitialized(true);
-  }
 
   const handleRightClick = (event: MouseEvent) => {
     event.preventDefault();
@@ -39,7 +32,7 @@ const UserText = () => {
   const handleKeyDown = (event: KeyboardEvent) => {
     const textDisplay = directoryManager.textDisplay;
 
-    if (event.key.length === 1) {
+    if (event.key.length === 1 && !event.getModifierState("Control")) {
       textDisplay.typeCharacter(event.key, true);
     } else if (event.key === "Backspace") {
       if (event.getModifierState("Control")) {
