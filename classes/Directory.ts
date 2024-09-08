@@ -4,6 +4,7 @@ import { getColor } from "@/functions/color";
 import { Directory_Manager } from "./DirectoryManager";
 import {
   accessDenied,
+  cannotRunFile,
   dirAlreadyExists,
   fileAlreadyExists,
   invalidFileType,
@@ -340,10 +341,7 @@ export class Directory {
   }
 
   private getFile(fileName: string): Dir_File | undefined {
-    return this.files.find(
-      (dirFile) =>
-        dirFile.name + dirFile.type == fileName || dirFile.name == fileName
-    );
+    return this.files.find((file) => file.name + file.type === fileName);
   }
 
   public runFile(requestName: string): void {
@@ -353,13 +351,17 @@ export class Directory {
 
     if (file) {
       if (file.onRun) {
-        textDisplay.addLines([`Running ${file.name}${file.type}...`]);
+        textDisplay.addLines(`Running ${file.name}${file.type}...`);
         file.onRun();
         return;
       }
+
+      textDisplay.addLines(cannotRunFile(file));
+      console.log(file);
+      return;
     }
 
-    textDisplay.addLines(noFileAtPath(requestName));
+    textDisplay.addLines(noFileAtPath(dir.path + name));
   }
 
   readFile(requestName: string): void {

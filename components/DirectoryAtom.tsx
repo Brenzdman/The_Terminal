@@ -1,35 +1,15 @@
 import { Directory_Manager } from "@/classes/DirectoryManager";
+import { generateDirectory } from "@/functions/generateDirectory";
 import { atom, useAtom } from "jotai";
 import { useEffect, useState } from "react";
 
 // Atoms
-const directoryManager = new Directory_Manager(true);
+const directoryManager = new Directory_Manager();
 export const DIRECTORY_MANAGER = atom(directoryManager);
 
 export function DirectoryAtom({ children }: { children: React.ReactNode }) {
   const [directoryManager, setDirectoryManager] = useAtom(DIRECTORY_MANAGER);
   const [isInitialized, setIsInitialized] = useState(false);
-
-  const generateDirectory = (): Directory_Manager => {
-    let directoryManager = new Directory_Manager(true);
-    let currentDirectory = directoryManager.currentDirectory;
-
-    if (!currentDirectory) {
-      throw new Error("Directory not found!");
-    }
-
-    currentDirectory.addFile("start.exe");
-
-    const testFile = currentDirectory.addFile("test.txt");
-
-    if (testFile) {
-      testFile.content = ["Hello World!"];
-    }
-
-    currentDirectory.makeDirectory("newDir", true, true);
-
-    return directoryManager;
-  };
 
   useEffect(() => {
     const updatedDirectoryManager = generateDirectory();

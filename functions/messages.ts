@@ -9,6 +9,13 @@ export function noFileAtPath(path: string): string {
   return getColorString(`No file found at '${path}'`, getColor("error"));
 }
 
+export function cannotRunFile(file: Dir_File): string {
+  return getColorString(
+    `File '${file.name}${file.type}' cannot be run`,
+    getColor("error")
+  );
+}
+
 export function noDirOrFileAtPath(path: string): string {
   return getColorString(
     `No directory or file found at '${path}'`,

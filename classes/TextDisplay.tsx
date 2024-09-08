@@ -12,9 +12,8 @@ export class TextDisplay {
     this.directoryManager = directoryManager;
     if (lines) {
       this.addLines(lines);
-    } else {
-      this.lines.push(new Line("", this.directoryManager.currentPath));
     }
+    this.lines.push(new Line("", this.directoryManager.currentPath));
   }
 
   addLines(lines: string[] | string) {
@@ -23,16 +22,11 @@ export class TextDisplay {
       lines = lines.split("\n");
     }
 
-    if (lines[lines.length - 1] === "") {
-      lines.pop();
-    }
-
     lines.forEach((line) => {
       this.lines.push(new Line(line, path));
     });
 
     this.lines.push(new Line(" ", path));
-    this.lines.push(new Line("", path));
   }
 
   typeCharacter(letter: string, userGenerated: boolean = true) {
@@ -125,7 +119,8 @@ export class TextDisplay {
         }
         const char = lastLine.text[this.cursorX - 1];
         if (breakList.includes(char)) {
-          break;        }
+          break;
+        }
       }
     } else if (direction === "Right") {
       while (this.cursorX < lastLine.text.length) {

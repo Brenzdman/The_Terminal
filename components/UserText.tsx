@@ -159,6 +159,11 @@ const UserText = () => {
 
     let segments = getSegments(text);
 
+    if (segments.length === 0) {
+      textDisplay.newLine();
+      return;
+    }
+
     // Messages
     const errorColor = getColor("error");
     const errorMessage = getColorString(
@@ -166,7 +171,7 @@ const UserText = () => {
       errorColor
     );
 
-    // Help
+    // Help CMD
     const cmd = segments[0].toLowerCase();
     if (cmd === "help") {
       textDisplay.addLines(getDetailedHelp(segments[1]));
