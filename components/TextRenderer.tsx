@@ -7,7 +7,7 @@ import {
   getColorString,
   insertColorString,
 } from "@/functions/color";
-import { Line } from "@/classes/Line";
+import { addLineBreaks, Line } from "@/classes/Line";
 import { Directory_Manager } from "@/classes/DirectoryManager";
 import { DIRECTORY_MANAGER } from "./DirectoryAtom";
 
@@ -94,12 +94,13 @@ const Renderer: React.FC<{
   };
 
   const formatLineText = (lineText: string): string => {
-    const firstSpace = lineText.indexOf(" ");
-    const firstSegment =
-      firstSpace !== -1 ? lineText.slice(0, firstSpace) : lineText;
+    const text = addLineBreaks(lineText);
+
+    const firstSpace = text.indexOf(" ");
+    const firstSegment = firstSpace !== -1 ? text.slice(0, firstSpace) : text;
     return (
       getColorString(firstSegment, getColor("function")) +
-      lineText.slice(firstSegment.length)
+      text.slice(firstSegment.length)
     );
   };
 
@@ -110,10 +111,12 @@ const Renderer: React.FC<{
     cursor: string,
     autoFillReplace: boolean,
     autoFill: string
-  ): [string, number] => {
+  ): [string, number, number] => {
     if (autoFillReplace) {
       lineText = formatLineText(autoFill);
     }
+
+    console.log(lineText);
 
     // Remove color codes and count \n characters before the cursor position
     const lineTextWithoutColors = lineText.replace(/\x1b\[[0-9;]*m/g, "");
@@ -122,7 +125,12 @@ const Renderer: React.FC<{
     ).length;
 
     // Adjust cursor position for color codes and newlines
-    const adjustedCursorX = cursorX + 9 - newlineCount;
+    let adjustedCursorX = cursorX + 9 - newlineCount;
+    // number of newlines before cursor
+    const adjustedCursorY =
+      lineText.slice(0, adjustedCursorX - 1).match(/\n/g)?.length || 0;
+
+    adjustedCursorX += adjustedCursorY * 2;
 
     let firstSpace = lineText.indexOf(" ");
     firstSpace = firstSpace === -1 ? lineText.length : firstSpace;
@@ -140,7 +148,7 @@ const Renderer: React.FC<{
         lineText.slice(adjustedCursorX);
     }
 
-    return [path + "> " + lineText, adjustedCursorX];
+    return [path + "> " + lineText, adjustedCursorX, adjustedCursorY];
   };
 
   const renderLineContent = (
@@ -162,7 +170,7 @@ const Renderer: React.FC<{
 
       // If last line:
       if (index === newLines.length - 1) {
-        let [text, adjustedCursorX] = renderLastLine(
+        let [text, adjustedCursorX, adjustedCursorY] = renderLastLine(
           path,
           lineText,
           cursorX,
@@ -183,7 +191,7 @@ const Renderer: React.FC<{
             <span
               style={{
                 position: "absolute",
-                top: 0,
+                top: adjustedCursorY * 1.5 + "em",
                 zIndex: 1,
                 transform: "translateX(-50%) scaleX(0.5)",
                 display: "inline-block",

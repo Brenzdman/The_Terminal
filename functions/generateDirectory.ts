@@ -2,6 +2,7 @@
 
 import { Directory_Manager } from "@/classes/DirectoryManager";
 import { TextDisplay } from "@/classes/TextDisplay";
+import README from "../txtFiles/README";
 
 export function generateDirectory(): Directory_Manager {
   let directoryManager = new Directory_Manager();
@@ -14,11 +15,10 @@ export function generateDirectory(): Directory_Manager {
   directoryManager.currentPath = home.path;
 
   // home directories
-  home.makeDirectory("Documents", false, true);
+  const Doc = home.makeDirectory("Documents", false, true);
   home.makeDirectory("Downloads", false, true);
   home.makeDirectory("Pictures", false, true);
   home.makeDirectory("Music", false, true);
-  let currentDirectory = directoryManager.currentDirectory;
 
   // Initial print to the terminal
   const welcomeMessage = [
@@ -32,21 +32,8 @@ export function generateDirectory(): Directory_Manager {
   );
 
   // Files
-  const startFile = currentDirectory.addFile("start.exe");
-  const textDisplay = directoryManager.textDisplay;
-
-  startFile!.onRun = () => {
-    textDisplay.addLines("Hello World!");
-    textDisplay.addLines("Hello World!");
-    textDisplay.addLines("Hello World!");
-    textDisplay.addLines("Hello World!");
-  };
-
-  const testFile = currentDirectory.addFile("test.txt");
-
-  if (testFile) {
-    testFile.content = ["Hello World!"];
-  }
+  const readMe = Doc.addFile("README.txt", false, false);
+  readMe!.content = README;
 
   return directoryManager;
 }
