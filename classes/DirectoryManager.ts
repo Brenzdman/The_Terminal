@@ -4,33 +4,18 @@ import { Dir_File, Directory } from "./Directory";
 import { TextDisplay } from "./TextDisplay";
 
 export class Directory_Manager {
-  public directories: Directory[] = [];
-  public currentDirectory: Directory = new Directory(this, "root", "/");
-  public currentPath: string = "/";
-  public homeDirectory: Directory = this.currentDirectory;
-  public textDisplay: TextDisplay = new TextDisplay(this);
+  public currentDirectory: Directory;
+  public directories: Directory[];
+  public currentPath: string;
+  public homeDirectory: Directory;
+  public textDisplay: TextDisplay;
 
-  constructor(init: boolean = false) {
-    if (!init) {
-      return;
-    }
-    const root = this.createDirectory("root", "/");
-    const home = root.makeDirectory("Users").makeDirectory("guest");
-    this.currentDirectory = home;
-    this.homeDirectory = home;
-    this.currentPath = home.path;
-
-    home.makeDirectory("Documents", false, true);
-    home.makeDirectory("Downloads", false, true);
-    home.makeDirectory("Pictures", false, true);
-    home.makeDirectory("Music", false, true);
-
-    const welcomeMessage = [
-      "Welcome to the Terminal.",
-      "Type 'help' to see a list of available commands.",
-    ];
-
-    this.textDisplay = new TextDisplay(this, welcomeMessage);
+  constructor() {
+    this.currentDirectory = new Directory(this, "root", "/");
+    this.directories = [this.currentDirectory];
+    this.currentPath = "/";
+    this.homeDirectory = this.currentDirectory;
+    this.textDisplay = new TextDisplay(this);
   }
 
   public createDirectory(name: string, path: string): Directory {
@@ -54,7 +39,11 @@ export class Directory_Manager {
     file: boolean = false
   ): string {
     path = path.trim();
+    // Replaces ~ with home path
+    path = path.replace(/^~/, this.homeDirectory.path);
+
     // Replaces \ with / for windows
+
     path = path?.replace(/\\/g, "/");
 
     // Replaces C:/ with /
@@ -119,11 +108,6 @@ export class Directory_Manager {
       return directory;
     }
 
-    // Finds home directory
-    if (path == "~") {
-      return this.homeDirectory;
-    }
-
     // Finds previous directory
     if (path == "..") {
       path = directory!.path;
@@ -183,7 +167,6 @@ export class Directory_Manager {
     }
 
     // Looks for the file from the current directory
-    console.log(path);
     return directory?.files.find(
       (file) => file.name + file.type === path || file.name === path
     );

@@ -12,27 +12,25 @@ export class TextDisplay {
     this.directoryManager = directoryManager;
     if (lines) {
       this.addLines(lines);
-    } else {
-      this.lines.push(new Line("", this.directoryManager.currentPath));
     }
+    this.lines.push(new Line("", this.directoryManager.currentPath));
+    this.newUserLine();
   }
 
-  addLines(lines: string[] | string) {
+  addLines(lines: string[] | string): Line[] {
     const path = this.directoryManager.currentPath;
     if (typeof lines === "string") {
       lines = lines.split("\n");
     }
 
-    if (lines[lines.length - 1] === "") {
-      lines.pop();
-    }
+    let newLines: Line[] = [];
 
     lines.forEach((line) => {
-      this.lines.push(new Line(line, path));
+      newLines.push(new Line(line, path));
     });
 
-    this.lines.push(new Line(" ", path));
-    this.lines.push(new Line("", path));
+    this.lines = this.lines.concat(newLines);
+    return newLines;
   }
 
   typeCharacter(letter: string, userGenerated: boolean = true) {
@@ -40,17 +38,18 @@ export class TextDisplay {
 
     // Checks if using a prev cmd
     if (this.autoFill && this.autoFillReplace) {
-      lastLine.text = this.autoFill;
+      lastLine.setText(this.autoFill);
       this.autoFill = "";
       this.autoFillReplace = false;
-      this.cursorX = lastLine.text.length;
+      this.cursorX = lastLine.getText().length;
     }
 
-    lastLine.text =
-      lastLine.text.slice(0, this.cursorX) +
-      letter +
-      lastLine.text.slice(this.cursorX);
+    const text = lastLine.getText();
+    lastLine.setText(
+      text.slice(0, this.cursorX) + letter + text.slice(this.cursorX)
+    );
 
+    // lastLine.setText(newText);
     lastLine.userGenerated = userGenerated;
     lastLine.path = this.directoryManager.currentPath;
 
@@ -76,7 +75,7 @@ export class TextDisplay {
       this.cursorX = Math.max(0, this.cursorX - 1);
     } else if (direction === "right") {
       const lastLine = this.getLastLine();
-      this.cursorX = Math.min(this.cursorX + 1, lastLine.text.length);
+      this.cursorX = Math.min(this.cursorX + 1, lastLine.getText().length);
     }
 
     this.cursorSymbol = "|";
@@ -85,8 +84,8 @@ export class TextDisplay {
   setTextToAutofill() {
     const lastLine = this.getLastLine();
     lastLine.userGenerated = true;
-    lastLine.text = this.autoFill;
-    this.cursorX = lastLine.text.length;
+    lastLine.setText(this.autoFill);
+    this.cursorX = lastLine.getText().length;
     this.autoFill = "";
     this.autoFillReplace = false;
   }
@@ -97,17 +96,22 @@ export class TextDisplay {
     }
 
     const lastLine = this.getLastLine();
-    lastLine.text =
-      lastLine.text.slice(0, this.cursorX - 1) +
-      lastLine.text.slice(this.cursorX);
+    const text = lastLine.getText();
+    lastLine.setText(
+      text.slice(0, this.cursorX - 1) + text.slice(this.cursorX)
+    );
+
     this.moveCursorLeft();
   }
 
   deleteCharacter() {
     const lastLine = this.getLastLine();
-    lastLine.text =
-      lastLine.text.slice(0, this.cursorX) +
-      lastLine.text.slice(this.cursorX + 1);
+
+    const text = lastLine.getText();
+    lastLine.setText(
+      text.slice(0, this.cursorX) + text.slice(this.cursorX + 1)
+    );
+
     this.cursorSymbol = "|";
   }
 
@@ -123,18 +127,19 @@ export class TextDisplay {
         } else {
           this.moveCursorLeft();
         }
-        const char = lastLine.text[this.cursorX - 1];
+        const char = lastLine.getText()[this.cursorX - 1];
         if (breakList.includes(char)) {
-          break;        }
+          break;
+        }
       }
     } else if (direction === "Right") {
-      while (this.cursorX < lastLine.text.length) {
+      while (this.cursorX < lastLine.getText().length) {
         if (deleteChar) {
           this.deleteCharacter();
         } else {
           this.moveCursorRight();
         }
-        const char = lastLine.text[this.cursorX];
+        const char = lastLine.getText()[this.cursorX];
         if (breakList.includes(char)) {
           break;
         }
@@ -160,8 +165,14 @@ export class TextDisplay {
     }
   }
 
-  newLine() {
+  newUserLine() {
+    const lastLine = this.getLastLine();
+    if (lastLine.getText().trim() !== "") {
+      this.lines.push(new Line("", this.directoryManager.currentPath));
+    }
+    
     const newLine = new Line("", this.directoryManager.currentPath);
+    newLine.userGenerated = true;
     this.lines.push(newLine);
     this.cursorX = 0;
   }

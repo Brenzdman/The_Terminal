@@ -1,50 +1,39 @@
 import { Dir_File } from "@/classes/Directory";
-import { getColorString, getColor } from "./color";
+import { getColor } from "./color";
+import { TextDisplay } from "@/classes/TextDisplay";
+import { StyledText } from "@/classes/StyledText";
 
-export function noDirAtPath(path: string): string {
-  return getColorString(`No directory found at '${path}'`, getColor("error"));
-}
+// Functions here add a message to the end of the text display
 
-export function noFileAtPath(path: string): string {
-  return getColorString(`No file found at '${path}'`, getColor("error"));
-}
+export function errorMessage(
+  textDisplay: TextDisplay,
+  type: string,
+  string: string
+): void {
+  let message = `Error: ${string}`;
+  if (type === "noDirAtPath") {
+    message = `No directory found at '${string}'`;
+  } else if (type === "noFileAtPath") {
+    message = `No file found at '${string}'`;
+  } else if (type === "noDirOrFileAtPath") {
+    message = `No directory or file found at '${string}'`;
+  } else if (type === "cannotRunFile") {
+    message = `File '${string}' cannot be run`;
+  } else if (type === "fileAlreadyExists") {
+    message = `File already exists at '${string}'`;
+  } else if (type === "dirAlreadyExists") {
+    message = `Directory already exists at '${string}'`;
+  } else if (type === "invalidName") {
+    message = `Invalid name '${string}'`;
+  } else if (type === "invalidPath") {
+    message = `Invalid path '${string}'`;
+  } else if (type === "invalidFileType") {
+    message = `This use of the command is only set up for txt files.`;
+  } else if (type === "invalidCommand") {
+    message = `Invalid command '${string}'`;
+  }
 
-export function noDirOrFileAtPath(path: string): string {
-  return getColorString(
-    `No directory or file found at '${path}'`,
-    getColor("error")
-  );
-}
-
-export function fileAlreadyExists(file: Dir_File): string {
-  return getColorString(
-    `File already exists at ${file.name}${file.type}`,
-    getColor("error")
-  );
-}
-
-export function dirAlreadyExists(path: string): string {
-  return getColorString(
-    `Directory already exists at '${path}'`,
-    getColor("error")
-  );
-}
-
-export function invalidName(name: string): string {
-  return getColorString(`Invalid name '${name}'`, getColor("error"));
-}
-
-export function invalidPath(path: string): string {
-  return getColorString(`Invalid path '${path}'`, getColor("error"));
-}
-
-export function accessDenied(): string {
-  return getColorString("ACCESS DENIED", getColor("error"));
-}
-
-export function invalidFileType(): string {
-  return getColorString(
-    "This use of the command is only set up for txt files.",
-    getColor("error")
-  );
+  const Lines = textDisplay.addLines(message);
+  const text: StyledText = Lines[0].text;
+  text.addStyle(0, text.getText().length, "error");
 }

@@ -46,7 +46,7 @@ export function getDetailedHelp(
       description: "Change to the specified directory.",
       aliases: ["cd", "chdir"],
       usage: "cd [dir]",
-      examples: ["cd Documents", "cd /path/to/dir"],
+      examples: ["cd Documents", "cd /path/to/dir", "cd ..", "cd ~"],
     };
   } else if (command === "mkdir" || command === "md") {
     help = {

@@ -1,12 +1,12 @@
 // Collaborates heavily with userText.tsx and DirectoryManager.ts
-
 "use client";
+
 import { useAtom } from "jotai";
 import React, { useEffect, useState } from "react";
-import { DIRECTORY_MANAGER } from "../constants/atoms";
-import { getColor, getColorString } from "@/functions/color";
+import { DIRECTORY_MANAGER } from "./DirectoryAtom";
 import { Directory_Manager } from "@/classes/DirectoryManager";
 import { getDetailedHelp } from "@/functions/help";
+import { errorMessage } from "@/functions/messages";
 
 const UserText = () => {
   const [directoryManager, setDirectoryManager] = useAtom(DIRECTORY_MANAGER);
@@ -32,7 +32,7 @@ const UserText = () => {
   const handleKeyDown = (event: KeyboardEvent) => {
     const textDisplay = directoryManager.textDisplay;
 
-    if (event.key.length === 1) {
+    if (event.key.length === 1 && !event.getModifierState("Control")) {
       textDisplay.typeCharacter(event.key, true);
     } else if (event.key === "Backspace") {
       if (event.getModifierState("Control")) {
@@ -49,12 +49,12 @@ const UserText = () => {
     } else if (event.key === "Enter") {
       if (textDisplay.autoFillReplace) {
         const lastLine = textDisplay.getLastLine();
-        lastLine.text = textDisplay.autoFill;
+        lastLine.setText(textDisplay.autoFill);
         lastLine.userGenerated = true;
         textDisplay.autoFillReplace = false;
       }
 
-      const cmd = textDisplay.getLastLine().text.trim();
+      const cmd = textDisplay.getLastLine().getText().trim();
 
       setCmdHistory((prevHistory) => {
         if (!cmd) return prevHistory;
@@ -130,18 +130,43 @@ const UserText = () => {
     const textDisplay = directoryManager.textDisplay;
     let currentDirectory = directoryManager.currentDirectory;
     const lastLine = textDisplay.getLastLine();
-    const text = lastLine.text.trim();
+    const text = lastLine.getText().trim();
 
-    let segments = text.split(" ");
+    const getSegments = (text: string): string[] => {
+      let segments: string[] = [];
+
+      let lineBreak = false;
+      let currentSegment = "";
+
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        if (char === " " && !lineBreak) {
+          segments.push(currentSegment);
+          currentSegment = "";
+        } else if (char === '"') {
+          lineBreak = !lineBreak;
+        } else {
+          currentSegment += char;
+        }
+
+        if (i === text.length - 1) {
+          segments.push(currentSegment);
+        }
+      }
+
+      return segments;
+    };
+
+    let segments = getSegments(text);
+
+    if (segments.length === 0) {
+      textDisplay.newUserLine();
+      return;
+    }
 
     // Messages
-    const errorColor = getColor("error");
-    const errorMessage = getColorString(
-      "Error: Command not found. Type 'help' for a list of available commands.",
-      errorColor
-    );
 
-    // Help
+    // Help CMD
     const cmd = segments[0].toLowerCase();
     if (cmd === "help") {
       textDisplay.addLines(getDetailedHelp(segments[1]));
@@ -152,7 +177,7 @@ const UserText = () => {
 
       // Change directory
     } else if (cmd === "cd" || cmd === "chdir") {
-      currentDirectory.cd(segments[1]);
+      currentDirectory.cd(segments.slice(1).join(" "));
 
       // DeSync Fix
       directoryManager.currentDirectory =
@@ -160,11 +185,15 @@ const UserText = () => {
 
       // Make new directory
     } else if (cmd === "mkdir" || cmd === "md") {
-      currentDirectory.makeDirectory(segments[1], true);
+      segments.slice(1).forEach((segment) => {
+        currentDirectory.makeDirectory(segment, true);
+      });
 
       // Remove directoryA
     } else if (cmd === "rmdir" || cmd === "rd") {
-      currentDirectory.removeDirectory(segments[1]);
+      segments.slice(1).forEach((segment) => {
+        currentDirectory.removeDirectory(segment);
+      });
 
       // Display txt file content
     } else if (cmd === "type") {
@@ -203,12 +232,13 @@ const UserText = () => {
 
       // Default
     } else if (cmd === "") {
-      textDisplay.newLine();
+      // Do nothing;
     } else {
-      textDisplay.addLines(errorMessage);
+      errorMessage(textDisplay, "invalidCommand", cmd);
     }
 
     textDisplay.autoFill = "";
+    textDisplay.newUserLine();
 
     const updatedDirectoryManager = new Directory_Manager();
     Object.assign(updatedDirectoryManager, {
