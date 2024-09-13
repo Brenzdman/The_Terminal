@@ -17,7 +17,7 @@ export class TextDisplay {
     this.newUserLine();
   }
 
-  addLines(lines: string[] | string) {
+  addLines(lines: string[] | string): void {
     const path = this.directoryManager.currentPath;
     if (typeof lines === "string") {
       lines = lines.split("\n");

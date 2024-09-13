@@ -4,9 +4,10 @@
 import { useAtom } from "jotai";
 import React, { useEffect, useState } from "react";
 import { DIRECTORY_MANAGER } from "./DirectoryAtom";
-import { getColor, getColorString } from "@/functions/color";
+import { getColor } from "@/functions/color";
 import { Directory_Manager } from "@/classes/DirectoryManager";
 import { getDetailedHelp } from "@/functions/help";
+import { commandNotFound } from "@/functions/messages";
 
 const UserText = () => {
   const [directoryManager, setDirectoryManager] = useAtom(DIRECTORY_MANAGER);
@@ -165,11 +166,6 @@ const UserText = () => {
     }
 
     // Messages
-    const errorColor = getColor("error");
-    const errorMessage = getColorString(
-      "Error: Command not found. Type 'help' for a list of available commands.",
-      errorColor
-    );
 
     // Help CMD
     const cmd = segments[0].toLowerCase();
@@ -239,7 +235,7 @@ const UserText = () => {
     } else if (cmd === "") {
       textDisplay.newUserLine();
     } else {
-      textDisplay.addLines(errorMessage);
+      commandNotFound(textDisplay, segments[0]);
     }
 
     textDisplay.autoFill = "";

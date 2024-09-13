@@ -3,7 +3,7 @@ import { StyledText } from "./StyledText";
 
 export class Line {
   color: string = "#fff";
-  private text: StyledText;
+  text: StyledText;
 
   userGenerated: boolean = false;
   path: string;

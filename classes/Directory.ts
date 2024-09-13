@@ -42,7 +42,7 @@ export class Directory {
       dir = this.directoryManager.getDirectory(this, path);
 
       if (!dir) {
-        textDisplay.addLines(noDirAtPath(path));
+        noDirAtPath(textDisplay, path);
         return;
       }
     }
@@ -82,7 +82,7 @@ export class Directory {
 
     if (file) {
       if (!suppressDialog) {
-        textDisplay.addLines(fileAlreadyExists(file));
+        fileAlreadyExists(textDisplay, file);
       }
 
       return file;
@@ -107,7 +107,7 @@ export class Directory {
       name.endsWith(" ") ||
       name.endsWith(".")
     ) {
-      textDisplay.addLines(invalidName(name));
+      invalidName(textDisplay, name);
       return false;
     }
     return true;
@@ -140,7 +140,7 @@ export class Directory {
     const [pathDir, name] = this.splitPathName(pathName);
 
     if (pathDir === this && name !== pathName) {
-      textDisplay.addLines(invalidPath(pathName));
+      invalidPath(textDisplay, pathName);
     }
 
     const existingDir = this.directoryManager.getDirectory(pathDir, name);
@@ -152,7 +152,7 @@ export class Directory {
 
     if (existingDir) {
       if (!suppressDialog) {
-        textDisplay.addLines(dirAlreadyExists(existingDir.path));
+        dirAlreadyExists(textDisplay, existingDir.path);
       }
       return existingDir;
     }
@@ -175,17 +175,17 @@ export class Directory {
     const [pathDir, name] = this.splitPathName(pathName);
 
     if (pathDir === this && name !== pathName) {
-      textDisplay.addLines(invalidPath(pathName));
+      invalidPath(textDisplay, pathName);
     }
 
     const dir = this.directoryManager.getDirectory(pathDir, name);
     if (!dir) {
-      textDisplay.addLines(noDirAtPath(pathName));
+      noDirAtPath(textDisplay, pathName);
       return;
     }
 
     if (!dir.userMalleable) {
-      textDisplay.addLines(accessDenied());
+      accessDenied(textDisplay);
       return;
     }
 
@@ -200,7 +200,8 @@ export class Directory {
     const [pathDir, name] = this.splitPathName(pathName);
 
     if (pathDir === this && name !== pathName) {
-      textDisplay.addLines(invalidPath(pathName));
+      invalidPath(textDisplay, pathName);
+      return;
     }
 
     const dir = this.directoryManager.getDirectory(pathDir, name);
@@ -211,7 +212,7 @@ export class Directory {
     }
 
     if ((dir && !dir.userMalleable) || (file && !file.userMalleable)) {
-      textDisplay.addLines(accessDenied());
+      accessDenied(textDisplay);
       return;
     }
 
@@ -226,7 +227,7 @@ export class Directory {
       return;
     }
 
-    textDisplay.addLines(noDirOrFileAtPath(pathName));
+    noDirOrFileAtPath(textDisplay, pathName);
     return;
   }
 
@@ -246,17 +247,17 @@ export class Directory {
 
     const sourceFile = sourceDir.getFile(fileName);
     if (!sourceFile) {
-      textDisplay.addLines(noFileAtPath(fileName));
+      noFileAtPath(textDisplay, fileName);
       return;
     }
 
     if (!sourceFile.userMalleable && move) {
-      textDisplay.addLines(accessDenied());
+      accessDenied(textDisplay);
       return;
     }
 
     if (sourceFile.type != ".txt") {
-      textDisplay.addLines(invalidFileType());
+      invalidFileType(textDisplay);
       return;
     }
 
@@ -279,7 +280,7 @@ export class Directory {
     }
 
     if (!destinationFile.userMalleable) {
-      textDisplay.addLines(accessDenied());
+      accessDenied(textDisplay);
       return;
     }
 
@@ -309,7 +310,7 @@ export class Directory {
           }
 
           if (!file.userMalleable) {
-            textManager.addLines(accessDenied());
+            accessDenied(textManager);
             return;
           }
 
@@ -317,7 +318,7 @@ export class Directory {
           textManager.addLines(`Text echoed to ${file.name}.txt`);
           return;
         } else {
-          textManager.addLines(invalidFileType());
+          invalidFileType(textManager);
           return;
         }
       }
@@ -331,7 +332,7 @@ export class Directory {
 
     const dir = this.directoryManager.getDirectory(this, path);
     if (!dir) {
-      textDisplay.addLines(noDirOrFileAtPath(path));
+      noDirOrFileAtPath(textDisplay, path);
       return;
     }
 
@@ -356,12 +357,12 @@ export class Directory {
         return;
       }
 
-      textDisplay.addLines(cannotRunFile(file));
+      cannotRunFile(textDisplay, file);
       console.log(file);
       return;
     }
 
-    textDisplay.addLines(noFileAtPath(dir.path + name));
+    noFileAtPath(textDisplay, dir.path + name);
   }
 
   readFile(requestName: string): void {
@@ -370,7 +371,7 @@ export class Directory {
     const file = dir.getFile(name);
 
     if (!file) {
-      textDisplay.addLines(noFileAtPath(requestName));
+      noFileAtPath(textDisplay, requestName);
       return;
     }
 
@@ -383,12 +384,12 @@ export class Directory {
     const file = dir.getFile(name);
 
     if (!file) {
-      textDisplay.addLines(noFileAtPath(requestName));
+      noFileAtPath(textDisplay, requestName);
       return;
     }
 
     if (!file.userMalleable) {
-      textDisplay.addLines(accessDenied());
+      accessDenied(textDisplay);
       return;
     }
 
