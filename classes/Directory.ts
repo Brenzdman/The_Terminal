@@ -337,7 +337,7 @@ export class Directory {
 
     this.directoryManager.currentDirectory = dir;
     this.directoryManager.currentPath = dir.path;
-    textDisplay.newLine();
+    textDisplay.newUserLine();
   }
 
   private getFile(fileName: string): Dir_File | undefined {

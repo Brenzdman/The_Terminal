@@ -8,8 +8,8 @@ export function generateDirectory(): Directory_Manager {
   let directoryManager = new Directory_Manager();
 
   // root directory
-  const root = directoryManager.createDirectory("root", "/");
-  const home = root.makeDirectory("Users").makeDirectory("guest");
+  const root = directoryManager.getDirectory(directoryManager.currentDirectory, "/");
+  const home = root!.makeDirectory("Users").makeDirectory("guest");
   directoryManager.currentDirectory = home;
   directoryManager.homeDirectory = home;
   directoryManager.currentPath = home.path;

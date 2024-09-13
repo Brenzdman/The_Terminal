@@ -4,11 +4,19 @@ import { Dir_File, Directory } from "./Directory";
 import { TextDisplay } from "./TextDisplay";
 
 export class Directory_Manager {
-  public directories: Directory[] = [];
-  public currentDirectory: Directory = new Directory(this, "root", "/");
-  public currentPath: string = "/";
-  public homeDirectory: Directory = this.currentDirectory;
-  public textDisplay: TextDisplay = new TextDisplay(this);
+  public currentDirectory: Directory;
+  public directories: Directory[];
+  public currentPath: string;
+  public homeDirectory: Directory;
+  public textDisplay: TextDisplay;
+
+  constructor() {
+    this.currentDirectory = new Directory(this, "root", "/");
+    this.directories = [this.currentDirectory];
+    this.currentPath = "/";
+    this.homeDirectory = this.currentDirectory;
+    this.textDisplay = new TextDisplay(this);
+  }
 
   public createDirectory(name: string, path: string): Directory {
     const newDir = new Directory(this, name, path);
@@ -33,7 +41,7 @@ export class Directory_Manager {
     path = path.trim();
     // Replaces ~ with home path
     path = path.replace(/^~/, this.homeDirectory.path);
-    
+
     // Replaces \ with / for windows
 
     path = path?.replace(/\\/g, "/");

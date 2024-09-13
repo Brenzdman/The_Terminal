@@ -1,13 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useAtom } from "jotai";
 import { TextDisplay } from "@/classes/TextDisplay";
-import {
-  getColor,
-  getColorDiv,
-  getColorString,
-  insertColorString,
-} from "@/functions/color";
-import { addLineBreaks, Line } from "@/classes/Line";
+import { getColor, getColorDiv, getColorString } from "@/functions/color";
+import { addLineBreaks, Line, numColorCodes } from "@/classes/Line";
 import { Directory_Manager } from "@/classes/DirectoryManager";
 import { DIRECTORY_MANAGER } from "./DirectoryAtom";
 
@@ -93,64 +88,6 @@ const Renderer: React.FC<{
       : "C:" + path.slice(0, -1).replace(/\//g, "\\");
   };
 
-  const formatLineText = (lineText: string): string => {
-    const text = addLineBreaks(lineText);
-
-    const firstSpace = text.indexOf(" ");
-    const firstSegment = firstSpace !== -1 ? text.slice(0, firstSpace) : text;
-    return (
-      getColorString(firstSegment, getColor("function")) +
-      text.slice(firstSegment.length)
-    );
-  };
-
-  const renderLastLine = (
-    path: string,
-    lineText: string,
-    cursorX: number,
-    cursor: string,
-    autoFillReplace: boolean,
-    autoFill: string
-  ): [string, number, number] => {
-    if (autoFillReplace) {
-      lineText = formatLineText(autoFill);
-    }
-
-    console.log(lineText);
-
-    // Remove color codes and count \n characters before the cursor position
-    const lineTextWithoutColors = lineText.replace(/\x1b\[[0-9;]*m/g, "");
-    const newlineCount = (
-      lineTextWithoutColors.slice(0, cursorX).match(/\n/g) || []
-    ).length;
-
-    // Adjust cursor position for color codes and newlines
-    let adjustedCursorX = cursorX + 9 - newlineCount;
-    // number of newlines before cursor
-    const adjustedCursorY =
-      lineText.slice(0, adjustedCursorX - 1).match(/\n/g)?.length || 0;
-
-    adjustedCursorX += adjustedCursorY * 2;
-
-    let firstSpace = lineText.indexOf(" ");
-    firstSpace = firstSpace === -1 ? lineText.length : firstSpace;
-
-    if (cursorX < firstSpace - 8) {
-      let firstSegment = lineText.slice(0, firstSpace);
-      firstSegment = insertColorString(firstSegment, cursor, cursorX);
-      const remainingText = lineText.slice(firstSpace);
-
-      lineText = firstSegment + remainingText;
-    } else {
-      lineText =
-        lineText.slice(0, adjustedCursorX) +
-        cursor +
-        lineText.slice(adjustedCursorX);
-    }
-
-    return [path + "> " + lineText, adjustedCursorX, adjustedCursorY];
-  };
-
   const renderLineContent = (
     line: Line,
     index: number,
@@ -161,57 +98,87 @@ const Renderer: React.FC<{
   ): React.ReactElement => {
     let content;
 
-    if (line.text === " " && !line.userGenerated) {
-      content = <br />;
-    } else if (line.userGenerated || line.text === "") {
-      const path = formatPath(line.path);
-      let lineText = formatLineText(line.text);
-      let text = path + "> " + lineText;
-
-      // If last line:
-      if (index === newLines.length - 1) {
-        let [text, adjustedCursorX, adjustedCursorY] = renderLastLine(
-          path,
-          lineText,
-          cursorX,
-          cursor,
-          textDisplay.autoFillReplace,
-          textDisplay.autoFill
-        );
-
-        adjustedCursorX += path.length + 2; // 2 for "> "
-
-        const segment1 = text.slice(0, adjustedCursorX);
-        const segment2 = text.slice(adjustedCursorX, adjustedCursorX + 1);
-        const segment3 = text.slice(adjustedCursorX + 1);
-
-        const content = (
-          <div style={{ position: "relative" }}>
-            <span>{getColorDiv(segment1)}</span>
-            <span
-              style={{
-                position: "absolute",
-                top: adjustedCursorY * 1.5 + "em",
-                zIndex: 1,
-                transform: "translateX(-50%) scaleX(0.5)",
-                display: "inline-block",
-
-                color: "#ffffff",
-              }}
-            >
-              {segment2}
-            </span>
-            <span>{getColorDiv(segment3)}</span>
-          </div>
-        );
-
-        return <div key={index}>{content}</div>;
+    // If line is not user generated, display as is
+    if (!line.userGenerated) {
+      // const text = addLineBreaks(line.text);
+      const text = line.getText();
+      // If line is empty, create empty space
+      if (text.trim() === "") {
+        content = <br />;
+      } else {
+        content = <span>{getColorDiv(text)}</span>;
       }
-
-      content = <span>{getColorDiv(text)}</span>;
-    } else {
-      content = <span>{getColorDiv(line.text)}</span>;
+      return <div key={index}>{content}</div>;
     }
+
+    const path = formatPath(line.path);
+    const pathStart = path + "> ";
+
+    function getUserText(text: string): string {
+      // let firstSpace = text.indexOf(" ");
+      // if (firstSpace === -1) firstSpace = text.length;
+
+      // const firstWord = text.slice(0, firstSpace);
+      // text =
+      //   getColorString(firstWord, getColor("function")) +
+      //   text.slice(firstWord.length);
+
+      let lineText = pathStart + text;
+
+      lineText = addLineBreaks(lineText);
+
+      return lineText;
+    }
+
+    let lineText = getUserText(line.getText());
+
+    // If not last line:
+    if (index !== newLines.length - 1) {
+      content = <span>{getColorDiv(lineText)}</span>;
+      return <div key={index}>{content}</div>;
+    }
+
+    // If last line, and autoFill is set, replace line text with autoFill
+    if (textDisplay.autoFillReplace) {
+      lineText = getUserText(textDisplay.autoFill);
+    }
+
+    // Calculate adjusted cursor position
+    let adjustedCursorX = pathStart.length + cursorX;
+    adjustedCursorX + numColorCodes(lineText.slice(0, adjustedCursorX)) * 8;
+
+    // Find the number of newlines before the cursor
+    const lineBreaks = lineText.match(/\n/g);
+    const adjustedCursorY = lineBreaks?.length || 0;
+    adjustedCursorX += adjustedCursorY;
+
+    // After the last line break, calculate the X position relative to the last line
+    const lastLineBreakIndex = lineText
+      .slice(0, adjustedCursorX)
+      .lastIndexOf("\n");
+    adjustedCursorX =
+      lastLineBreakIndex === -1
+        ? adjustedCursorX // No newline, so X remains as is
+        : adjustedCursorX - lastLineBreakIndex - 1; // Adjust for position after last newline
+
+    content = (
+      <div style={{ position: "relative" }}>
+        <span>{getColorDiv(lineText)}</span>
+        <span
+          style={{
+            position: "absolute",
+            top: adjustedCursorY * 1.5 + "em", // 1.5em can be dynamic based on your actual line height
+            left: adjustedCursorX + "ch", // 'ch' is based on character width, more consistent for monospace fonts
+            zIndex: 1,
+            transform: "translateX(-50%) scaleX(0.5)",
+            display: "inline-block",
+            color: "#ffffff",
+          }}
+        >
+          {cursor}
+        </span>
+      </div>
+    );
 
     return <div key={index}>{content}</div>;
   };

@@ -49,12 +49,12 @@ const UserText = () => {
     } else if (event.key === "Enter") {
       if (textDisplay.autoFillReplace) {
         const lastLine = textDisplay.getLastLine();
-        lastLine.text = textDisplay.autoFill;
+        lastLine.setText(textDisplay.autoFill);
         lastLine.userGenerated = true;
         textDisplay.autoFillReplace = false;
       }
 
-      const cmd = textDisplay.getLastLine().text.trim();
+      const cmd = textDisplay.getLastLine().getText().trim();
 
       setCmdHistory((prevHistory) => {
         if (!cmd) return prevHistory;
@@ -130,7 +130,7 @@ const UserText = () => {
     const textDisplay = directoryManager.textDisplay;
     let currentDirectory = directoryManager.currentDirectory;
     const lastLine = textDisplay.getLastLine();
-    const text = lastLine.text.trim();
+    const text = lastLine.getText().trim();
 
     const getSegments = (text: string): string[] => {
       let segments: string[] = [];
@@ -160,7 +160,7 @@ const UserText = () => {
     let segments = getSegments(text);
 
     if (segments.length === 0) {
-      textDisplay.newLine();
+      textDisplay.newUserLine();
       return;
     }
 
@@ -237,14 +237,14 @@ const UserText = () => {
 
       // Default
     } else if (cmd === "") {
-      textDisplay.newLine();
+      textDisplay.newUserLine();
     } else {
       textDisplay.addLines(errorMessage);
     }
 
     textDisplay.autoFill = "";
-    if (textDisplay.getLastLine().text !== "") {
-      textDisplay.newLine();
+    if (textDisplay.getLastLine().getText() !== "") {
+      textDisplay.newUserLine();
     }
 
     const updatedDirectoryManager = new Directory_Manager();

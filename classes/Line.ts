@@ -1,13 +1,29 @@
+import { MAX_LINE_LENGTH } from "@/constants/constants";
+import { StyledText } from "./StyledText";
+
 export class Line {
   color: string = "#fff";
-  text: string = "";
+  private text: StyledText;
 
   userGenerated: boolean = false;
   path: string;
 
-  constructor(text: string, path: string) {
-    this.text = text;
+  constructor(text: string | StyledText, path: string) {
+    if (text instanceof StyledText) {
+      this.text = text;
+    } else {
+      this.text = new StyledText(text);
+    }
+
     this.path = path;
+  }
+
+  setText(text: string) {
+    this.text.setText(text);
+  }
+
+  getText(): string {
+    return this.text.getText();
   }
 
   copy() {
@@ -19,41 +35,54 @@ export class Line {
   }
 }
 
+export function numColorCodes(text: string): number {
+  return (text.match(/\[#[0-9a-fA-F]{6}\]/g) || []).length;
+}
+
 export function addLineBreaks(
   input: string,
-  maxLineLength: number = 50
+  maxLineLength: number = MAX_LINE_LENGTH
 ): string {
-  const words = input.split(" ");
-  let result = "";
-  let currentLine = "";
+  return input;
+  // const lines = input.split("\n");
+  // let result = "";
 
-  words.forEach((word) => {
-    // If adding the word to the current line exceeds the max length, add a line break
-    if ((currentLine + word).length > maxLineLength) {
-      // If the word is longer than maxLineLength, split the word itself
-      if (word.length > maxLineLength) {
-        // First, complete the current line
-        if (currentLine.length > 0) {
-          result += currentLine + "\n";
-          currentLine = "";
-        }
-        // Split the long word into chunks and add them with line breaks
-        const chunks =
-          word.match(new RegExp(`.{1,${maxLineLength}}`, "g")) || [];
-        result += chunks.join("\n") + " ";
-      } else {
-        // Add current line to result and start a new line with the current word
-        result += currentLine + "\n";
-        currentLine = word + " ";
-      }
-    } else {
-      // If current word fits in the line, just add it to the current line
-      currentLine += word + " ";
-    }
-  });
+  // lines.forEach((line, lineIndex) => {
+  //   const words = line.split(" ");
+  //   let currentLine = "";
 
-  // Add the last line to the result
-  result += currentLine.trim();
+  //   words.forEach((word) => {
+  //     // For each color code in string, add length modifier of 8
+  //     let lengthModifier = numColorCodes(word) * 8;
 
-  return result;
+  //     // If adding a word would exceed the max line length split the line before adding the word
+  //     if ((currentLine + word).length > maxLineLength + lengthModifier) {
+  //       result += currentLine + "\n";
+  //       currentLine = "";
+  //     }
+  //     let segment = word;
+
+  //     // If the word is longer than the max line length split it
+  //     while (segment.length > maxLineLength + numColorCodes(segment) * 8) {
+  //       currentLine = segment.slice(0, maxLineLength);
+  //       segment = segment.slice(maxLineLength);
+  //       result += currentLine + "\n";
+  //       currentLine = "";
+  //     }
+  //     currentLine += segment + " ";
+
+  //     // If it's the last word, add it to the result
+  //     // if (wordIndex === words.length - 1) {
+  //     //   result += currentLine;
+  //     // }
+  //   });
+
+  //   result += currentLine.trim();
+  //   if (lineIndex < lines.length - 1) {
+  //     result += "\n";
+  //   }
+  // });
+
+  // // console.log(result);
+  // return result;
 }
