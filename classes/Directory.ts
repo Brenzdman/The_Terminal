@@ -30,7 +30,7 @@ export class Directory {
   }
 
   public toString(): string {
-    return `[${getColor("dir")}${this.name}]`;
+    return `${this.name}`;
   }
 
   // Lists all files and directories in the current directory
@@ -415,6 +415,6 @@ export class Dir_File {
   }
 
   toString(): string {
-    return `[${getColor(this.type)}${this.name}${this.type}]`;
+    return `${this.name}${this.type}`;
   }
 }

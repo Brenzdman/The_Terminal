@@ -26,6 +26,14 @@ export class Line {
     return this.text.getText();
   }
 
+  getDiv(path: string = ""): React.ReactElement {
+    let text = this.text;
+    if (path) {
+      text = new StyledText(path + "> " + this.text.getText());
+    }
+    return text.getStyledText();
+  }
+
   copy() {
     let newLine = new Line(this.text, this.path);
     newLine.userGenerated = this.userGenerated;

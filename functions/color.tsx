@@ -30,6 +30,7 @@ export const getColor = (type: string) => {
 };
 
 export const getColorString = (text: string, color: string): string => {
+  return text;
   return `[${color}${text}]`;
 };
 
@@ -59,7 +60,9 @@ export const insertColorString = (
   return `${beforeInsert}]${insert}${getColorString(afterInsert, color)}`;
 };
 
-export const getColorDiv = (text: string): React.ReactElement => {
+export const getColorDiv = (text: string) => {
+  return;
+
   const segments: { text: string; color: string | null }[] = [];
 
   let string = "";
