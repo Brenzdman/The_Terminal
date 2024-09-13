@@ -31,7 +31,7 @@ export class Line {
     if (path) {
       text = new StyledText(path + "> " + this.text.getText());
     }
-    return text.getStyledText();
+    return text.getStyledTextDiv();
   }
 
   copy() {

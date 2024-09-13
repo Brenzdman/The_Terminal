@@ -1,19 +1,7 @@
 // Collaborates heavily with userText.tsx and DirectoryManager.ts
 
-import { getColor } from "@/functions/color";
+import { errorMessage } from "@/functions/messages";
 import { Directory_Manager } from "./DirectoryManager";
-import {
-  accessDenied,
-  cannotRunFile,
-  dirAlreadyExists,
-  fileAlreadyExists,
-  invalidFileType,
-  invalidName,
-  invalidPath,
-  noDirAtPath,
-  noDirOrFileAtPath,
-  noFileAtPath,
-} from "@/functions/messages";
 
 export class Directory {
   public name: string;
@@ -42,7 +30,7 @@ export class Directory {
       dir = this.directoryManager.getDirectory(this, path);
 
       if (!dir) {
-        noDirAtPath(textDisplay, path);
+        errorMessage(textDisplay, "noDirAtPath", path);
         return;
       }
     }
@@ -55,7 +43,15 @@ export class Directory {
     const dirStrings = sortedDirs.map((dir) => dir.toString());
     const fileStrings = sortedFiles.map((file) => file.toString());
 
-    textDisplay.addLines([...dirStrings, ...fileStrings]);
+    dirStrings.forEach((string) => {
+      const line = textDisplay.addLines(string);
+      line[0].text.addStyle(0, string.length, "dir");
+    });
+
+    fileStrings.forEach((string) => {
+      const line = textDisplay.addLines(string);
+      line[0].text.addStyle(0, string.length, "file");
+    });
   }
 
   public addFile(
@@ -82,7 +78,7 @@ export class Directory {
 
     if (file) {
       if (!suppressDialog) {
-        fileAlreadyExists(textDisplay, file);
+        errorMessage(textDisplay, "fileAlreadyExists", file.toString());
       }
 
       return file;
@@ -107,7 +103,7 @@ export class Directory {
       name.endsWith(" ") ||
       name.endsWith(".")
     ) {
-      invalidName(textDisplay, name);
+      errorMessage(textDisplay, "invalidName", name);
       return false;
     }
     return true;
@@ -140,7 +136,7 @@ export class Directory {
     const [pathDir, name] = this.splitPathName(pathName);
 
     if (pathDir === this && name !== pathName) {
-      invalidPath(textDisplay, pathName);
+      errorMessage(textDisplay, "invalidPath", pathName);
     }
 
     const existingDir = this.directoryManager.getDirectory(pathDir, name);
@@ -152,7 +148,7 @@ export class Directory {
 
     if (existingDir) {
       if (!suppressDialog) {
-        dirAlreadyExists(textDisplay, existingDir.path);
+        errorMessage(textDisplay, "dirAlreadyExists", existingDir.toString());
       }
       return existingDir;
     }
@@ -175,17 +171,17 @@ export class Directory {
     const [pathDir, name] = this.splitPathName(pathName);
 
     if (pathDir === this && name !== pathName) {
-      invalidPath(textDisplay, pathName);
+      errorMessage(textDisplay, "invalidPath", pathName);
     }
 
     const dir = this.directoryManager.getDirectory(pathDir, name);
     if (!dir) {
-      noDirAtPath(textDisplay, pathName);
+      errorMessage(textDisplay, "noDirAtPath", pathName);
       return;
     }
 
     if (!dir.userMalleable) {
-      accessDenied(textDisplay);
+      errorMessage(textDisplay, "accessDenied", pathName);
       return;
     }
 
@@ -200,7 +196,7 @@ export class Directory {
     const [pathDir, name] = this.splitPathName(pathName);
 
     if (pathDir === this && name !== pathName) {
-      invalidPath(textDisplay, pathName);
+      errorMessage(textDisplay, "invalidPath", pathName);
       return;
     }
 
@@ -212,7 +208,7 @@ export class Directory {
     }
 
     if ((dir && !dir.userMalleable) || (file && !file.userMalleable)) {
-      accessDenied(textDisplay);
+      errorMessage(textDisplay, "accessDenied", pathName);
       return;
     }
 
@@ -227,7 +223,7 @@ export class Directory {
       return;
     }
 
-    noDirOrFileAtPath(textDisplay, pathName);
+    errorMessage(textDisplay, "noDirOrFileAtPath", pathName);
     return;
   }
 
@@ -247,17 +243,17 @@ export class Directory {
 
     const sourceFile = sourceDir.getFile(fileName);
     if (!sourceFile) {
-      noFileAtPath(textDisplay, fileName);
+      errorMessage(textDisplay, "noFileAtPath", sourcePath);
       return;
     }
 
     if (!sourceFile.userMalleable && move) {
-      accessDenied(textDisplay);
+      errorMessage(textDisplay, "accessDenied", sourcePath);
       return;
     }
 
     if (sourceFile.type != ".txt") {
-      invalidFileType(textDisplay);
+      errorMessage(textDisplay, "invalidFileType", sourcePath);
       return;
     }
 
@@ -280,7 +276,7 @@ export class Directory {
     }
 
     if (!destinationFile.userMalleable) {
-      accessDenied(textDisplay);
+      errorMessage(textDisplay, "accessDenied", destinationPath);
       return;
     }
 
@@ -310,7 +306,7 @@ export class Directory {
           }
 
           if (!file.userMalleable) {
-            accessDenied(textManager);
+            errorMessage(textManager, "accessDenied", pathSegment);
             return;
           }
 
@@ -318,7 +314,7 @@ export class Directory {
           textManager.addLines(`Text echoed to ${file.name}.txt`);
           return;
         } else {
-          invalidFileType(textManager);
+          errorMessage(textManager, "invalidFileType", pathSegment);
           return;
         }
       }
@@ -332,7 +328,7 @@ export class Directory {
 
     const dir = this.directoryManager.getDirectory(this, path);
     if (!dir) {
-      noDirOrFileAtPath(textDisplay, path);
+      errorMessage(textDisplay, "noDirAtPath", path);
       return;
     }
 
@@ -356,13 +352,12 @@ export class Directory {
         file.onRun();
         return;
       }
-
-      cannotRunFile(textDisplay, file);
+      errorMessage(textDisplay, "cannotRunFile", file.toString());
       console.log(file);
       return;
     }
 
-    noFileAtPath(textDisplay, dir.path + name);
+    errorMessage(textDisplay, "noFileAtPath", requestName);
   }
 
   readFile(requestName: string): void {
@@ -371,7 +366,7 @@ export class Directory {
     const file = dir.getFile(name);
 
     if (!file) {
-      noFileAtPath(textDisplay, requestName);
+      errorMessage(textDisplay, "noFileAtPath", requestName);
       return;
     }
 
@@ -384,12 +379,12 @@ export class Directory {
     const file = dir.getFile(name);
 
     if (!file) {
-      noFileAtPath(textDisplay, requestName);
+      errorMessage(textDisplay, "noFileAtPath", requestName);
       return;
     }
 
     if (!file.userMalleable) {
-      accessDenied(textDisplay);
+      errorMessage(textDisplay, "accessDenied", requestName);
       return;
     }
 

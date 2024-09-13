@@ -1,3 +1,5 @@
+export const textColor = "#c9c9c9";
+
 const palette = [
   "#5FA8FF", // Function Color (Medium Blue)
   "#7AD7F0", // Text Color (Light Cyan)

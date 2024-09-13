@@ -4,10 +4,9 @@
 import { useAtom } from "jotai";
 import React, { useEffect, useState } from "react";
 import { DIRECTORY_MANAGER } from "./DirectoryAtom";
-import { getColor } from "@/functions/color";
 import { Directory_Manager } from "@/classes/DirectoryManager";
 import { getDetailedHelp } from "@/functions/help";
-import { commandNotFound } from "@/functions/messages";
+import { errorMessage } from "@/functions/messages";
 
 const UserText = () => {
   const [directoryManager, setDirectoryManager] = useAtom(DIRECTORY_MANAGER);
@@ -233,15 +232,13 @@ const UserText = () => {
 
       // Default
     } else if (cmd === "") {
-      textDisplay.newUserLine();
+      // Do nothing;
     } else {
-      commandNotFound(textDisplay, segments[0]);
+      errorMessage(textDisplay, "invalidCommand", cmd);
     }
 
     textDisplay.autoFill = "";
-    if (textDisplay.getLastLine().getText() !== "") {
-      textDisplay.newUserLine();
-    }
+    textDisplay.newUserLine();
 
     const updatedDirectoryManager = new Directory_Manager();
     Object.assign(updatedDirectoryManager, {

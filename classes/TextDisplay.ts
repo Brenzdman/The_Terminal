@@ -17,17 +17,20 @@ export class TextDisplay {
     this.newUserLine();
   }
 
-  addLines(lines: string[] | string): void {
+  addLines(lines: string[] | string): Line[] {
     const path = this.directoryManager.currentPath;
     if (typeof lines === "string") {
       lines = lines.split("\n");
     }
 
+    let newLines: Line[] = [];
+
     lines.forEach((line) => {
-      this.lines.push(new Line(line, path));
+      newLines.push(new Line(line, path));
     });
 
-    this.lines.push(new Line(" ", path));
+    this.lines = this.lines.concat(newLines);
+    return newLines;
   }
 
   typeCharacter(letter: string, userGenerated: boolean = true) {
@@ -163,6 +166,11 @@ export class TextDisplay {
   }
 
   newUserLine() {
+    const lastLine = this.getLastLine();
+    if (lastLine.getText().trim() !== "") {
+      this.lines.push(new Line("", this.directoryManager.currentPath));
+    }
+    
     const newLine = new Line("", this.directoryManager.currentPath);
     newLine.userGenerated = true;
     this.lines.push(newLine);
