@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useAtom } from "jotai";
 import { TextDisplay } from "@/classes/TextDisplay";
-import { addLineBreaks, Line, numColorCodes } from "@/classes/Line";
+import { Line } from "@/classes/Line";
 import { Directory_Manager } from "@/classes/DirectoryManager";
 import { DIRECTORY_MANAGER } from "./DirectoryAtom";
 
@@ -105,18 +105,18 @@ const Renderer: React.FC<{
       if (text.trim() === "") {
         content = <br />;
       } else {
-        content = <span>{line.getDiv()}</span>;
+        content = <span>{line.getDiv()[0]}</span>;
       }
       return <div key={index}>{content}</div>;
     }
 
     const path = formatPath(line.path);
     const pathStart = path + "> ";
-    let adjustedCursorX = cursorX + pathStart.length
+    let adjustedCursorX = cursorX + pathStart.length;
 
     // If not last line:
     if (index !== newLines.length - 1) {
-      content = <span>{line.getDiv(path)}</span>;
+      content = <span>{line.getDiv(path)[0]}</span>;
       return <div key={index}>{content}</div>;
     }
 
@@ -127,13 +127,17 @@ const Renderer: React.FC<{
         cursorX + pathStart.length + textDisplay.autoFill.length;
     }
 
+    const [mainDiv, numLines, xModif] = line.getDiv(path);
+    adjustedCursorX -= xModif;
+    adjustedCursorX += numLines -2;
+
     content = (
       <div style={{ position: "relative" }}>
-        <span>{line.getDiv(path)}</span>
+        <span>{mainDiv}</span>
         <span
           style={{
             position: "absolute",
-            top: 0 * 1.5 + "em",
+            top: (numLines -1) * 1.5 + "em",
             left: adjustedCursorX + "ch",
             zIndex: 1,
             transform: "translateX(-50%) scaleX(0.5)",

@@ -9,7 +9,6 @@ export class StyledText {
     this.addText(text);
   }
 
-  // TODO modif all cmds
   addText(text: string, index: number = this.text.length): void {
     if (index < 0 || index > this.text.length) {
       throw new Error(`Index out of bounds in addText: ${index}`);

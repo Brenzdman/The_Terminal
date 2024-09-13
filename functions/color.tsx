@@ -8,7 +8,7 @@ const palette = [
   "#FF5555", // Error Color (Red)
 ];
 
-export const functionColor = palette[0];
+export const commandColor = palette[0];
 export const txtColor = palette[1];
 export const dirColor = palette[2];
 export const exeColor = palette[3];
@@ -24,9 +24,9 @@ export const getColor = (type: string) => {
       return dirColor;
     case "error":
       return errorColor;
-    case "function":
-      return functionColor;
+    case "command":
+      return commandColor;
     default:
-      return errorColor;
+      throw new Error(`Invalid color type: ${type}`);
   }
 };

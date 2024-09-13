@@ -50,7 +50,14 @@ export class Directory {
 
     fileStrings.forEach((string) => {
       const line = textDisplay.addLines(string);
-      line[0].text.addStyle(0, string.length, "file");
+
+      if (string.endsWith(".txt")) {
+        line[0].text.addStyle(0, string.length, ".txt");
+      }
+
+      if (string.endsWith(".exe")) {
+        line[0].text.addStyle(0, string.length, ".exe");
+      }
     });
   }
 
@@ -334,7 +341,6 @@ export class Directory {
 
     this.directoryManager.currentDirectory = dir;
     this.directoryManager.currentPath = dir.path;
-    textDisplay.newUserLine();
   }
 
   private getFile(fileName: string): Dir_File | undefined {

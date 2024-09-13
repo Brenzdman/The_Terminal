@@ -1,7 +1,6 @@
-import { Dir_File } from "@/classes/Directory";
-import { getColor } from "./color";
-import { TextDisplay } from "@/classes/TextDisplay";
 import { StyledText } from "@/classes/StyledText";
+import { TextDisplay } from "@/classes/TextDisplay";
+
 
 // Functions here add a message to the end of the text display
 
