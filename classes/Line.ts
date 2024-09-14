@@ -27,13 +27,13 @@ export class Line {
     return this.text.getText();
   }
 
-  getDiv(path: string = ""): [React.ReactElement, number, number] {
+  getDiv(path: string = ""): [React.ReactElement, string] {
     let text = this.text;
 
-    let [brokenText, numLines] = addLineBreaks(text.getText());
+    let brokenText = addLineBreaks(text.getText());
     if (path) {
       path += "> ";
-      [brokenText, numLines] = addLineBreaks(path + text.getText());
+      brokenText = addLineBreaks(path + text.getText());
     }
 
     let lineText = new StyledText(brokenText);
@@ -50,9 +50,8 @@ export class Line {
     }
     // subtracts x from the cursor position to account for the line breaks
     // gets last '\n' index
-    const lastLineBreak = brokenText.lastIndexOf("\n");
 
-    return [lineText.getStyledTextDiv(), numLines, lastLineBreak];
+    return [lineText.getStyledTextDiv(), brokenText];
   }
 
   copy() {
@@ -67,12 +66,13 @@ export class Line {
 export function addLineBreaks(
   input: string,
   maxLineLength: number = MAX_LINE_LENGTH
-): [string, number] {
+): string {
   const lines = input.split("\n");
   let result = "";
 
   lines.forEach((line, lineIndex) => {
     const words = line.split(" ");
+
     let currentLine = "";
 
     words.forEach((word) => {
@@ -91,11 +91,6 @@ export function addLineBreaks(
         currentLine = "";
       }
       currentLine += segment + " ";
-
-      // If it's the last word, add it to the result
-      // if (wordIndex === words.length - 1) {
-      //   result += currentLine;
-      // }
     });
 
     result += currentLine.trim();
@@ -104,7 +99,5 @@ export function addLineBreaks(
     }
   });
 
-  const numberOfLines = result.split("\n").length;
-
-  return [result, numberOfLines];
+  return result;
 }

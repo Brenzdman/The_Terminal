@@ -127,9 +127,25 @@ const Renderer: React.FC<{
         cursorX + pathStart.length + textDisplay.autoFill.length;
     }
 
-    const [mainDiv, numLines, xModif] = line.getDiv(path);
-    adjustedCursorX -= xModif;
-    adjustedCursorX += numLines -2;
+    const [mainDiv, text] = line.getDiv(path);
+
+    // Gets relative cursor position based on line breaks.
+    let cursorText = "";
+    let numBreaks = 0;
+    for (let i = 0; i < adjustedCursorX + numBreaks; i++) {
+      cursorText += text[i];
+      if (text[i] === "\n") {
+        numBreaks++;
+      }
+    }
+
+    const lastLineBreak = cursorText.lastIndexOf("\n");
+
+    console.log(`cursorText: ${cursorText}`);
+    console.log(`numBreaks: ${numBreaks}`);
+    console.log(`adjustedCursorY: ${lastLineBreak}`);
+    let adjustedCursorY = numBreaks;
+    adjustedCursorX -= lastLineBreak - numBreaks + 1;
 
     content = (
       <div style={{ position: "relative" }}>
@@ -137,7 +153,7 @@ const Renderer: React.FC<{
         <span
           style={{
             position: "absolute",
-            top: (numLines -1) * 1.5 + "em",
+            top: adjustedCursorY * 1.5 + "em",
             left: adjustedCursorX + "ch",
             zIndex: 1,
             transform: "translateX(-50%) scaleX(0.5)",
