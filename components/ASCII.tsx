@@ -43,6 +43,7 @@ const ASCII: React.FC = () => {
     backgroundColor: "#000",
     color: "#17214f",
     userSelect: "none",
+    left: "-5px",
   };
 
   return (
