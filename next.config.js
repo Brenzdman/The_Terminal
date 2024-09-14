@@ -28,6 +28,8 @@ const nextConfig = {
               // prefetch-src is deprecated
               // See https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/prefetch-src
               "prefetch-src": false,
+              "frame-ancestors": ["'none'"], // Prevents embedding of your content
+              "form-action": ["'self'"], // Restricts where forms can be submitted
             },
             // Additional security headers
             strictTransportSecurity:
@@ -60,7 +62,13 @@ const nextConfig = {
           {
             key: "Content-Security-Policy",
             value:
-              "default-src 'self'; script-src 'self' 'unsafe-inline'; img-src 'self' blob:; style-src 'self' 'unsafe-inline'; connect-src 'self';",
+              "default-src 'self'; " +
+              "script-src 'self' 'unsafe-inline'; " +
+              "img-src 'self' blob:; " +
+              "style-src 'self' 'unsafe-inline'; " +
+              "connect-src 'self'; " +
+              "frame-ancestors 'none'; " + // Prevents embedding of your content
+              "form-action 'self';", // Restricts where forms can be submitted
           },
         ],
       },
