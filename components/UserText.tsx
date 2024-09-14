@@ -69,6 +69,7 @@ const UserText = () => {
         }
 
         newHistory.push(cmd);
+        console.log(`cmd: ${cmd}`);
         setCmdIndex(newHistory.length);
         return newHistory;
       });
@@ -107,7 +108,7 @@ const UserText = () => {
         textDisplay.setAutofill("");
       } else {
         textDisplay.setAutofill(cmdHistory[newCmdIndex], true);
-        console.log(cmdHistory[newCmdIndex]);
+        console.log(`cmdHistory[newCmdIndex]`, cmdHistory[newCmdIndex]);
       }
 
       textDisplay.cursorX = textDisplay.autoFill.length;

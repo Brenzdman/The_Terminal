@@ -122,9 +122,8 @@ const Renderer: React.FC<{
 
     // If last line, and autoFill is set, replace line text with autoFill
     if (textDisplay.autoFillReplace) {
-      line.setText(pathStart + textDisplay.autoFill);
-      adjustedCursorX =
-        cursorX + pathStart.length + textDisplay.autoFill.length;
+      line.setText(textDisplay.autoFill);
+      adjustedCursorX = pathStart.length + textDisplay.autoFill.length;
     }
 
     const [mainDiv, text] = line.getDiv(path);
@@ -141,9 +140,6 @@ const Renderer: React.FC<{
 
     const lastLineBreak = cursorText.lastIndexOf("\n");
 
-    console.log(`cursorText: ${cursorText}`);
-    console.log(`numBreaks: ${numBreaks}`);
-    console.log(`adjustedCursorY: ${lastLineBreak}`);
     let adjustedCursorY = numBreaks;
     adjustedCursorX -= lastLineBreak - numBreaks + 1;
 
