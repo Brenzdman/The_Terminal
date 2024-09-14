@@ -11,6 +11,7 @@
   "dependencies": {
     "jotai": "^2.9.3",
     "next": "14.2.5",
+    "next-safe": "^3.5.0",
     "react": "^18",
     "react-dom": "^18"
   },

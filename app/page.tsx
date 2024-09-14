@@ -14,10 +14,11 @@ export default function Home() {
         name="google-site-verification"
         content="hhhgfqTYYPQugAs6cLEnyHM7z1sMIaKjdCIxFysX58M"
       />
+      
 
       <meta
         name="description"
-        content="This is a online emulator of a Windows terminal."
+        content="This is a online emulator of a Windows terminal that will have secrets implemented in the future."
       />
       <meta
         name="keywords"
