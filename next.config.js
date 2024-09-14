@@ -46,7 +46,7 @@ const nextConfig = {
           // CORS headers
           {
             key: "Access-Control-Allow-Origin",
-            value: "*", // Adjust this to restrict access to specific origins
+            value: "https://cmdterminal.vercel.app", // Replace with your specific domain
           },
           {
             key: "Access-Control-Allow-Methods",
@@ -55,6 +55,12 @@ const nextConfig = {
           {
             key: "Access-Control-Allow-Headers",
             value: "X-Requested-With, Content-Type, Authorization",
+          },
+          // Ensure Content-Security-Policy header is defined
+          {
+            key: "Content-Security-Policy",
+            value:
+              "default-src 'self'; script-src 'self' 'unsafe-inline'; img-src 'self' blob:; style-src 'self' 'unsafe-inline'; connect-src 'self';",
           },
         ],
       },
