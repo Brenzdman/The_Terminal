@@ -17,13 +17,14 @@ const nextConfig = {
               "script-src": [
                 "'self'",
                 "'unsafe-inline'",
+                ...(isDev ? ["'unsafe-eval'"] : []), // Add unsafe-eval in dev
                 // "https://plausible.io/js/script.js", // Analytics
               ],
               "img-src": ["'self'", "blob:"],
               "style-src": ["'self'", "'unsafe-inline'"],
               "connect-src": [
                 "'self'",
-                ...(isDev ? ["http://localhost:3000"] : []), // Allow localhost in dev
+                ...(isDev ? ["http://localhost:3000"] : []),
                 // "https://plausible.io", // Analytics
               ],
               "prefetch-src": false,
@@ -48,7 +49,7 @@ const nextConfig = {
             key: "Access-Control-Allow-Origin",
             value: isDev
               ? "http://localhost:3000"
-              : "https://cmdterminal.vercel.app", // Allow localhost in dev
+              : "https://cmdterminal.vercel.app",
           },
           {
             key: "Access-Control-Allow-Methods",
@@ -63,7 +64,9 @@ const nextConfig = {
             key: "Content-Security-Policy",
             value:
               "default-src 'self'; " +
-              "script-src 'self' 'unsafe-inline'; " +
+              "script-src 'self' 'unsafe-inline'" +
+              (isDev ? " 'unsafe-eval'" : "") +
+              "; " +
               "img-src 'self' blob:; " +
               "style-src 'self' 'unsafe-inline'; " +
               `connect-src 'self' ${isDev ? "http://localhost:3000" : ""}; ` +

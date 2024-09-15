@@ -37,6 +37,7 @@ export class Line {
     }
 
     let lineText = new StyledText(brokenText);
+    lineText.styles = text.styles;
 
     if (path) {
       const firstSpaceIndex = lineText.text.indexOf(" ");
