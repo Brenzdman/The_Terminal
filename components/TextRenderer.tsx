@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useAtom } from "jotai";
 import { TextDisplay } from "@/classes/TextDisplay";
 import { Line } from "@/classes/Line";
@@ -46,11 +46,7 @@ const TextRenderer: React.FC = () => {
   useEffect(() => {
     if (intervalRef.current === null) {
       intervalRef.current = setInterval(() => {
-        if (textDisplay.cursorSymbol === " ") {
-          textDisplay.cursorSymbol = "|";
-        } else {
-          textDisplay.cursorSymbol = " ";
-        }
+        textDisplay.cursorSymbol = textDisplay.cursorSymbol === " " ? "|" : " ";
         const updateDirectory = new Directory_Manager();
         Object.assign(updateDirectory, directoryManager);
         setDirectoryManager(updateDirectory);
@@ -66,20 +62,6 @@ const TextRenderer: React.FC = () => {
     };
   }, [directoryManager]);
 
-  return <Renderer textDisplay={textDisplay} scrollRef={scrollRef} />;
-};
-
-export default TextRenderer;
-
-const Renderer: React.FC<{
-  textDisplay: TextDisplay;
-  scrollRef: React.RefObject<HTMLDivElement>;
-}> = ({ textDisplay, scrollRef }) => {
-  const cursor = textDisplay.cursorSymbol;
-  const cursorX = textDisplay.cursorX;
-  const lines = textDisplay.lines;
-  let newLines = lines.map((line) => line.copy());
-
   const formatPath = (path: string): string => {
     // Removes last "/" if not root and replaces "/" with "\"
     return path === "/"
@@ -87,14 +69,7 @@ const Renderer: React.FC<{
       : "C:" + path.slice(0, -1).replace(/\//g, "\\");
   };
 
-  const renderLineContent = (
-    line: Line,
-    index: number,
-    cursorX: number,
-    cursor: string,
-    textDisplay: TextDisplay,
-    newLines: Line[]
-  ): React.ReactElement => {
+  const renderStaticLines = (line: Line, index: number): React.ReactElement => {
     let content;
 
     // If line is not user generated, display as is
@@ -112,13 +87,28 @@ const Renderer: React.FC<{
 
     const path = formatPath(line.path);
     const pathStart = path + "> ";
-    let adjustedCursorX = cursorX + pathStart.length;
 
-    // If not last line:
-    if (index !== newLines.length - 1) {
-      content = <span>{line.getDiv(path)[0]}</span>;
-      return <div key={index}>{content}</div>;
-    }
+    content = <span>{line.getDiv(path)[0]}</span>;
+    return <div key={index}>{content}</div>;
+  };
+
+  const staticLines = useMemo(() => {
+    const lines = textDisplay.lines.slice(0, -1);
+    return lines.map((line, index) => renderStaticLines(line, index));
+  }, [textDisplay.lines]);
+
+  const renderFinalLine = (
+    line: Line,
+    index: number,
+    cursorX: number,
+    cursor: string,
+    textDisplay: TextDisplay
+  ): React.ReactElement => {
+    let content;
+
+    const path = formatPath(line.path);
+    const pathStart = path + "> ";
+    let adjustedCursorX = cursorX + pathStart.length;
 
     // If last line, and autoFill is set, replace line text with autoFill
     if (textDisplay.autoFillReplace) {
@@ -164,15 +154,31 @@ const Renderer: React.FC<{
 
     return <div key={index}>{content}</div>;
   };
+  const Renderer = () => {
+    const cursor = textDisplay.cursorSymbol;
+    const cursorX = textDisplay.cursorX;
+    const lines = textDisplay.lines;
+    let newLines = lines.map((line) => line.copy());
+    const line = newLines[newLines.length - 1];
 
-  return (
-    <div ref={scrollRef} style={divStyle}>
-      {newLines.map((line, index) =>
-        renderLineContent(line, index, cursorX, cursor, textDisplay, newLines)
-      )}
-    </div>
-  );
+    return (
+      <div ref={scrollRef} style={divStyle}>
+        {staticLines}
+        {renderFinalLine(
+          line,
+          newLines.length - 1,
+          cursorX,
+          cursor,
+          textDisplay
+        )}
+      </div>
+    );
+  };
+
+  return Renderer();
 };
+
+export default TextRenderer;
 
 const divStyle: React.CSSProperties = {
   width: "100%",
