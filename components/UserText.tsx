@@ -69,7 +69,6 @@ const UserText = () => {
         }
 
         newHistory.push(cmd);
-        console.log(`cmd: ${cmd}`);
         setCmdIndex(newHistory.length);
         return newHistory;
       });
@@ -102,13 +101,11 @@ const UserText = () => {
         newCmdIndex = Math.min(cmdHistory.length, cmdIndex + 1);
       }
 
-      console.log("cmdIndex", newCmdIndex);
       // Sets the text to the command
       if (newCmdIndex === cmdHistory.length) {
         textDisplay.setAutofill("");
       } else {
         textDisplay.setAutofill(cmdHistory[newCmdIndex], true);
-        console.log(`cmdHistory[newCmdIndex]`, cmdHistory[newCmdIndex]);
       }
 
       textDisplay.cursorX = textDisplay.autoFill.length;

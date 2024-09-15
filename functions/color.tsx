@@ -30,3 +30,30 @@ export const getColor = (type: string) => {
       throw new Error(`Invalid color type: ${type}`);
   }
 };
+
+ export function blendColors(colorA: string, colorB: string, amount: number = 0.5) {
+   if (!colorA || !colorB) {
+     throw new Error(`Invalid color format: ${colorA} or ${colorB}`);
+   }
+   const matchA = colorA.match(/\w\w/g);
+   const matchB = colorB.match(/\w\w/g);
+
+   if (!matchA || !matchB) {
+     throw new Error(`Invalid color format: ${colorA} or ${colorB}`);
+   }
+
+   const [rA, gA, bA] = matchA.map((c) => parseInt(c, 16));
+   const [rB, gB, bB] = matchB.map((c) => parseInt(c, 16));
+
+   const r = Math.round(rA + (rB - rA) * amount)
+     .toString(16)
+     .padStart(2, "0");
+   const g = Math.round(gA + (gB - gA) * amount)
+     .toString(16)
+     .padStart(2, "0");
+   const b = Math.round(bA + (bB - bA) * amount)
+     .toString(16)
+     .padStart(2, "0");
+
+   return `#${r}${g}${b}`;
+ }

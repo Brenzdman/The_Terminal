@@ -359,7 +359,6 @@ export class Directory {
         return;
       }
       errorMessage(textDisplay, "cannotRunFile", file.toString());
-      console.log(file);
       return;
     }
 

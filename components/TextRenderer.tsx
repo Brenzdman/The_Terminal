@@ -54,6 +54,7 @@ const TextRenderer: React.FC = () => {
     }
 
     handleAutoScroll();
+    document.addEventListener("keydown", handleKeyDown);
 
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
@@ -69,33 +70,21 @@ const TextRenderer: React.FC = () => {
       : "C:" + path.slice(0, -1).replace(/\//g, "\\");
   };
 
-  const renderStaticLines = (line: Line, index: number): React.ReactElement => {
-    let content;
+  const renderStaticLine = (line: Line, index: number): React.ReactElement => {
+    let content, path;
 
     // If line is not user generated, display as is
-    if (!line.userGenerated) {
-      // const text = addLineBreaks(line.text);
+    if (line.userGenerated) {
+      path = formatPath(line.path);
+    } else {
       const text = line.getText();
-      // If line is empty, create empty space
       if (text.trim() === "") {
-        content = <br />;
-      } else {
-        content = <span>{line.getDiv()[0]}</span>;
+        return <div key={index}>{<br />}</div>;
       }
-      return <div key={index}>{content}</div>;
     }
-
-    const path = formatPath(line.path);
-    const pathStart = path + "> ";
-
     content = <span>{line.getDiv(path)[0]}</span>;
     return <div key={index}>{content}</div>;
   };
-
-  const staticLines = useMemo(() => {
-    const lines = textDisplay.lines.slice(0, -1);
-    return lines.map((line, index) => renderStaticLines(line, index));
-  }, [textDisplay.lines]);
 
   const renderFinalLine = (
     line: Line,
@@ -108,12 +97,14 @@ const TextRenderer: React.FC = () => {
 
     const path = formatPath(line.path);
     const pathStart = path + "> ";
-    let adjustedCursorX = cursorX + pathStart.length;
+    
+    let adjustedCursorX = pathStart.length;
 
-    // If last line, and autoFill is set, replace line text with autoFill
     if (textDisplay.autoFillReplace) {
       line.setText(textDisplay.autoFill);
-      adjustedCursorX = pathStart.length + textDisplay.autoFill.length;
+      adjustedCursorX += textDisplay.autoFill.length;
+    } else {
+      adjustedCursorX += cursorX;
     }
 
     const [mainDiv, text] = line.getDiv(path);
@@ -154,18 +145,20 @@ const TextRenderer: React.FC = () => {
 
     return <div key={index}>{content}</div>;
   };
+
   const Renderer = () => {
     const cursor = textDisplay.cursorSymbol;
     const cursorX = textDisplay.cursorX;
     const lines = textDisplay.lines;
     let newLines = lines.map((line) => line.copy());
-    const line = newLines[newLines.length - 1];
+    const finalLine = newLines[newLines.length - 1];
+    const staticLines = textDisplay.lines.slice(0, -1);
 
     return (
       <div ref={scrollRef} style={divStyle}>
-        {staticLines}
+        {staticLines.map((line, index) => renderStaticLine(line, index))}
         {renderFinalLine(
-          line,
+          finalLine,
           newLines.length - 1,
           cursorX,
           cursor,

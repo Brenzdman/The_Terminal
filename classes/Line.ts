@@ -1,7 +1,5 @@
 import { MAX_LINE_LENGTH } from "@/constants/constants";
 import { StyledText } from "@/classes/StyledText";
-import { getColor } from "@/functions/color";
-
 export class Line {
   color: string = "#fff";
   text: StyledText;

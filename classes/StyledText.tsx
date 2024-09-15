@@ -1,6 +1,6 @@
 // Handles the styling of text in the terminal.
 
-import { getColor, textColor } from "@/functions/color";
+import { blendColors, getColor, textColor } from "@/functions/color";
 
 export class StyledText {
   text: string = "";
@@ -44,71 +44,54 @@ export class StyledText {
   }
 
   getStyledTextDiv(): React.ReactElement {
-    const cmdList = this.styles.sort((a, b) => a.indexStart - b.indexStart);
+    const textLength = this.text.length;
+    const colorArray: string[] = new Array(textLength).fill("");
 
-    // For each cmd style the text in that color, other styles not yet implemented
-    let colorArray: string[] = [];
-
-    // each char has it's own div
-    for (let i = 0; i < this.text.length; i++) {
-      colorArray.push(textColor);
-    }
-
-    function blendColors(colorA: string, colorB: string, amount: number = 0.5) {
-      if (!colorA || !colorB) {
-        throw new Error(`Invalid color format: ${colorA} or ${colorB}`);
-      }
-      const matchA = colorA.match(/\w\w/g);
-      if (!matchA) {
-        throw new Error(`Invalid color format: ${colorA}`);
-      }
-      const matchB = colorB.match(/\w\w/g);
-      if (!matchB) {
-        throw new Error(`Invalid color format: ${colorB}`);
-      }
-
-      const [rA, gA, bA] = matchA.map((c) => parseInt(c, 16));
-      const [rB, gB, bB] = matchB.map((c) => parseInt(c, 16));
-      const r = Math.round(rA + (rB - rA!) * amount)
-        .toString(16)
-        .padStart(2, "0");
-      const g = Math.round(gA + (gB - gA!) * amount)
-        .toString(16)
-        .padStart(2, "0");
-      const b = Math.round(bA + (bB - bA!) * amount)
-        .toString(16)
-        .padStart(2, "0");
-      return "#" + r + g + b;
-    }
-
-    cmdList.forEach((cmd) => {
+    this.styles.forEach((cmd) => {
       if (cmd.styleType === "color") {
+        const endingColor = getColor(cmd.modifier);
+
         for (let i = cmd.indexStart; i < cmd.indexEnd; i++) {
           const startingColor = colorArray[i];
-          const endingColor = getColor(cmd.modifier);
-          const blendAmount = 0.5;
 
-          if (startingColor === textColor) {
+          // Only blend if the starting color is different
+          if (!startingColor) {
             colorArray[i] = endingColor;
-          } else {
-            colorArray[i] = blendColors(
-              startingColor,
-              endingColor,
-              blendAmount
-            );
+          } else if (startingColor !== endingColor) {
+            colorArray[i] =
+              startingColor === textColor
+                ? endingColor
+                : blendColors(startingColor, endingColor);
           }
         }
       }
     });
 
-    const divArray = this.text.split("").map((char, index) => {
-      const color = colorArray[index];
-      return (
-        <span key={index} style={{ color: color }}>
-          {char}
-        </span>
-      );
-    });
+    // Reduce number of React elements by grouping consecutive characters with the same style
+    const divArray = [];
+    let lastColor = colorArray[0];
+    let currentText = this.text[0];
+
+    for (let i = 1; i < textLength; i++) {
+      if (colorArray[i] === lastColor) {
+        currentText += this.text[i];
+      } else {
+        divArray.push(
+          <span key={divArray.length} style={{ color: lastColor }}>
+            {currentText}
+          </span>
+        );
+        lastColor = colorArray[i];
+        currentText = this.text[i];
+      }
+    }
+
+    // Push the last accumulated text
+    divArray.push(
+      <span key={divArray.length} style={{ color: lastColor }}>
+        {currentText}
+      </span>
+    );
 
     return <div>{divArray}</div>;
   }
