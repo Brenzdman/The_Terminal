@@ -1,8 +1,8 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useAtom } from "jotai";
 import { TextDisplay } from "@/classes/TextDisplay";
 import { Line } from "@/classes/Line";
-import { Directory_Manager } from "@/classes/DirectoryManager";
+import { DirectoryManager } from "@/classes/DirectoryManager";
 import { DIRECTORY_MANAGER } from "./DirectoryAtom";
 
 const TextRenderer: React.FC = () => {
@@ -47,7 +47,7 @@ const TextRenderer: React.FC = () => {
     if (intervalRef.current === null) {
       intervalRef.current = setInterval(() => {
         textDisplay.cursorSymbol = textDisplay.cursorSymbol === " " ? "|" : " ";
-        const updateDirectory = new Directory_Manager();
+        const updateDirectory = new DirectoryManager();
         Object.assign(updateDirectory, directoryManager);
         setDirectoryManager(updateDirectory);
       }, 550);
@@ -97,7 +97,7 @@ const TextRenderer: React.FC = () => {
 
     const path = formatPath(line.path);
     const pathStart = path + "> ";
-    
+
     let adjustedCursorX = pathStart.length;
 
     if (textDisplay.autoFillReplace) {

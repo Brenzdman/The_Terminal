@@ -3,7 +3,7 @@
 import { Dir_File, Directory } from "./Directory";
 import { TextDisplay } from "./TextDisplay";
 
-export class Directory_Manager {
+export class DirectoryManager {
   public currentDirectory: Directory;
   public directories: Directory[];
   public currentPath: string;

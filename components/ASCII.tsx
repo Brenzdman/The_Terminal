@@ -41,7 +41,7 @@ const ASCII: React.FC = () => {
     fontSize: `${fontSize}px`,
     whiteSpace: "pre-wrap",
     backgroundColor: "#000",
-    color: "#17214f",
+    color: "#3d3680",
     userSelect: "none",
     left: "-5px",
   };

@@ -1,17 +1,17 @@
 // Collaborates heavily with userText.tsx and DirectoryManager.ts
 
 import { errorMessage } from "@/functions/messages";
-import { Directory_Manager } from "./DirectoryManager";
+import { DirectoryManager } from "./DirectoryManager";
 
 export class Directory {
   public name: string;
   public files: Dir_File[] = [];
   public directories: Directory[] = [];
-  public directoryManager: Directory_Manager;
+  public directoryManager: DirectoryManager;
   public userMalleable: boolean = false;
   public path: string;
 
-  constructor(dm: Directory_Manager, name: string, path: string) {
+  constructor(dm: DirectoryManager, name: string, path: string) {
     this.name = name;
     this.path = path;
     this.directoryManager = dm;

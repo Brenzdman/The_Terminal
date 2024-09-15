@@ -1,4 +1,4 @@
-import { Directory_Manager } from "./DirectoryManager";
+import { DirectoryManager } from "./DirectoryManager";
 import { Line } from "./Line";
 export class TextDisplay {
   lines: Line[] = [];
@@ -6,9 +6,9 @@ export class TextDisplay {
   cursorSymbol: string = "|";
   autoFill: string = "";
   autoFillReplace: boolean = false;
-  directoryManager: Directory_Manager;
+  directoryManager: DirectoryManager;
 
-  constructor(directoryManager: Directory_Manager, lines?: string[]) {
+  constructor(directoryManager: DirectoryManager, lines?: string[]) {
     this.directoryManager = directoryManager;
     if (lines) {
       this.addLines(lines);
@@ -170,7 +170,7 @@ export class TextDisplay {
     if (lastLine.getText().trim() !== "") {
       this.lines.push(new Line("", this.directoryManager.currentPath));
     }
-    
+
     const newLine = new Line("", this.directoryManager.currentPath);
     newLine.userGenerated = true;
     this.lines.push(newLine);

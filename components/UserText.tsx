@@ -4,7 +4,7 @@
 import { useAtom } from "jotai";
 import React, { useEffect, useState } from "react";
 import { DIRECTORY_MANAGER } from "./DirectoryAtom";
-import { Directory_Manager } from "@/classes/DirectoryManager";
+import { DirectoryManager } from "@/classes/DirectoryManager";
 import { getDetailedHelp } from "@/functions/help";
 import { errorMessage } from "@/functions/messages";
 
@@ -21,7 +21,7 @@ const UserText = () => {
       const textDisplay = directoryManager.textDisplay;
       textDisplay.typeCharacter(text, true);
 
-      const updatedDirectoryManager = new Directory_Manager();
+      const updatedDirectoryManager = new DirectoryManager();
       Object.assign(updatedDirectoryManager, {
         ...directoryManager,
       });
@@ -117,7 +117,7 @@ const UserText = () => {
       setCmdIndex(cmdHistory.length);
     }
 
-    const updatedDirectoryManager = new Directory_Manager();
+    const updatedDirectoryManager = new DirectoryManager();
     Object.assign(updatedDirectoryManager, {
       ...directoryManager,
     });
@@ -238,7 +238,7 @@ const UserText = () => {
     textDisplay.autoFill = "";
     textDisplay.newUserLine();
 
-    const updatedDirectoryManager = new Directory_Manager();
+    const updatedDirectoryManager = new DirectoryManager();
     Object.assign(updatedDirectoryManager, {
       ...directoryManager,
       currentDirectory: currentDirectory,

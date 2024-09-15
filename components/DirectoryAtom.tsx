@@ -1,10 +1,10 @@
-import { Directory_Manager } from "@/classes/DirectoryManager";
+import { DirectoryManager } from "@/classes/DirectoryManager";
 import { generateDirectory } from "@/functions/generateDirectory";
 import { atom, useAtom } from "jotai";
 import { useEffect, useState } from "react";
 
 // Atoms
-const directoryManager = new Directory_Manager();
+const directoryManager = new DirectoryManager();
 export const DIRECTORY_MANAGER = atom(directoryManager);
 
 export function DirectoryAtom({ children }: { children: React.ReactNode }) {
