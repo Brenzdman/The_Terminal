@@ -23,15 +23,13 @@ const nextConfig = {
               "style-src": ["'self'", "'unsafe-inline'"],
               "connect-src": [
                 "'self'",
+                ...(isDev ? ["http://localhost:3000"] : []), // Allow localhost in dev
                 // "https://plausible.io", // Analytics
               ],
-              // prefetch-src is deprecated
-              // See https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/prefetch-src
               "prefetch-src": false,
-              "frame-ancestors": ["'none'"], // Prevents embedding of your content
-              "form-action": ["'self'"], // Restricts where forms can be submitted
+              "frame-ancestors": ["'none'"],
+              "form-action": ["'self'"],
             },
-            // Additional security headers
             strictTransportSecurity:
               "max-age=63072000; includeSubDomains; preload",
             xContentTypeOptions: "nosniff",
@@ -48,7 +46,9 @@ const nextConfig = {
           // CORS headers
           {
             key: "Access-Control-Allow-Origin",
-            value: "https://cmdterminal.vercel.app", // Replace with your specific domain
+            value: isDev
+              ? "http://localhost:3000"
+              : "https://cmdterminal.vercel.app", // Allow localhost in dev
           },
           {
             key: "Access-Control-Allow-Methods",
@@ -66,9 +66,9 @@ const nextConfig = {
               "script-src 'self' 'unsafe-inline'; " +
               "img-src 'self' blob:; " +
               "style-src 'self' 'unsafe-inline'; " +
-              "connect-src 'self'; " +
-              "frame-ancestors 'none'; " + // Prevents embedding of your content
-              "form-action 'self';", // Restricts where forms can be submitted
+              `connect-src 'self' ${isDev ? "http://localhost:3000" : ""}; ` +
+              "frame-ancestors 'none'; " +
+              "form-action 'self';",
           },
         ],
       },
