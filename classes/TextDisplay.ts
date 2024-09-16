@@ -1,5 +1,6 @@
 import { DirectoryManager } from "./DirectoryManager";
 import { Line } from "./Line";
+import { StyledText } from "./StyledText";
 export class TextDisplay {
   lines: Line[] = [];
   cursorX: number = 0;
@@ -17,10 +18,14 @@ export class TextDisplay {
     this.newUserLine();
   }
 
-  addLines(lines: string[] | string): Line[] {
+  addLines(lines: string[] | string | StyledText[] | StyledText): Line[] {
     const path = this.directoryManager.currentPath;
     if (typeof lines === "string") {
       lines = lines.split("\n");
+    }
+
+    if (lines instanceof StyledText) {
+      lines = [lines];
     }
 
     let newLines: Line[] = [];

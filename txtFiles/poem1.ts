@@ -1,3 +1,6 @@
+import { Dir_File } from "@/classes/Directory";
+import { StyledText } from "@/classes/StyledText";
+
 const FileContents: string[] = [
   `We all make mistakes`,
   `By Brenden Bushman`,
@@ -18,4 +21,12 @@ const FileContents: string[] = [
   `For all we ever were, is lost because of me.`,
 ];
 
-export default FileContents;
+const poem = new Dir_File("poem", ".txt");
+const contents: StyledText[] = FileContents.map((line) => new StyledText(line));
+contents[0].addStyle(0, contents[0].getText().length, "bold", "bold");
+contents[1].addStyle(0, contents[1].getText().length, "italic", "italic");
+
+
+poem.content = contents;
+
+export default poem;

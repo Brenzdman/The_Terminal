@@ -24,7 +24,12 @@ export class StyledText {
     return this.text;
   }
 
-  addStyle(indexStart: number, indexEnd: number, modifier: string): void {
+  addStyle(
+    indexStart: number,
+    indexEnd: number,
+    modifier: string,
+    type: string = "color"
+  ): void {
     if (
       indexStart < 0 ||
       indexStart > this.text.length ||
@@ -32,7 +37,7 @@ export class StyledText {
       indexEnd > this.text.length
     ) {
       throw new Error(
-        `Index out of bounds in addStyle: ${indexStart} , ${indexEnd}`
+        `Index out of bounds in addStyle: ${indexStart} , ${indexEnd} for text ${this.text}`
       );
     }
 
@@ -40,7 +45,7 @@ export class StyledText {
       throw new Error(`Invalid range in addStyle: ${indexStart} - ${indexEnd}`);
     }
 
-    this.styles.push(new Style(indexStart, indexEnd, modifier));
+    this.styles.push(new Style(indexStart, indexEnd, modifier, type));
   }
 
   getStyledTextDiv(): React.ReactElement {
@@ -104,13 +109,16 @@ export class StyledText {
       }
     }
 
-    
-    
-
-
     // Push the last accumulated text
     divArray.push(
-      <span key={divArray.length} style={{ color: lastColor }}>
+      <span
+        key={divArray.length}
+        style={{
+          color: lastColor,
+          fontStyle: lastStyle === "italic" ? "italic" : "normal",
+          fontWeight: lastStyle === "bold" ? "bold" : "normal",
+        }}
+      >
         {currentText}
       </span>
     );
@@ -130,7 +138,7 @@ class Style {
     indexStart: number,
     indexEnd: number,
     modifier: string,
-    styleType: string = "color"
+    styleType: string,
   ) {
     this.indexStart = indexStart;
     this.indexEnd = indexEnd;

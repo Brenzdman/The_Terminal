@@ -2,7 +2,7 @@
 
 import { DirectoryManager } from "@/classes/DirectoryManager";
 import { TextDisplay } from "@/classes/TextDisplay";
-import poem1text from "../txtFiles/poem1";
+import poemFile from "../txtFiles/poem1";
 
 export function generateDirectory(): DirectoryManager {
   let directoryManager = new DirectoryManager();
@@ -35,8 +35,10 @@ export function generateDirectory(): DirectoryManager {
   );
 
   // Files
-  const poem1 = Doc.addFile("poem.txt", false, false);
-  poem1!.content = poem1text;
+  let poem1 = Doc.addFile("poem.txt", false, false);
+  if (poem1) {
+    Object.assign(poem1, poemFile);
+  }
 
   return directoryManager;
 }

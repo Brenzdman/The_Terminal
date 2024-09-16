@@ -2,6 +2,7 @@
 
 import { errorMessage } from "@/functions/messages";
 import { DirectoryManager } from "./DirectoryManager";
+import { StyledText } from "./StyledText";
 
 export class Directory {
   public name: string;
@@ -317,7 +318,14 @@ export class Directory {
             return;
           }
 
-          file.content = segments.slice(0, segments.length - 2);
+          const content: StyledText[] = [];
+          segments.forEach((segment) => {
+            if (segment != ">") {
+              content.push(new StyledText(segment));
+            }
+          });
+
+          file.content = content;
           textManager.addLines(`Text echoed to ${file.name}.txt`);
           return;
         } else {
@@ -404,7 +412,7 @@ export class Directory {
 
 export class Dir_File {
   public name: string;
-  public content: string[] = [];
+  public content: StyledText[] = [];
   public type: string = ".txt";
   public onRun: (() => void) | null = null;
   public userMalleable: boolean = false;
