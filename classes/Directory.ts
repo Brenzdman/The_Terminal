@@ -319,7 +319,7 @@ export class Directory {
           }
 
           const content: StyledText[] = [];
-          segments.forEach((segment) => {
+          segments.splice(0, segments.length - 2).forEach((segment) => {
             if (segment != ">") {
               content.push(new StyledText(segment));
             }
