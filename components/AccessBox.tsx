@@ -63,12 +63,12 @@ const AccessBox = () => {
 
   // ASCII art for the unified border around the content and input
   const asciiBorder = `
-  +--------------------------------------+
-  |                                      |
-  |                                      |
-  |                                      |
-  |                                      |
-  +--------------------------------------+
+  +--------------------------------------+ 
+  |                                      | 
+  |                                      | 
+  |                                      | 
+  |                                      | 
+  +--------------------------------------+ 
   `;
 
   const boxText = (text: string | null) => {
@@ -81,6 +81,16 @@ const AccessBox = () => {
       inputValue.length > 1
         ? inputValue.slice(0, -1).replace(/./g, "*") + inputValue.slice(-1)
         : inputValue;
+    
+    const handleMouseDown = (event: React.MouseEvent<HTMLInputElement>) => {
+      event.preventDefault(); // Prevent selecting the text via mouse
+    };
+
+    const handleSelectStart = (
+      event: React.SyntheticEvent<HTMLInputElement>
+    ) => {
+      event.preventDefault(); // Prevent text selection
+    };
 
     return (
       <input
@@ -90,6 +100,8 @@ const AccessBox = () => {
         value={hiddenValue}
         style={styles.inputBox}
         placeholder=""
+        onMouseDown={handleMouseDown}
+        onSelect={handleSelectStart}
       />
     );
   };
@@ -118,6 +130,7 @@ export default AccessBox;
 
 const styles: { [key: string]: React.CSSProperties } = {
   accessBox: {
+    userSelect: "none",
     display: "flex",
     position: "fixed",
     justifyContent: "center",
@@ -161,7 +174,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   inputBox: {
     width: "150%",
-    transform: "translate(-14%, 0)",
+    transform: "translate(-15.5%, 0)",
     padding: "10px",
     border: "1px solid #00FF00",
     backgroundColor: "rgba(0, 0, 0, 0)",
