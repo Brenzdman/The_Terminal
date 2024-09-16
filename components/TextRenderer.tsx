@@ -4,10 +4,12 @@ import { TextDisplay } from "@/classes/TextDisplay";
 import { Line } from "@/classes/Line";
 import { DirectoryManager } from "@/classes/DirectoryManager";
 import { DIRECTORY_MANAGER } from "./DirectoryAtom";
+import { usePopup } from "@/functions/Access";
 
 const TextRenderer: React.FC = () => {
   const [directoryManager, setDirectoryManager] = useAtom(DIRECTORY_MANAGER);
   const textDisplay = directoryManager.textDisplay;
+  const { isVisible: AccessBoxIsVisible } = usePopup();
 
   const [prevLineLength, setPrevLineLength] = useState<number>(
     textDisplay.lines.length
@@ -21,7 +23,11 @@ const TextRenderer: React.FC = () => {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleKeyDown = (event: KeyboardEvent) => {
-    if (event.key === " ") {
+    if (event.key === " " && event.target instanceof HTMLElement) {
+      if (event.target.tagName.toLowerCase() === "input") {
+        return; // Do nothing, allow space input
+      }
+
       event.preventDefault();
     }
   };
@@ -50,7 +56,7 @@ const TextRenderer: React.FC = () => {
         const updateDirectory = new DirectoryManager();
         Object.assign(updateDirectory, directoryManager);
         setDirectoryManager(updateDirectory);
-      }, 550);
+      }, 520);
     }
 
     handleAutoScroll();
@@ -123,6 +129,10 @@ const TextRenderer: React.FC = () => {
 
     let adjustedCursorY = numBreaks;
     adjustedCursorX -= lastLineBreak - numBreaks + 1;
+
+    if (AccessBoxIsVisible) {
+      cursor = " ";
+    }
 
     content = (
       <div style={{ position: "relative" }}>

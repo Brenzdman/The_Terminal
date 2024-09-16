@@ -5,7 +5,9 @@ const AccessBox = () => {
   const { isVisible, hidePopup, popupPassword } = usePopup();
   const inputRef = useRef<HTMLInputElement>(null); // Reference to the input element
   const [inputValue, setInputValue] = useState(""); // Stores the input value
+  const [trueInputValue, setTrueInputValue] = useState(""); // Stores the true input value
   const [accessStatus, setAccessStatus] = useState<string | null>(null); // Access status (granted/denied)
+  const [hideInterval, setHideInterval] = useState<NodeJS.Timeout | null>(null); // Stores the interval ID
 
   useEffect(() => {
     if (isVisible && inputRef.current) {
@@ -13,28 +15,50 @@ const AccessBox = () => {
     }
   }, [isVisible]);
 
-    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
-      if (inputValue === popupPassword) {
-          setAccessStatus("ACCESS GRANTED");
-          document.addEventListener("keydown", closePopup);
+      if (trueInputValue === popupPassword) {
+        setAccessStatus("ACCESS GRANTED");
+        document.addEventListener("keydown", closePopup);
       } else {
-          setAccessStatus("ACCESS DENIED");
-          document.addEventListener("keydown", closePopup);
+        setAccessStatus("ACCESS DENIED");
+        document.addEventListener("keydown", closePopup);
       }
-      }
-      
+    }
   };
 
-    const closePopup = () => {
-        setInputValue("");
-        setAccessStatus(null);
-        hidePopup();
-        document.removeEventListener("keydown", closePopup);
-    }
-    
+  const closePopup = () => {
+    setInputValue("");
+    setTrueInputValue("");
+    setAccessStatus(null);
+    hidePopup();
+    document.removeEventListener("keydown", closePopup);
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value); // Update input as the user types
+    const newValue = e.target.value;
+    setInputValue(newValue); // Update input as the user types
+
+    // if new character is entered, append it to the true input value
+    if (newValue.length > trueInputValue.length) {
+      setTrueInputValue(trueInputValue + newValue.slice(-1));
+    } else {
+      // if a character is deleted, remove the last character from the true input value
+      setTrueInputValue(trueInputValue.slice(0, -1));
+    }
+
+    if (hideInterval) {
+      clearInterval(hideInterval);
+    }
+
+    // Set a new interval to hide the last character after 1 second
+    const newHideInterval = setInterval(() => {
+      setInputValue((prevValue) => prevValue.replace(/./g, "*"));
+      clearInterval(newHideInterval);
+      setHideInterval(null);
+    }, 500);
+
+    setHideInterval(newHideInterval);
   };
 
   // ASCII art for the unified border around the content and input
@@ -52,12 +76,18 @@ const AccessBox = () => {
   };
 
   const inputBox = () => {
+    // Show all but last character as asterisks
+    const hiddenValue =
+      inputValue.length > 1
+        ? inputValue.slice(0, -1).replace(/./g, "*") + inputValue.slice(-1)
+        : inputValue;
+
     return (
       <input
         ref={inputRef}
         onKeyDown={handleKeyDown}
         onChange={handleChange}
-        value={inputValue}
+        value={hiddenValue}
         style={styles.inputBox}
         placeholder=""
       />
@@ -111,7 +141,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     width: "350px",
     textAlign: "center",
     backgroundColor: "rgba(0, 0, 0, 0.5)",
-    height: "100%",
+    height: "120px",
   },
 
   asciiBorder: {

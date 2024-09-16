@@ -23,7 +23,6 @@ export const AccessProvider = ({ children }: { children: ReactNode }) => {
 
   // Function to show the popup
   const showPopup = (password: string) => {
-    console.log(password);
     setPassword(password);
     setIsVisible(true);
   };
