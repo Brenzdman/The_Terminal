@@ -7,7 +7,7 @@ const AccessBox = () => {
   const [inputValue, setInputValue] = useState(""); // Stores the input value
   const [trueInputValue, setTrueInputValue] = useState(""); // Stores the true input value
   const [accessStatus, setAccessStatus] = useState<string | null>(null); // Access status (granted/denied)
-  const [hideInterval, setHideInterval] = useState<NodeJS.Timeout | null>(null); // Stores the interval ID
+  const [hideTimeout, setHideTimeout] = useState<NodeJS.Timeout | null>(null); // Stores the timeout ID
 
   useEffect(() => {
     if (isVisible && inputRef.current) {
@@ -37,28 +37,29 @@ const AccessBox = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
+    const lastChar = newValue.slice(-1);
+
     setInputValue(newValue); // Update input as the user types
 
     // if new character is entered, append it to the true input value
     if (newValue.length > trueInputValue.length) {
-      setTrueInputValue(trueInputValue + newValue.slice(-1));
+      setTrueInputValue(trueInputValue + lastChar);
     } else {
       // if a character is deleted, remove the last character from the true input value
       setTrueInputValue(trueInputValue.slice(0, -1));
     }
 
-    if (hideInterval) {
-      clearInterval(hideInterval);
+    if (hideTimeout) {
+      clearTimeout(hideTimeout);
     }
 
-    // Set a new interval to hide the last character after 1 second
-    const newHideInterval = setInterval(() => {
+    // Set a new timeout to hide the last character after 500ms
+    const newHideTimeout = setTimeout(() => {
       setInputValue((prevValue) => prevValue.replace(/./g, "*"));
-      clearInterval(newHideInterval);
-      setHideInterval(null);
+      setHideTimeout(null);
     }, 500);
 
-    setHideInterval(newHideInterval);
+    setHideTimeout(newHideTimeout);
   };
 
   // ASCII art for the unified border around the content and input
@@ -81,19 +82,13 @@ const AccessBox = () => {
       inputValue.length > 1
         ? inputValue.slice(0, -1).replace(/./g, "*") + inputValue.slice(-1)
         : inputValue;
-    
+
     const handleMouseDown = (event: React.MouseEvent<HTMLInputElement>) => {
-      // foucs the input on mouse click
+      // Focus the input on mouse click
       if (inputRef.current) {
         inputRef.current.focus();
       }
       event.preventDefault(); // Prevent selecting the text via mouse
-    };
-
-    const handleSelectStart = (
-      event: React.SyntheticEvent<HTMLInputElement>
-    ) => {
-      event.preventDefault(); // Prevent text selection
     };
 
     return (
@@ -105,7 +100,6 @@ const AccessBox = () => {
         style={styles.inputBox}
         placeholder=""
         onMouseDown={handleMouseDown}
-        onSelect={handleSelectStart}
       />
     );
   };
