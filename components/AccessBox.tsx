@@ -83,6 +83,10 @@ const AccessBox = () => {
         : inputValue;
     
     const handleMouseDown = (event: React.MouseEvent<HTMLInputElement>) => {
+      // foucs the input on mouse click
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
       event.preventDefault(); // Prevent selecting the text via mouse
     };
 
