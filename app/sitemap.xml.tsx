@@ -5,8 +5,8 @@ const Sitemap = () => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { res } = context;
-  const baseUrl = "https://cmdterminal.vercel.app";
+  const { res, req } = context;
+  const baseUrl = `https://${req.headers.host}`;
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
   <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
