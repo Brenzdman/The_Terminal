@@ -1,5 +1,4 @@
 import { usePopup } from "@/functions/Access";
-import { doc } from "firebase/firestore";
 import React, { useRef, useState, useEffect } from "react";
 
 const AccessBox = () => {

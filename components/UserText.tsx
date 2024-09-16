@@ -13,7 +13,7 @@ const UserText = () => {
   const [directoryManager, setDirectoryManager] = useAtom(DIRECTORY_MANAGER);
   const [cmdHistory, setCmdHistory] = useState<string[]>([]);
   const [cmdIndex, setCmdIndex] = useState<number>(-1);
-  const { showPopup } = usePopup();
+  const { showPopup, isVisible: AccessBoxIsVisible } = usePopup();
 
   const handleRightClick = (event: MouseEvent) => {
     event.preventDefault();
@@ -32,8 +32,9 @@ const UserText = () => {
   };
 
   const handleKeyDown = (event: KeyboardEvent) => {
-    const textDisplay = directoryManager.textDisplay;
+    if (AccessBoxIsVisible) return;
 
+    const textDisplay = directoryManager.textDisplay;
     if (event.key.length === 1 && !event.getModifierState("Control")) {
       textDisplay.typeCharacter(event.key, true);
     } else if (event.key === "Backspace") {
