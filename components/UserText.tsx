@@ -7,11 +7,13 @@ import { DIRECTORY_MANAGER } from "./DirectoryAtom";
 import { DirectoryManager } from "@/classes/DirectoryManager";
 import { getDetailedHelp } from "@/functions/help";
 import { errorMessage } from "@/functions/messages";
+import { usePopup } from "@/functions/Access";
 
 const UserText = () => {
   const [directoryManager, setDirectoryManager] = useAtom(DIRECTORY_MANAGER);
   const [cmdHistory, setCmdHistory] = useState<string[]>([]);
   const [cmdIndex, setCmdIndex] = useState<number>(-1);
+  const { showPopup } = usePopup();
 
   const handleRightClick = (event: MouseEvent) => {
     event.preventDefault();
@@ -227,6 +229,10 @@ const UserText = () => {
       // Run file
     } else if (cmd === "start") {
       currentDirectory.runFile(segments[1]);
+    } else if (cmd === "test") {
+      textDisplay.addLines(["Test command executed"]);
+
+      showPopup("secret");
 
       // Default
     } else if (cmd === "") {

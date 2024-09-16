@@ -1,10 +1,12 @@
 "use client";
 
+import AccessBox from "@/components/AccessBox";
 import ASCII from "@/components/ASCII";
 import { DirectoryAtom } from "@/components/DirectoryAtom";
 import FullscreenButton from "@/components/FullscreenButton";
 import TextRenderer from "@/components/TextRenderer";
 import UserText from "@/components/UserText";
+import { AccessProvider } from "@/functions/Access";
 import React from "react";
 
 export default function Home() {
@@ -14,7 +16,6 @@ export default function Home() {
         name="google-site-verification"
         content="hhhgfqTYYPQugAs6cLEnyHM7z1sMIaKjdCIxFysX58M"
       />
-      
 
       <meta
         name="description"
@@ -26,6 +27,10 @@ export default function Home() {
       />
 
       <DirectoryAtom>
+        <AccessProvider>
+          <AccessBox />
+        </AccessProvider>
+
         <ASCII />
         <UserText />
         <TextRenderer />

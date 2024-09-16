@@ -39,6 +39,8 @@ const nextConfig = {
               camera: ["'none'"],
               microphone: ["'none'"],
               fullscreen: ["'self'"],
+              "clipboard-read": ["'self'"], // Allow clipboard read
+              "clipboard-write": ["'self'"], // Allow clipboard write
             },
           }),
           {
@@ -62,7 +64,7 @@ const nextConfig = {
               (isDev ? " 'unsafe-eval'" : "") +
               "; img-src 'self' blob:; style-src 'self' 'unsafe-inline'; " +
               `connect-src 'self' ${isDev ? "http://localhost:3000" : ""}; ` +
-              "frame-ancestors 'none'; form-action 'self';",
+              "frame-ancestors 'none'; form-action 'self';", // Remove clipboard directives
           },
         ],
       },

@@ -46,6 +46,7 @@ export class StyledText {
   getStyledTextDiv(): React.ReactElement {
     const textLength = this.text.length;
     const colorArray: string[] = new Array(textLength).fill("");
+    const textTypeArray: string[] = new Array(textLength).fill("");
 
     this.styles.forEach((cmd) => {
       if (cmd.styleType === "color") {
@@ -64,27 +65,48 @@ export class StyledText {
                 : blendColors(startingColor, endingColor);
           }
         }
+      } else if (cmd.styleType === "bold") {
+        for (let i = cmd.indexStart; i < cmd.indexEnd; i++) {
+          textTypeArray[i] = "bold";
+        }
+      } else if (cmd.styleType === "italic") {
+        for (let i = cmd.indexStart; i < cmd.indexEnd; i++) {
+          textTypeArray[i] = "italic";
+        }
       }
     });
 
     // Reduce number of React elements by grouping consecutive characters with the same style
     const divArray = [];
     let lastColor = colorArray[0];
+    let lastStyle = textTypeArray[0];
     let currentText = this.text[0];
 
     for (let i = 1; i < textLength; i++) {
-      if (colorArray[i] === lastColor) {
+      if (colorArray[i] === lastColor && textTypeArray[i] === lastStyle) {
         currentText += this.text[i];
       } else {
         divArray.push(
-          <span key={divArray.length} style={{ color: lastColor }}>
+          <span
+            key={divArray.length}
+            style={{
+              color: lastColor,
+              fontStyle: lastStyle === "italic" ? "italic" : "normal",
+              fontWeight: lastStyle === "bold" ? "bold" : "normal",
+            }}
+          >
             {currentText}
           </span>
         );
         lastColor = colorArray[i];
+        lastStyle = textTypeArray[i];
         currentText = this.text[i];
       }
     }
+
+    
+    
+
 
     // Push the last accumulated text
     divArray.push(
@@ -101,12 +123,18 @@ export class StyledText {
 class Style {
   public indexStart: number;
   public indexEnd: number;
-  public styleType: string = "color";
+  public styleType: string;
   public modifier: string;
 
-  constructor(indexStart: number, indexEnd: number, modifier: string) {
+  constructor(
+    indexStart: number,
+    indexEnd: number,
+    modifier: string,
+    styleType: string = "color"
+  ) {
     this.indexStart = indexStart;
     this.indexEnd = indexEnd;
     this.modifier = modifier;
+    this.styleType = styleType;
   }
 }
