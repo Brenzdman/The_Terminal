@@ -33,6 +33,8 @@ const AccessBox = () => {
     setAccessStatus(null);
     hidePopup();
     document.removeEventListener("keydown", closePopup);
+    document.removeEventListener("contextmenu", handleRightClick);
+    document.removeEventListener("paste", handlePaste);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,6 +78,20 @@ const AccessBox = () => {
     return <pre style={styles.boxText}>{text || ""}</pre>;
   };
 
+  const handleRightClick = (event: MouseEvent) => {
+    event.preventDefault();
+
+    const pasteText = navigator.clipboard.readText();
+    pasteText.then((text) => {
+      setInputValue(text);
+      setTrueInputValue(text);
+    });
+  };
+
+  const handlePaste = (event: ClipboardEvent) => {
+    event.preventDefault();
+  };
+
   const inputBox = () => {
     // Show all but last character as asterisks
     const hiddenValue =
@@ -83,6 +99,8 @@ const AccessBox = () => {
         ? inputValue.slice(0, -1).replace(/./g, "*") + inputValue.slice(-1)
         : inputValue;
 
+    document.addEventListener("contextmenu", handleRightClick);
+    document.addEventListener("paste", handlePaste);
     const handleMouseDown = (event: React.MouseEvent<HTMLInputElement>) => {
       // Focus the input on mouse click
       if (inputRef.current) {

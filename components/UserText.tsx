@@ -17,6 +17,7 @@ const UserText = () => {
 
   const handleRightClick = (event: MouseEvent) => {
     event.preventDefault();
+    if (AccessBoxIsVisible) return;
 
     const pasteText = navigator.clipboard.readText();
     pasteText.then((text) => {
