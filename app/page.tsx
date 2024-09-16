@@ -8,6 +8,7 @@ import TextRenderer from "@/components/TextRenderer";
 import UserText from "@/components/UserText";
 import { AccessProvider } from "@/functions/Access";
 import React from "react";
+import Sitemap from "./sitemap.xml";
 
 export default function Home() {
   return (
@@ -35,6 +36,7 @@ export default function Home() {
         <UserText />
         <TextRenderer />
         <FullscreenButton />
+        <Sitemap />
       </DirectoryAtom>
     </div>
   );
