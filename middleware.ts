@@ -22,7 +22,10 @@ export function middleware(req: NextRequest) {
 
   const { protocol } = req.nextUrl;
   if (protocol !== "https:" && !isDev) {
-    return NextResponse.redirect(`https://${url}`);
+    return NextResponse.json(
+      { error: "Forbidden: server-side requests only" },
+      { status: 403 }
+    );
   }
   return NextResponse.next();
 }
