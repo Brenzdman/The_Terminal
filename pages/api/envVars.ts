@@ -10,14 +10,19 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
   // Check if the request is coming from the server-side
   const serverSideHeader = req.headers["x-server-side-request"];
-  const allowedIPs = ["127.0.0.1", "::1"]; // Add more trusted IPs if necessary
+  const allowedIPs = ["127.0.0.1", "::1", "76.76.21.142", "76.76.21.241"];
 
   const forwardedFor =
     req.headers["x-forwarded-for"] || req.socket.remoteAddress;
-  if (!serverSideHeader || !allowedIPs.includes(forwardedFor as string)) {
+
+  if (!serverSideHeader) {
     return res
       .status(403)
       .json({ error: "Forbidden: server-side requests only" });
+  }
+
+  if (!allowedIPs.includes(forwardedFor as string)) {
+    return res.status(403).json({ error: "Forbidden: ip not allowed" });
   }
 
   try {
