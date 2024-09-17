@@ -1,5 +1,3 @@
-import crypto from "crypto";
-
 export function getEnvVar(name: string): string {
   const value = process.env[name];
   if (!value) {
@@ -8,19 +6,22 @@ export function getEnvVar(name: string): string {
   return value;
 }
 
-// Generate a secure random nonce
-function generateNonce() {
-  return crypto.randomBytes(16).toString("hex");
-}
-
-export async function fetchEnvVar(varName: string) {
-  // Step 1: Generate the nonce
-  const nonce = generateNonce();
-
-  let response;
+export async function fetchEnvVar(varName: string): Promise<string> {
   try {
-    // Step 2: Send the nonce in the request header
-    response = await fetch(`/api/envVars?varName=${varName}`, {
+    // Step 1: Get the nonce from the server
+    const nonceResponse = await fetch(`/api/generateNonce?varName=${varName}`);
+
+    if (!nonceResponse.ok) {
+      throw new Error(`Failed to get nonce, status: ${nonceResponse.status}`);
+    }
+
+    const { nonce } = await nonceResponse.json();
+    if (!nonce) {
+      throw new Error("Failed to generate nonce");
+    }
+
+    // Step 2: Send the nonce with the request to fetch the environment variable
+    const response = await fetch(`/api/envVars?varName=${varName}`, {
       headers: {
         "x-server-side-request": "true",
         "x-nonce": nonce, // Pass the nonce with the request
@@ -30,13 +31,16 @@ export async function fetchEnvVar(varName: string) {
     if (!response.ok) {
       throw new Error(`Response returned ${response.status}`);
     }
-  } catch (error) {
-    throw new Error(`Failed to fetch ${varName}, ${error}`);
-  }
 
-  const data = await response.json();
-  if (!data.value) {
-    throw new Error(`Failed to load ${varName}`);
+    const data = await response.json();
+    if (!data.value) {
+      throw new Error(`Failed to load ${varName}`);
+    }
+
+    return data.value;
+  } catch (error) {
+    // Log the error for debugging
+    console.error(`Error fetching environment variable ${varName}:`, error);
+    throw new Error(`Failed to fetch ${varName}: ${error}`);
   }
-  return data.value;
 }
