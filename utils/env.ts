@@ -1,3 +1,5 @@
+import crypto from "crypto";
+
 export function getEnvVar(name: string): string {
   const value = process.env[name];
   if (!value) {
@@ -6,16 +8,22 @@ export function getEnvVar(name: string): string {
   return value;
 }
 
+// Generate a secure random nonce
+function generateNonce() {
+  return crypto.randomBytes(16).toString("hex");
+}
+
 export async function fetchEnvVar(varName: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_URL;
+  // Step 1: Generate the nonce
+  const nonce = generateNonce();
 
   let response;
-  console.log(`${baseUrl}/api/envVars?varName=${varName}`);
   try {
-    // response = await fetch(`${baseUrl}/api/envVars?varName=${varName}`, {
+    // Step 2: Send the nonce in the request header
     response = await fetch(`/api/envVars?varName=${varName}`, {
       headers: {
         "x-server-side-request": "true",
+        "x-nonce": nonce, // Pass the nonce with the request
       },
     });
 
