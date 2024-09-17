@@ -6,14 +6,24 @@ export function getEnvVar(name: string): string {
   return value;
 }
 
-
 export async function fetchEnvVar(varName: string) {
-    const response = await fetch(`/api/envVars?varName=${varName}`, {
+  const baseUrl = process.env.NEXT_PUBLIC_URL;
+
+  let response;
+  try {
+    response = await fetch(`${baseUrl}/api/envVars?varName=${varName}`, {
       headers: {
         "x-server-side-request": "true",
       },
     });
-    
+
+    if (!response.ok) {
+      throw new Error(`Response returned ${response.status}`);
+    }
+  } catch (error) {
+    throw new Error(`Failed to fetch ${varName}, ${error}`);
+  }
+
   const data = await response.json();
   if (!data.value) {
     throw new Error(`Failed to load ${varName}`);
