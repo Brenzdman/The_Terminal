@@ -10,8 +10,10 @@ export async function fetchEnvVar(varName: string) {
   const baseUrl = process.env.NEXT_PUBLIC_URL;
 
   let response;
+  console.log(`${baseUrl}/api/envVars?varName=${varName}`);
   try {
-    response = await fetch(`${baseUrl}/api/envVars?varName=${varName}`, {
+    // response = await fetch(`${baseUrl}/api/envVars?varName=${varName}`, {
+    response = await fetch(`/api/envVars?varName=${varName}`, {
       headers: {
         "x-server-side-request": "true",
       },
