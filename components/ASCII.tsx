@@ -1,10 +1,11 @@
-"use client";
 import { ASCIIimg } from "@/images/ASCII";
-import React, { useEffect, useState } from "react";
+import { fetchEnvVar } from "@/utils/env";
+import React, { useEffect, useState, useRef } from "react";
 
 const ASCII: React.FC = () => {
   const [text, setText] = useState<string>("Loading...");
   const [fontSize, setFontSize] = useState<number>(16);
+  const hasEncoded = useRef(false); // Ref to track if encoding has been done
 
   const calculateFontSize = () => {
     const { innerWidth, innerHeight } = window;
@@ -14,7 +15,54 @@ const ASCII: React.FC = () => {
   };
 
   useEffect(() => {
-    setText(ASCIIimg);
+    // Prevent encoding if already done
+
+    async function encodeImage() {
+      const ASCII_CODE = await fetchEnvVar("ASCII_CODE");
+      const codeLength = ASCII_CODE.length;
+
+      let lines = ASCIIimg;
+      let totalLines = lines.length;
+
+      // Determine the number of lines to skip to get evenly spaced ones
+      let lineSkip = Math.max(1, Math.floor(totalLines / codeLength));
+      // gets the lines that will have encoded chars
+      let encodedLines: number[] = Array.from(
+        { length: codeLength },
+        (_, i) => i * lineSkip
+      );
+
+      if (encodedLines.length < codeLength) {
+        throw new Error(`Not enough lines to encode ASCII code`);
+      }
+
+      function getRandom0InString(str: string): number {
+        if (!str.includes("0")) {
+          throw new Error(`No 0 in string`);
+        }
+
+        let index = Math.floor(Math.random() * str.length);
+        return str[index] === "0" ? index : getRandom0InString(str);
+      }
+
+      for (let i = 0; i < codeLength; i++) {
+        let line = encodedLines[i];
+        let encodedChar = ASCII_CODE[i];
+        let encodedLine = lines[line];
+        let encodedIndex = getRandom0InString(encodedLine);
+        lines[line] =
+          encodedLine.slice(0, encodedIndex) +
+          encodedChar +
+          encodedLine.slice(encodedIndex + 1);
+      }
+
+      setText(lines.join("\n"));
+    }
+
+    if (!hasEncoded.current) {
+      hasEncoded.current = true;
+      encodeImage();
+    }
     calculateFontSize(); // Set initial font size
 
     const handleResize = () => {

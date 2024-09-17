@@ -6,6 +6,7 @@ const palette = [
   "#9A76FF", // Directory Color (Medium Purple)
   "#66CCFF", // Executable Color (Light Blue)
   "#FF5555", // Error Color (Red)
+  "#9ebadb", // Input Box (Light blue)
 ];
 
 export const commandColor = palette[0];
@@ -13,6 +14,7 @@ export const txtColor = palette[1];
 export const dirColor = palette[2];
 export const exeColor = palette[3];
 export const errorColor = palette[4];
+export const inputBoxColor = palette[5];
 
 export const getColor = (type: string) => {
   switch (type) {
@@ -26,6 +28,8 @@ export const getColor = (type: string) => {
       return errorColor;
     case "command":
       return commandColor;
+    case "input":
+      return inputBoxColor;
     default:
       throw new Error(`Invalid color type: ${type}`);
   }

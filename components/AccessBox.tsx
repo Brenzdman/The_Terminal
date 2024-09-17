@@ -1,8 +1,9 @@
 import { usePopup } from "@/functions/Access";
 import React, { useRef, useState, useEffect } from "react";
+import { getColor } from "@/functions/color";
 
 const AccessBox = () => {
-  const { isVisible, hidePopup, popupPassword } = usePopup();
+  const { isVisible, hidePopup, popupPassword, onComplete } = usePopup();
   const inputRef = useRef<HTMLInputElement>(null); // Reference to the input element
   const [inputValue, setInputValue] = useState(""); // Stores the input value
   const [trueInputValue, setTrueInputValue] = useState(""); // Stores the true input value
@@ -17,12 +18,24 @@ const AccessBox = () => {
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
-      if (trueInputValue === popupPassword) {
-        setAccessStatus("ACCESS GRANTED");
-        document.addEventListener("keydown", closePopup);
-      } else {
-        setAccessStatus("ACCESS DENIED");
-        document.addEventListener("keydown", closePopup);
+      const checkPassword = (password: string) => {
+        if (trueInputValue === password) {
+          setAccessStatus("ACCESS GRANTED");
+          document.addEventListener("keydown", closePopup);
+
+          onComplete();
+        } else {
+          setAccessStatus("ACCESS DENIED");
+          document.addEventListener("keydown", closePopup);
+        }
+      };
+
+      if (popupPassword instanceof Promise) {
+        popupPassword.then((resolvedPassword) => {
+          checkPassword(resolvedPassword);
+        });
+      } else if (typeof popupPassword === "string") {
+        checkPassword(popupPassword);
       }
     }
   };
@@ -133,7 +146,7 @@ const AccessBox = () => {
         <div style={styles.background}></div>
 
         {/* Dynamic Content inside the border */}
-        {boxText(accessStatus ? accessStatus : "Enter the password")}
+        {boxText(accessStatus ? accessStatus : "ENTER PASSWORD")}
 
         {/* Input box inside the same border */}
         {accessStatus ? null : inputBox()}
@@ -143,6 +156,8 @@ const AccessBox = () => {
 };
 
 export default AccessBox;
+
+const color = getColor("input");
 
 const styles: { [key: string]: React.CSSProperties } = {
   accessBox: {
@@ -154,7 +169,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     left: "50%",
     transform: "translate(-50%, -50%)",
     padding: "20px",
-    color: "#00FF00",
+    color: color,
     zIndex: 1000,
     width: "350px",
     textAlign: "center",
@@ -178,13 +193,14 @@ const styles: { [key: string]: React.CSSProperties } = {
     transform: "translate(-50%, -50%)",
     top: "50%",
     left: "50%",
-    color: "#00FF00",
+    color: color,
     margin: 0,
+    fontWeight: "bold",
   },
   boxText: {
-    color: "#00FF00",
+    color: color,
     fontFamily: "'Courier New', monospace",
-    fontSize: "14px",
+    fontSize: "18px",
     textAlign: "center",
     marginBottom: "20px",
   },
@@ -192,13 +208,13 @@ const styles: { [key: string]: React.CSSProperties } = {
     width: "150%",
     transform: "translate(-15.5%, 0)",
     padding: "10px",
-    border: "1px solid #00FF00",
+    border: "1px solid " + color,
     backgroundColor: "rgba(0, 0, 0, 0)",
-    color: "#00FF00",
+    color: color,
     fontSize: "14px",
     fontFamily: "'Courier New', monospace",
     outline: "none",
-    caretColor: "#00FF00",
+    caretColor: color,
     boxShadow: "none",
   },
 };

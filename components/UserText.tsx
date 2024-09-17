@@ -13,7 +13,7 @@ const UserText = () => {
   const [directoryManager, setDirectoryManager] = useAtom(DIRECTORY_MANAGER);
   const [cmdHistory, setCmdHistory] = useState<string[]>([]);
   const [cmdIndex, setCmdIndex] = useState<number>(-1);
-  const { showPopup, isVisible: AccessBoxIsVisible } = usePopup();
+  const { isVisible: AccessBoxIsVisible } = usePopup();
 
   const handleRightClick = (event: MouseEvent) => {
     event.preventDefault();
@@ -231,10 +231,6 @@ const UserText = () => {
       // Run file
     } else if (cmd === "start") {
       currentDirectory.runFile(segments[1]);
-    } else if (cmd === "test") {
-      textDisplay.addLines(["Test command executed"]);
-
-      showPopup("secret");
 
       // Default
     } else if (cmd === "") {

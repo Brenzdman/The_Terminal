@@ -29,11 +29,11 @@ export default function Home() {
         />
       </Head>
 
-      <DirectoryAtom>
-        <AccessProvider>
-          <AccessBox />
-        </AccessProvider>
+      <AccessProvider>
+        <AccessBox />
+      </AccessProvider>
 
+      <DirectoryAtom>
         <ASCII />
         <UserText />
         <TextRenderer />

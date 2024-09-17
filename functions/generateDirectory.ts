@@ -3,8 +3,11 @@
 import { DirectoryManager } from "@/classes/DirectoryManager";
 import { TextDisplay } from "@/classes/TextDisplay";
 import poemFile from "../txtFiles/poem1";
+import { beginEXE, getOnRun } from "@/exeFiles/begin";
 
-export function generateDirectory(): DirectoryManager {
+export function generateDirectory(
+  showPopup: (arg0: any, arg1: any) => void
+): DirectoryManager {
   let directoryManager = new DirectoryManager();
 
   // root directory
@@ -38,6 +41,12 @@ export function generateDirectory(): DirectoryManager {
   let poem1 = Doc.addFile("poem.txt", false, false);
   if (poem1) {
     Object.assign(poem1, poemFile);
+  }
+
+  let begin = root?.addFile("begin.exe", false, false);
+  if (begin) {
+    Object.assign(begin, beginEXE);
+    begin.onRun = getOnRun(directoryManager, showPopup);
   }
 
   return directoryManager;
