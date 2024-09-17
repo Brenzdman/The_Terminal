@@ -17,13 +17,15 @@ const nextConfig = {
               "script-src": [
                 "'self'",
                 "'unsafe-inline'",
-                ...(isDev ? ["'unsafe-eval'"] : []), // Add unsafe-eval in dev
+                ...(isDev ? ["'unsafe-eval'"] : []),
               ],
               "img-src": ["'self'", "blob:"],
               "style-src": ["'self'", "'unsafe-inline'"],
               "connect-src": [
                 "'self'",
-                ...(isDev ? ["http://localhost:3000"] : []),
+                ...(isDev
+                  ? ["http://localhost:3000"]
+                  : ["https://cmdterminal.vercel.app"]),
               ],
               "frame-ancestors": ["'none'"],
               "form-action": ["'self'"],
@@ -39,8 +41,8 @@ const nextConfig = {
               camera: ["'none'"],
               microphone: ["'none'"],
               fullscreen: ["'self'"],
-              "clipboard-read": ["'self'"], // Allow clipboard read
-              "clipboard-write": ["'self'"], // Allow clipboard write
+              "clipboard-read": ["'self'"],
+              "clipboard-write": ["'self'"],
             },
           }),
           {
@@ -63,8 +65,12 @@ const nextConfig = {
               "default-src 'self'; script-src 'self' 'unsafe-inline'" +
               (isDev ? " 'unsafe-eval'" : "") +
               "; img-src 'self' blob:; style-src 'self' 'unsafe-inline'; " +
-              `connect-src 'self' ${isDev ? "http://localhost:3000" : ""}; ` +
-              "frame-ancestors 'none'; form-action 'self';", // Remove clipboard directives
+              `connect-src 'self' ${
+                isDev
+                  ? "http://localhost:3000"
+                  : "https://cmdterminal.vercel.app"
+              }; ` +
+              "frame-ancestors 'none'; form-action 'self';",
           },
         ],
       },
