@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 const isDev = process.env.NODE_ENV !== "production";
 
 // This middleware only applies to API routes like /api/envVars
-const allowedIPs = ["76.76.21.142", "76.76.21.22"]; // Replace with your server IP addresses
+const allowedIPs = ["76.76.21.142", "76.76.21.164"]; // Replace with your server IP addresses
 
 export function middleware(req: NextRequest) {
   const url = req.nextUrl;
@@ -16,7 +16,7 @@ export function middleware(req: NextRequest) {
     // Get the IP address of the request
     const forwardedFor = req.headers.get("x-forwarded-for");
     const ip = forwardedFor ? forwardedFor.split(",")[0].trim() : req.ip;
-
+    
     // If the request is missing the header, the IP is not allowed, or the protocol is not HTTPS in production, return 403 Forbidden
     if (
       !serverSideHeader ||

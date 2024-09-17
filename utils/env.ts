@@ -17,7 +17,6 @@ export async function fetchEnvVar(varName: string): Promise<string> {
       throw new Error(`Failed to get nonce, status: ${nonceResponse.status}`);
     }
 
-    console.log("nonceResponse", nonceResponse);
     const { nonce } = await nonceResponse.json();
     if (!nonce) {
       throw new Error("Failed to generate nonce");
