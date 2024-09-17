@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 const isDev = process.env.NODE_ENV !== "production";
 
 // This middleware only applies to API routes like /api/envVars
-const allowedIPs = ["76.76.21.142", "76.76.21.164"]; // Replace with your server IP addresses
+const allowedIPPrefixes = ["76.76.21"]; // Replace with your server IP address prefixes
 
 export function middleware(req: NextRequest) {
   const url = req.nextUrl;
@@ -16,14 +16,23 @@ export function middleware(req: NextRequest) {
     // Get the IP address of the request
     const forwardedFor = req.headers.get("x-forwarded-for");
     const ip = forwardedFor ? forwardedFor.split(",")[0].trim() : req.ip;
-    
+
+    // Log the extracted IP address for debugging
+    console.error("Extracted IP:", ip);
+
+    // Check if the IP address starts with any of the allowed prefixes
+    const ipAllowed = allowedIPPrefixes.some((prefix) =>
+      ip?.startsWith(prefix)
+    );
+
     // If the request is missing the header, the IP is not allowed, or the protocol is not HTTPS in production, return 403 Forbidden
     if (
       !serverSideHeader ||
       serverSideHeader !== "true" ||
       (!isDev && url.protocol !== "https:") ||
-      (!isDev && !allowedIPs.includes(ip ?? ""))
+      (!isDev && !ipAllowed)
     ) {
+      console.error("Request blocked. IP:", ip, "Header:", serverSideHeader);
       return NextResponse.json(
         { error: "Forbidden: server-side requests only" },
         { status: 403 }
