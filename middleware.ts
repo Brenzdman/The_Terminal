@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+const isDev = process.env.NODE_ENV !== "production";
 
 // This middleware only applies to API routes like /api/envVars
 export function middleware(req: NextRequest) {
@@ -19,7 +20,10 @@ export function middleware(req: NextRequest) {
     }
   }
 
-  // Allow the request to continue if everything checks out
+  const { protocol } = req.nextUrl;
+  if (protocol !== "https:" && !isDev) {
+    return NextResponse.redirect(`https://${url}`);
+  }
   return NextResponse.next();
 }
 

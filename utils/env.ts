@@ -9,12 +9,15 @@ export function getEnvVar(name: string): string {
 export async function fetchEnvVar(varName: string): Promise<string> {
   try {
     // Step 1: Get the nonce from the server
-    const nonceResponse = await fetch(`/api/generateNonce?varName=${varName}`);
+    const nonceResponse = await fetch(`/api/generateNonce?varName=${varName}`, {
+      headers: { "x-server-side-request": "true" },
+    });
 
     if (!nonceResponse.ok) {
       throw new Error(`Failed to get nonce, status: ${nonceResponse.status}`);
     }
 
+    console.log("nonceResponse", nonceResponse);
     const { nonce } = await nonceResponse.json();
     if (!nonce) {
       throw new Error("Failed to generate nonce");

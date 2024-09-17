@@ -26,14 +26,6 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   // Step 3: Once the nonce is validated, remove it to prevent reuse
   deleteNonceForVarName(varName);
 
-  // Step 4: Ensure server-side request
-  const serverSideHeader = req.headers["x-server-side-request"];
-  if (!serverSideHeader) {
-    return res
-      .status(403)
-      .json({ error: "Forbidden: server-side requests only" });
-  }
-
   // Fetch the environment variable
   try {
     const envVarValue = getEnvVar(varName);
