@@ -19,16 +19,19 @@ const AccessBox = () => {
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       const checkPassword = async (popupPassword: string | null) => {
+        // const { identifier, passcode } = req.body;
         const res = await fetch("/api/check-secret", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            popupPassword,
-            trueInputValue,
+            identifier: "ASCII",
+            passcode: trueInputValue,
           }),
         });
+
+        console.log(popupPassword, trueInputValue);
 
         const data = await res.json();
 
