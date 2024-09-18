@@ -18,8 +18,21 @@ const AccessBox = () => {
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
-      const checkPassword = (password: string) => {
-        if (trueInputValue === password) {
+      const checkPassword = async (popupPassword: string | null) => {
+        const res = await fetch("/api/check-secret", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            popupPassword,
+            trueInputValue,
+          }),
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
           setAccessStatus("ACCESS GRANTED");
           document.addEventListener("keydown", closePopup);
 
@@ -30,13 +43,7 @@ const AccessBox = () => {
         }
       };
 
-      if (popupPassword instanceof Promise) {
-        popupPassword.then((resolvedPassword) => {
-          checkPassword(resolvedPassword);
-        });
-      } else if (typeof popupPassword === "string") {
-        checkPassword(popupPassword);
-      }
+      checkPassword(popupPassword);
     }
   };
 

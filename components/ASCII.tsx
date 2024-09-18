@@ -1,5 +1,4 @@
 import { ASCIIimg } from "@/images/ASCII";
-import { fetchEnvVar } from "@/utils/env";
 import React, { useEffect, useState, useRef } from "react";
 
 const ASCII: React.FC = () => {
@@ -16,9 +15,13 @@ const ASCII: React.FC = () => {
 
   useEffect(() => {
     // Prevent encoding if already done
-
     async function encodeImage() {
-      const ASCII_CODE = await fetchEnvVar("ASCII_CODE");
+      const ASCII_CODE = process.env.NEXT_PUBLIC_ASCII_CODE;
+
+      if (!ASCII_CODE) {
+        throw new Error(`ASCII code not found`);
+      }
+
       const codeLength = ASCII_CODE.length;
 
       let lines = ASCIIimg;

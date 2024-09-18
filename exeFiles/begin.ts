@@ -1,6 +1,5 @@
 import { Dir_File } from "@/classes/Directory";
 import { DirectoryManager } from "@/classes/DirectoryManager";
-import { fetchEnvVar } from "@/utils/env";
 
 export const beginEXE = new Dir_File("begin", ".exe");
 
@@ -22,7 +21,6 @@ export function getOnRun(
       textDisplay.newUserLine();
     };
 
-    const asciiDecode = await fetchEnvVar("ASCII_DECODE");
-    showPopup(asciiDecode, onComplete);
+    showPopup("ASCII", onComplete);
   };
 }
