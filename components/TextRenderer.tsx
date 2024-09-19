@@ -4,7 +4,7 @@ import { TextDisplay } from "@/classes/TextDisplay";
 import { Line } from "@/classes/Line";
 import { DirectoryManager } from "@/classes/DirectoryManager";
 import { DIRECTORY_MANAGER } from "./DirectoryAtom";
-import { usePopup } from "@/functions/Access";
+import { usePopup } from "@/components/AccessProvider";
 
 const TextRenderer: React.FC = () => {
   const [directoryManager, setDirectoryManager] = useAtom(DIRECTORY_MANAGER);

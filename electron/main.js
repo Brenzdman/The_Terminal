@@ -5,12 +5,13 @@ let mainWindow;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    fullscreen: true, // Start in full-screen mode
+    fullscreen: false, // Start in windowed mode
     frame: false, // Remove the default window frame
+    icon: path.join(__dirname, "icon.ico"), // Set the window icon
     webPreferences: {
       preload: path.join(__dirname, "preload.js"), // Ensure this path is correct
       nodeIntegration: true,
-      contextIsolation: true, 
+      contextIsolation: true, // Enable contextIsolation
     },
   });
 
@@ -46,13 +47,11 @@ app.on("activate", () => {
 ipcMain.on("request-fullscreen", () => {
   if (mainWindow) {
     mainWindow.setFullScreen(true);
-    console.log("fullscreen");
   }
 });
 
 ipcMain.on("exit-fullscreen", () => {
   if (mainWindow) {
     mainWindow.setFullScreen(false);
-    console.log("exit fullscreen");
   }
 });

@@ -1,5 +1,5 @@
 import { DirectoryManager } from "@/classes/DirectoryManager";
-import { usePopup } from "@/functions/Access";
+import { usePopup } from "@/components/AccessProvider";
 import { generateDirectory } from "@/functions/generateDirectory";
 import { atom, useAtom } from "jotai";
 import { useEffect, useState } from "react";

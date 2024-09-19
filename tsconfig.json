@@ -21,6 +21,14 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "getSavedData.js", "electron/getFile.js"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "getSavedData.js",
+    "electron/getFile.js",
+    "pages/api/download.js"
+  ],
   "exclude": ["node_modules"]
 }

@@ -7,7 +7,7 @@ import { DIRECTORY_MANAGER } from "./DirectoryAtom";
 import { DirectoryManager } from "@/classes/DirectoryManager";
 import { getDetailedHelp } from "@/functions/help";
 import { errorMessage } from "@/functions/messages";
-import { usePopup } from "@/functions/Access";
+import { usePopup } from "@/components/AccessProvider";
 
 const UserText = () => {
   const [directoryManager, setDirectoryManager] = useAtom(DIRECTORY_MANAGER);
@@ -231,6 +231,7 @@ const UserText = () => {
       // Run file
     } else if (cmd === "start") {
       currentDirectory.runFile(segments[1]);
+    
 
       // Default
     } else if (cmd === "") {

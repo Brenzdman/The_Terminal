@@ -7,7 +7,7 @@ import { DirectoryAtom } from "@/components/DirectoryAtom";
 import FullscreenButton from "@/components/FullscreenButton";
 import TextRenderer from "@/components/TextRenderer";
 import UserText from "@/components/UserText";
-import { AccessProvider } from "@/functions/Access";
+import { AccessProvider } from "@/components/AccessProvider";
 import React from "react";
 
 export default function Home() {

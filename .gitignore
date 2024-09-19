@@ -9,6 +9,7 @@ electron/node_modules
 
 # testing
 /coverage
+electron/dist*
 
 # next.js
 /.next/

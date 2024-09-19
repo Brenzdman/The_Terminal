@@ -3,7 +3,8 @@
 import { DirectoryManager } from "@/classes/DirectoryManager";
 import { TextDisplay } from "@/classes/TextDisplay";
 import poemFile from "../txtFiles/poem1";
-import { beginEXE, getOnRun } from "@/exeFiles/begin";
+import { beginEXE } from "@/exeFiles/begin";
+import { downloadEXE, getDownloadOnRun } from "@/exeFiles/download";
 
 export function generateDirectory(
   showPopup: (arg0: any, arg1: any) => void
@@ -22,7 +23,7 @@ export function generateDirectory(
 
   // home directories
   const Doc = home.makeDirectory("Documents", false, true);
-  home.makeDirectory("Downloads", false, true);
+  const Downloads = home.makeDirectory("Downloads", false, true);
   home.makeDirectory("Pictures", false, true);
   home.makeDirectory("Music", false, true);
 
@@ -46,7 +47,14 @@ export function generateDirectory(
   let begin = root?.addFile("begin.exe", false, false);
   if (begin) {
     Object.assign(begin, beginEXE);
-    begin.onRun = getOnRun(directoryManager, showPopup);
+    begin.onRun = getDownloadOnRun(directoryManager);
+  }
+
+  let download = Downloads.addFile("download.exe", false, false);
+
+  if (download) {
+    Object.assign(download, downloadEXE);
+    download.onRun = getDownloadOnRun(directoryManager);
   }
 
   return directoryManager;

@@ -1,16 +1,45 @@
 {
-  "name": "electron",
+  "name": "the_terminal",
   "version": "1.0.0",
   "main": "main.js",
+  "author": "Brenden Bushman",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron ."
+    "start": "electron .",
+    "build": "electron-builder"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "build": {
+    "appId": "cmdterminal.verel.app",
+    "win": {
+      "icon": "icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "index.html",
+      "icon.ico"
+    ],
+    "extraResources": [
+      {
+        "from": "dist/",
+        "to": "dist/",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "compression": "maximum"
+  },
   "devDependencies": {
-    "electron": "^32.1.0"
+    "electron": "^32.1.0",
+    "electron-builder": "^25.0.5",
+    "electron-packager": "^17.1.2"
   }
 }

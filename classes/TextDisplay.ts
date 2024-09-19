@@ -120,6 +120,11 @@ export class TextDisplay {
     this.cursorSymbol = "|";
   }
 
+  setLastLine(text: string) {
+    const lastLine = this.getLastLine();
+    lastLine.setText(text);
+  }
+
   ctrlDelete(direction: string, deleteChar = true) {
     const lastLine = this.getLastLine();
 

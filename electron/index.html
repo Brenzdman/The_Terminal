@@ -1,42 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Electron App</title>
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-    }
-    .title-bar {
-      -webkit-app-region: drag;
-      height: 30px;
-      background: #333;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 10px;
-    }
-    .title-bar button {
-      -webkit-app-region: no-drag;
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
-    }
-  </style>
-</head>
-<body>
-  <div class="title-bar">
-    <span>The Terminal</span>
-    <div>
-      <button onclick="window.electron.minimizeWindow()">_</button>
-      <button onclick="window.electron.maximizeWindow()">[]</button>
-      <button onclick="window.electron.closeWindow()">X</button>
-      <button onclick="window.electron.toggleFullScreen()">⛶</button> <!-- Fullscreen toggle button -->
-    </div>
-  </div>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Terminal</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+    </style>
+  </head>
 </html>

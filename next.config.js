@@ -24,7 +24,7 @@ const nextConfig = {
               "connect-src": [
                 "'self'",
                 ...(isDev
-                  ? ["http://localhost:3000"]
+                  ? ["http://localhost:3000", "ws://localhost:8080"]
                   : ["https://cmdterminal.vercel.app"]),
               ],
               "frame-ancestors": ["'none'"],
@@ -67,7 +67,7 @@ const nextConfig = {
               "; img-src 'self' blob:; style-src 'self' 'unsafe-inline'; " +
               `connect-src 'self' ${
                 isDev
-                  ? "http://localhost:3000"
+                  ? "http://localhost:3000 ws://localhost:8080"
                   : "https://cmdterminal.vercel.app"
               }; ` +
               "frame-ancestors 'none'; form-action 'self';",
