@@ -3,7 +3,7 @@
 import { DirectoryManager } from "@/classes/DirectoryManager";
 import { TextDisplay } from "@/classes/TextDisplay";
 import poemFile from "../txtFiles/poem1";
-import { beginEXE } from "@/exeFiles/begin";
+import { beginEXE, getOnRun } from "@/exeFiles/begin";
 import { downloadEXE, getDownloadOnRun } from "@/exeFiles/download";
 
 export function generateDirectory(
@@ -47,7 +47,7 @@ export function generateDirectory(
   let begin = root?.addFile("begin.exe", false, false);
   if (begin) {
     Object.assign(begin, beginEXE);
-    begin.onRun = getDownloadOnRun(directoryManager);
+    begin.onRun = getOnRun(directoryManager, showPopup);
   }
 
   let download = Downloads.addFile("download.exe", false, false);

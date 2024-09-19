@@ -1,13 +1,16 @@
 {
   "name": "terminal",
   "version": "0.1.0",
+  "author": "Brenden Bushman",
+  "description": "A terminal emulator that may have secrets.",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "webSocket": "node websocketServer.js",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "start-electron": "cd electron && electron ."
   },
   "dependencies": {
     "express": "^4.21.0",
@@ -24,11 +27,15 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "app-builder-bin": "^4.2.0",
     "concurrently": "^9.0.1",
+    "electron": "^32.1.1",
+    "electron-builder": "^25.0.5",
     "eslint": "^8",
     "eslint-config-next": "^14.2.11",
     "postcss": "^8",
     "raw-loader": "^4.0.2",
+    "rimraf": "^6.0.1",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   }

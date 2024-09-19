@@ -33,7 +33,9 @@ const UserText = () => {
   };
 
   const handleKeyDown = (event: KeyboardEvent) => {
-    if (AccessBoxIsVisible) return;
+    const lastLine = directoryManager.textDisplay.getLastLine();
+
+    if (AccessBoxIsVisible || !lastLine.userGenerated) return;
 
     const textDisplay = directoryManager.textDisplay;
     if (event.key.length === 1 && !event.getModifierState("Control")) {
@@ -231,7 +233,6 @@ const UserText = () => {
       // Run file
     } else if (cmd === "start") {
       currentDirectory.runFile(segments[1]);
-    
 
       // Default
     } else if (cmd === "") {

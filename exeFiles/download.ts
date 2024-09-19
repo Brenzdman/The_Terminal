@@ -36,7 +36,7 @@ async function onRun(dm: DirectoryManager) {
         if (data.type === "heartbeat") {
           heartbeats++;
         } else if (data.type === "progress") {
-          progress++
+          progress = data.progress;
         } else if (data.type === "error") {
           console.error(`Error: ${data.message}`);
           textDisplay.addLines(`Error: ${data.message}`);
@@ -56,10 +56,12 @@ async function onRun(dm: DirectoryManager) {
 
     ws.onclose = () => {
       console.log("Disconnected from WebSocket server");
+      textDisplay.newUserLine();
     };
 
     ws.onerror = (error) => {
       console.error("WebSocket error:", error);
+      textDisplay.addLines(`Error: ${error}`);
     };
   } catch (error) {
     console.error("There was a problem with the WebSocket operation:", error);

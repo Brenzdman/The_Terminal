@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useRef } from "react";
 
 const ButtonStyle: React.CSSProperties = {
   position: "fixed",
@@ -12,6 +12,8 @@ const ButtonStyle: React.CSSProperties = {
 };
 
 const FullscreenButton: React.FC = () => {
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
   const handleClick = () => {
     if (!document.fullscreenElement) {
       if (document.documentElement.requestFullscreen) {
@@ -22,10 +24,14 @@ const FullscreenButton: React.FC = () => {
         document.exitFullscreen();
       }
     }
+
+    if (buttonRef.current) {
+      buttonRef.current.blur();
+    }
   };
 
   return (
-    <button style={ButtonStyle} onClick={handleClick}>
+    <button ref={buttonRef} style={ButtonStyle} onClick={handleClick}>
       ⛶
     </button>
   );

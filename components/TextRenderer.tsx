@@ -101,8 +101,12 @@ const TextRenderer: React.FC = () => {
   ): React.ReactElement => {
     let content;
 
-    const path = formatPath(line.path);
-    const pathStart = path + "> ";
+    let path = formatPath(line.path);
+    let pathStart = path + "> ";
+    if (!line.userGenerated) {
+      pathStart = "";
+      path = "";
+    }
 
     let adjustedCursorX = pathStart.length;
 
@@ -130,7 +134,7 @@ const TextRenderer: React.FC = () => {
     let adjustedCursorY = numBreaks;
     adjustedCursorX -= lastLineBreak - numBreaks + 1;
 
-    if (AccessBoxIsVisible) {
+    if (AccessBoxIsVisible || !line.userGenerated) {
       cursor = " ";
     }
 

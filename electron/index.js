@@ -5,13 +5,13 @@ let mainWindow;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    fullscreen: false, // Start in windowed mode
-    frame: false, // Remove the default window frame
-    icon: path.join(__dirname, "icon.ico"), // Set the window icon
+    fullscreen: false,
+    frame: false, 
+    icon: path.join(__dirname, "favicon.ico"), // Set the window icon
     webPreferences: {
-      preload: path.join(__dirname, "preload.js"), // Ensure this path is correct
+      preload: path.join(__dirname, "preload.js"),
       nodeIntegration: true,
-      contextIsolation: true, // Enable contextIsolation
+      contextIsolation: true,
     },
   });
 

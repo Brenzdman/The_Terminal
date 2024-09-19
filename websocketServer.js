@@ -14,9 +14,7 @@ wss.on("connection", (ws) => {
     console.log(`Received message: ${message}`);
 
     if (message == "start-build") {
-      const electronDir = path.join(process.cwd(), "electron");
-
-      let totalSteps = 10; // Define total steps for the build process (if you know them)
+      let totalSteps = 28; // Define total steps for the build process (if you know them)
       let currentStep = 0;
 
       // Heartbeat every second to check if the connection is still alive
@@ -32,15 +30,13 @@ wss.on("connection", (ws) => {
       }, 1000);
 
       // Start the build process
-      const buildProcess = exec("npm run build", { cwd: electronDir });
+      const buildProcess = exec("npm run build-electron", { cwd: path });
 
       // Handle stdout data (progress output)
       buildProcess.stdout.on("data", (data) => {
         console.log(`stdout: ${data}`);
 
-        if (data.includes("Compiling")) {
-          currentStep += 1; // Example condition for tracking progress
-        }
+        currentStep += 1;
 
         const progressPercentage = Math.min(
           Math.floor((currentStep / totalSteps) * 100),
@@ -82,7 +78,7 @@ wss.on("connection", (ws) => {
 
           // Now start sending the file to the client
           const filePath = path.join(
-            electronDir,
+            path,
             "dist",
             "win-unpacked",
             "the_terminal.exe"
