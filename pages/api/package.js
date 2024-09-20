@@ -5,27 +5,31 @@ import fs from "fs";
 
 const execAsync = promisify(exec);
 
-// Define the public/downloads directory
-const publicDownloadsDir = join(process.cwd(), "public", "downloads");
+const downloadDir = process.cwd();
 
 // Ensure the public/downloads directory exists
-if (!fs.existsSync(publicDownloadsDir)) {
-  fs.mkdirSync(publicDownloadsDir, { recursive: true });
+if (!fs.existsSync(downloadDir)) {
+  fs.mkdirSync(downloadDir, { recursive: true });
 }
 
 export default async function handler(req, res) {
   try {
     // Define your packaging command
-    const command = `electron-packager . TheTerminal --platform=win32 --arch=x64 --icon=favicon.ico --out=${publicDownloadsDir} --overwrite`;
+    const command = `electron-packager . TheTerminal --platform=win32 --arch=x64 --icon=favicon.ico --out=${downloadDir} --overwrite`;
 
     // Run the packaging command in the electron directory
     await execAsync(command, { cwd: join(process.cwd(), "electron") });
 
     // Define the path to the zip file
-    const zipPath = join(publicDownloadsDir, "The_Terminal.zip");
+    const zipPath = join(downloadDir, "The_Terminal.zip");
 
     // Create the zip file
-    await zipFolder(join(publicDownloadsDir, "TheTerminal-win32-x64"), zipPath);
+    await zipFolder(join(downloadDir, "TheTerminal-win32-x64"), zipPath);
+
+    //after zip file is created, delete the folder
+    fs.rmdirSync(join(downloadDir, "TheTerminal-win32-x64"), {
+      recursive: true,
+    });
 
     // Respond with success message
     res.status(200).json({ message: "Packaging complete", zipPath });

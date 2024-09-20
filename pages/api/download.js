@@ -2,7 +2,8 @@ import path from "path";
 import fs from "fs";
 
 export default function handler(req, res) {
-  const filePath = path.resolve(".", "public/downloads/The_Terminal.zip");
+  const downloadsDir = process.cwd();
+  const filePath = path.resolve(".", `${downloadsDir}/The_Terminal.zip`);
   const stat = fs.statSync(filePath);
 
   res.setHeader("Content-Length", stat.size);
@@ -14,54 +15,9 @@ export default function handler(req, res) {
 
   // Listen for the finish event to delete files and folders after sending
   res.on("finish", () => {
-    const downloadsDir = path.resolve(".", "public/downloads");
+    const downloadsDir = path.resolve(".", downloadsDir);
 
-    // Delete all files in the public/downloads directory
-    fs.readdir(downloadsDir, (err, files) => {
-      if (err) {
-        console.error("Error reading downloads directory:", err);
-        return;
-      }
-
-      files.forEach((file) => {
-        const fileToDelete = path.join(downloadsDir, file);
-        fs.lstat(fileToDelete, (err, stats) => {
-          if (err) {
-            console.error("Error getting file stats:", err);
-            return;
-          }
-
-          if (stats.isDirectory()) {
-            // Recursively delete the directory
-            deleteFolder(fileToDelete);
-          } else {
-            // Delete the file
-            fs.unlink(fileToDelete, (err) => {
-              if (err) {
-                console.error("Error deleting file:", err);
-              } else {
-                console.log(`Deleted file: ${fileToDelete}`);
-              }
-            });
-          }
-        });
-      });
-    });
+    // Delete zip file after sending
+    fs.unlinkSync(filePath);
   });
-}
-
-// Function to recursively delete a folder and its contents
-function deleteFolder(folderPath) {
-  if (fs.existsSync(folderPath)) {
-    fs.readdirSync(folderPath).forEach((file) => {
-      const curPath = path.join(folderPath, file);
-      if (fs.lstatSync(curPath).isDirectory()) {
-        deleteFolder(curPath);
-      } else {
-        fs.unlinkSync(curPath);
-      }
-    });
-    fs.rmdirSync(folderPath);
-    console.log(`Deleted folder: ${folderPath}`);
-  }
 }
