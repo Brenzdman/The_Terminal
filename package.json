@@ -13,15 +13,28 @@
     "start-electron": "cd electron && electron .",
     "package": "node electron/package.js"
   },
+  "bin": "desktop-app/script.js",
+  "pkg": {
+    "targets": [
+      "node16-win-x64"
+    ],
+    "output": "desktop-app/The_Terminal.exe",
+    "assets": [
+      "desktop-app/**/*"
+    ],
+    "windows": {
+      "gui": true
+    }
+  },
   "dependencies": {
     "archiver": "^7.0.1",
-    "electron": "^32.1.2",
     "electron-packager": "^17.1.2",
     "express": "^4.21.0",
     "file-saver": "^2.0.5",
     "jotai": "^2.9.3",
     "next": "^14.2.11",
     "next-safe": "^3.5.0",
+    "pkg": "^5.8.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "windows-shortcuts": "^0.1.6",

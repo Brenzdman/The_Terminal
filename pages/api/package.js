@@ -2,31 +2,44 @@ import { exec } from "child_process";
 import { promisify } from "util";
 import { join } from "path";
 import fs from "fs";
-import { version as electronVersion } from "electron/package.json"; // Import Electron version
+import archiver from "archiver"; // Archiver is needed for zipping files
 
 const execAsync = promisify(exec);
 
-// Use Vercel's /tmp directory for temporary storage
-const downloadDir = "/tmp"; // Vercel allows writing here during execution
+// Use the temp directory for temporary storage
+const tempDir = join(process.cwd(), "temp");
 
-// Ensure the /tmp directory exists (it should exist by default, but double-check)
-if (!fs.existsSync(downloadDir)) {
-  fs.mkdirSync(downloadDir, { recursive: true });
+// Ensure the temp directory exists
+if (!fs.existsSync(tempDir)) {
+  fs.mkdirSync(tempDir, { recursive: true });
 }
 
 export default async function handler(req, res) {
   try {
-    // Define your packaging command using npx and specify the Electron version
-    const command = `npx electron-packager . TheTerminal --platform=win32 --arch=x64 --icon=favicon.ico --out=${downloadDir} --overwrite --electron-version=${electronVersion} --ignore=node_modules --ignore=tests --ignore=docs`;
+    // Path to the desktop-app folder you want to zip
+    const desktopAppFolderPath = join(process.cwd(), "desktop-app/app");
 
-    // Run the packaging command in the electron directory
-    await execAsync(command, { cwd: join(process.cwd(), "electron") });
+    // Path to the script.js file inside the desktop-app folder
+    const scriptJsPath = join(process.cwd(), "desktop-app/script.js");
 
-    // Define the path to the zip file
-    const zipPath = join(downloadDir, "The_Terminal.zip");
+    // Define the path to the new executable
+    const exeFilePath = join(tempDir, "The_Terminal.exe");
 
-    // Create the zip file
-    await zipFolder(join(downloadDir, "TheTerminal-win32-x64"), zipPath);
+    // Compile script.js into The_Terminal.exe using pkg with debug flag
+    await execAsync(
+      `pkg --debug ${scriptJsPath} --targets node16-win-x64 --output ${exeFilePath}`
+    );
+
+    // Check if the executable was created
+    if (!fs.existsSync(exeFilePath)) {
+      throw new Error(`Executable not found at ${exeFilePath}`);
+    }
+
+    // Define the path to the zip file to be created
+    const zipPath = join(tempDir, "The_Terminal.zip");
+
+    // Zip the desktop-app/app folder and the exe file into one package
+    await zipFolder(desktopAppFolderPath, exeFilePath, zipPath);
 
     // Respond by sending the file as a download
     res.setHeader("Content-Type", "application/zip");
@@ -40,27 +53,27 @@ export default async function handler(req, res) {
     fileStream.on("close", () => {
       // After the file is served, delete the zip file and other temporary files
       fs.unlinkSync(zipPath);
-      fs.rmdirSync(join(downloadDir, "TheTerminal-win32-x64"), {
-        recursive: true,
-      });
+      fs.unlinkSync(exeFilePath);
     });
   } catch (error) {
-    console.error("Error packaging app:", error);
+    console.error("Error zipping app files:", error);
     res
       .status(500)
-      .json({ message: "Error during packaging", error: error.message });
+      .json({ message: "Error during zipping", error: error.message });
   }
 }
 
-// Function to zip the folder
-async function zipFolder(source, out) {
-  const archiver = require("archiver");
+// Function to zip the folder (including desktop-app/app folder and exe file)
+async function zipFolder(desktopAppFolderPath, exeFilePath, out) {
   const stream = fs.createWriteStream(out);
   const archive = archiver("zip", { zlib: { level: 9 } });
 
   return new Promise((resolve, reject) => {
     archive
-      .directory(source, false)
+      // Add the desktop-app/app folder to the zip
+      .directory(desktopAppFolderPath, "app")
+      // Add the executable to the zip
+      .file(exeFilePath, { name: "The_Terminal.exe" })
       .on("error", (err) => reject(err))
       .pipe(stream);
 

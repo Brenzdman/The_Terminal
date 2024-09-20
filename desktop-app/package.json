@@ -1,0 +1,14 @@
+{
+  "name": "the_terminal",
+  "version": "0.1.1",
+  "bin": "script.js",
+  "pkg": {
+    "targets": [
+      "node16-win-x64"
+    ],
+    "output": "the_terminal.exe",
+    "windows": {
+      "gui": true
+    }
+  }
+}
