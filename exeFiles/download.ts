@@ -13,6 +13,18 @@ export function getDownloadOnRun(dm: DirectoryManager): () => void {
 async function onRun(dm: DirectoryManager) {
   const textDisplay = dm.textDisplay;
   try {
+    // Trigger the build process via API
+    const buildResponse = await fetch("/api/package", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!buildResponse.ok) {
+      throw new Error("Failed to start the build process");
+    }
+
     // Optionally, handle progress or status updates
     // For simplicity, you might want to wait a bit for the build to complete
     // You can implement a polling mechanism if needed

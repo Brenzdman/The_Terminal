@@ -10,7 +10,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "start-electron": "cd electron && electron ."
+    "start-electron": "cd electron && electron .",
+    "package": "node electron/package.js"
   },
   "dependencies": {
     "archiver": "^7.0.1",
