@@ -14,12 +14,7 @@ async function onRun(dm: DirectoryManager) {
   const textDisplay = dm.textDisplay;
   try {
     // Trigger the build process via API
-    const buildResponse = await fetch("/api/package", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const buildResponse = await fetch("/api/package");
 
     if (!buildResponse.ok) {
       throw new Error("Failed to start the build process");
