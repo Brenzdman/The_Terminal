@@ -1,8 +1,9 @@
 import path from "path";
 import fs from "fs";
 
+const downloadsDir = process.cwd();
+
 export default function handler(req, res) {
-  const downloadsDir = process.cwd();
   const filePath = path.resolve(".", `${downloadsDir}/The_Terminal.zip`);
   const stat = fs.statSync(filePath);
 
