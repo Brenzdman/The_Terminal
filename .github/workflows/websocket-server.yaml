@@ -1,0 +1,27 @@
+name: WebSocket Server Build
+
+on:
+  push:
+    branches:
+      - main # Or any branch you want to track
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22.9.0' 
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run WebSocket Server
+        run: |
+          node websocketServer.js
