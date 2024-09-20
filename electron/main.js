@@ -6,7 +6,7 @@ let mainWindow;
 function createWindow() {
   mainWindow = new BrowserWindow({
     fullscreen: false,
-    frame: false, 
+    frame: false,
     icon: path.join(__dirname, "favicon.ico"), // Set the window icon
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
@@ -14,6 +14,8 @@ function createWindow() {
       contextIsolation: true,
     },
   });
+
+  // electron-packager . TheTerminal --platform=win32 --arch=x64 --icon=favicon.ico
 
   // Load the website directly
   mainWindow.loadURL("https://cmdterminal.vercel.app");
