@@ -14,10 +14,6 @@ if (!fs.existsSync(publicDownloadsDir)) {
 }
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ message: "Method not allowed" });
-  }
-
   try {
     // Define your packaging command
     const command = `electron-packager . TheTerminal --platform=win32 --arch=x64 --icon=favicon.ico --out=${publicDownloadsDir} --overwrite`;
