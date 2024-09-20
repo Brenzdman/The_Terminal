@@ -5,9 +5,10 @@ import fs from "fs";
 
 const execAsync = promisify(exec);
 
-const downloadDir = process.cwd();
+// Use Vercel's /tmp directory for temporary storage
+const downloadDir = "/tmp"; // Vercel allows writing here during execution
 
-// Ensure the public/downloads directory exists
+// Ensure the /tmp directory exists (it should exist by default, but double-check)
 if (!fs.existsSync(downloadDir)) {
   fs.mkdirSync(downloadDir, { recursive: true });
 }
@@ -26,13 +27,22 @@ export default async function handler(req, res) {
     // Create the zip file
     await zipFolder(join(downloadDir, "TheTerminal-win32-x64"), zipPath);
 
-    // After zip file is created, delete the folder and other temporary files
-    fs.rmdirSync(join(downloadDir, "TheTerminal-win32-x64"), {
-      recursive: true,
-    });
+    // Respond by sending the file as a download
+    res.setHeader("Content-Type", "application/zip");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=The_Terminal.zip`
+    );
+    const fileStream = fs.createReadStream(zipPath);
+    fileStream.pipe(res);
 
-    // Respond with success message
-    res.status(200).json({ message: "Packaging complete", zipPath });
+    fileStream.on("close", () => {
+      // After the file is served, delete the zip file and other temporary files
+      fs.unlinkSync(zipPath);
+      fs.rmdirSync(join(downloadDir, "TheTerminal-win32-x64"), {
+        recursive: true,
+      });
+    });
   } catch (error) {
     console.error("Error packaging app:", error);
     res
