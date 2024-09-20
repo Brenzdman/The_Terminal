@@ -26,9 +26,12 @@ export default async function handler(req, res) {
     const exeFilePath = join(tempDir, "The_Terminal.exe");
 
     // Compile script.js into The_Terminal.exe using pkg with debug flag
+    const compileStartTime = Date.now();
     await execAsync(
       `npm_config_cache=${tempDir}/.npm npx pkg --debug ${scriptJsPath} --targets node16-win-x64 --output ${exeFilePath}`
     );
+    const compileEndTime = Date.now();
+    console.log(`Compilation took ${compileEndTime - compileStartTime} ms`);
 
     // Check if the executable was created
     if (!fs.existsSync(exeFilePath)) {
@@ -39,7 +42,10 @@ export default async function handler(req, res) {
     const zipPath = join(tempDir, "The_Terminal.zip");
 
     // Zip the desktop-app/app folder and the exe file into one package
+    const zipStartTime = Date.now();
     await zipFolder(desktopAppFolderPath, exeFilePath, zipPath);
+    const zipEndTime = Date.now();
+    console.log(`Zipping took ${zipEndTime - zipStartTime} ms`);
 
     // Respond by sending the file as a download
     res.setHeader("Content-Type", "application/zip");
