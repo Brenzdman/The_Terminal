@@ -13,7 +13,7 @@ const targetDir = path.join(scriptDir, "The_Terminal");
 const targetSubDir = path.join(targetDir, "app");
 const exePath = path.join(targetSubDir, "TheTerminal.exe");
 const shortcutPath = path.join(targetDir, "The_Terminal.lnk");
-const zipPath = path.join(scriptDir, "The_Terminal.zip");
+const zipPath = path.join(scriptDir, "..", "public", "The_Terminal.zip"); // Updated path to place zip in terminal/public
 
 function deleteFolder(folderPath) {
   if (fs.existsSync(folderPath)) {
@@ -88,6 +88,7 @@ exec(
           zipFolder(targetDir, zipPath)
             .then(() => {
               console.log("Folder zipped successfully.");
+              deleteFolder(targetDir);
             })
             .catch((err) => {
               console.error(`Error zipping folder: ${err}`);
