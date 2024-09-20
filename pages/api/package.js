@@ -14,8 +14,8 @@ if (!fs.existsSync(downloadDir)) {
 
 export default async function handler(req, res) {
   try {
-    // Define your packaging command
-    const command = `electron-packager . TheTerminal --platform=win32 --arch=x64 --icon=favicon.ico --out=${downloadDir} --overwrite`;
+    // Define your packaging command using npx
+    const command = `npx electron-packager . TheTerminal --platform=win32 --arch=x64 --icon=favicon.ico --out=${downloadDir} --overwrite`;
 
     // Run the packaging command in the electron directory
     await execAsync(command, { cwd: join(process.cwd(), "electron") });
@@ -26,7 +26,7 @@ export default async function handler(req, res) {
     // Create the zip file
     await zipFolder(join(downloadDir, "TheTerminal-win32-x64"), zipPath);
 
-    //after zip file is created, delete the folder
+    // After zip file is created, delete the folder and other temporary files
     fs.rmdirSync(join(downloadDir, "TheTerminal-win32-x64"), {
       recursive: true,
     });
