@@ -1,7 +1,12 @@
-import path from "path";
+import path, { join } from "path";
 import fs from "fs";
+import { exec } from "child_process";
+import { promisify } from "util";
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
+  // Call the packager function to package the app
+  await packager();
+
   const filePath = path.resolve(".", "public/downloads/The_Terminal.zip");
   const stat = fs.statSync(filePath);
 
@@ -64,4 +69,50 @@ function deleteFolder(folderPath) {
     fs.rmdirSync(folderPath);
     console.log(`Deleted folder: ${folderPath}`);
   }
+}
+
+export async function packager() {
+  const execAsync = promisify(exec);
+  // Define the public/downloads directory
+  const publicDownloadsDir = join(process.cwd(), "public", "downloads");
+
+  // Ensure the public/downloads directory exists
+  if (!fs.existsSync(publicDownloadsDir)) {
+    fs.mkdirSync(publicDownloadsDir, { recursive: true });
+  }
+  try {
+    // Define your packaging command
+    const command = `electron-packager . TheTerminal --platform=win32 --arch=x64 --icon=favicon.ico --out=${publicDownloadsDir} --overwrite`;
+
+    // Run the packaging command in the electron directory
+    await execAsync(command, { cwd: join(process.cwd(), "electron") });
+
+    // Define the path to the zip file
+    const zipPath = join(publicDownloadsDir, "The_Terminal.zip");
+
+    // Create the zip file
+    await zipFolder(join(publicDownloadsDir, "TheTerminal-win32-x64"), zipPath);
+
+    // Respond with success message
+    console.log("App packaged successfully");
+  } catch (error) {
+    console.error("Error packaging app:", error);
+  }
+}
+
+// Function to zip the folder
+async function zipFolder(source, out) {
+  const archiver = require("archiver");
+  const stream = fs.createWriteStream(out);
+  const archive = archiver("zip", { zlib: { level: 9 } });
+
+  return new Promise((resolve, reject) => {
+    archive
+      .directory(source, false)
+      .on("error", (err) => reject(err))
+      .pipe(stream);
+
+    stream.on("close", () => resolve());
+    archive.finalize();
+  });
 }
