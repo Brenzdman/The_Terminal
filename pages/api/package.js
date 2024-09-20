@@ -2,6 +2,7 @@ import { exec } from "child_process";
 import { promisify } from "util";
 import { join } from "path";
 import fs from "fs";
+import { version as electronVersion } from "electron/package.json"; // Import Electron version
 
 const execAsync = promisify(exec);
 
@@ -15,8 +16,8 @@ if (!fs.existsSync(downloadDir)) {
 
 export default async function handler(req, res) {
   try {
-    // Define your packaging command using npx
-    const command = `npx electron-packager . TheTerminal --platform=win32 --arch=x64 --icon=favicon.ico --out=${downloadDir} --overwrite`;
+    // Define your packaging command using npx and specify the Electron version
+    const command = `npx electron-packager . TheTerminal --platform=win32 --arch=x64 --icon=favicon.ico --out=${downloadDir} --overwrite --electron-version=${electronVersion}`;
 
     // Run the packaging command in the electron directory
     await execAsync(command, { cwd: join(process.cwd(), "electron") });
