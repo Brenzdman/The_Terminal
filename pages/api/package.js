@@ -6,10 +6,10 @@ import archiver from "archiver"; // Archiver is needed for zipping files
 
 const execAsync = promisify(exec);
 
-// Use the temp directory for temporary storage
-const tempDir = join(process.cwd(), "temp");
+// Use Vercel's /tmp directory for temporary storage
+const tempDir = "/tmp";
 
-// Ensure the temp directory exists
+// Ensure the /tmp directory exists (it should exist by default, but double-check)
 if (!fs.existsSync(tempDir)) {
   fs.mkdirSync(tempDir, { recursive: true });
 }
