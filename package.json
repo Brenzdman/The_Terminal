@@ -14,8 +14,8 @@
     "package": "node electron/package.js"
   },
   "dependencies": {
-    "electron-packager": "^17.1.2",
     "archiver": "^7.0.1",
+    "electron-packager": "^17.1.2",
     "express": "^4.21.0",
     "file-saver": "^2.0.5",
     "jotai": "^2.9.3",
@@ -33,7 +33,6 @@
     "@types/react-dom": "^18",
     "app-builder-bin": "^4.2.0",
     "concurrently": "^9.0.1",
-    "electron": "^32.1.1",
     "eslint": "^8",
     "eslint-config-next": "^14.2.11",
     "postcss": "^8",
