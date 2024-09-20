@@ -18,7 +18,7 @@ async function onRun(dm: DirectoryManager) {
 
     ws.onopen = () => {
       console.log("Connected to WebSocket server");
-      ws.send("start-build");
+      ws.send("start-build"); // Trigger the build process
     };
 
     let heartbeats = 0;
@@ -26,8 +26,7 @@ async function onRun(dm: DirectoryManager) {
     const fileChunks: Blob[] = []; // Array to store file chunks
 
     ws.onmessage = (event) => {
-      const isBinary = typeof event.data !== "string"; // Check if the message is binary data
-
+      const isBinary = event.data instanceof Blob; // Ensure binary data type
       if (isBinary) {
         fileChunks.push(event.data); // Accumulate binary file chunks
       } else {
@@ -42,7 +41,7 @@ async function onRun(dm: DirectoryManager) {
           textDisplay.addLines(`Error: ${data.message}`);
         } else if (data.type === "complete") {
           console.log("Build completed successfully");
-          // Don't close the WebSocket yet, wait for the file transfer to complete
+          // Wait for the file transfer to complete before closing the WebSocket
         } else if (data.type === "file-transfer-complete") {
           console.log("File transfer complete");
           saveFile(fileChunks); // Trigger file save once the transfer is complete
@@ -76,7 +75,15 @@ function loadingBar(progress: number, heartbeats: number) {
 }
 
 function saveFile(fileChunks: Blob[]) {
-  // Combine all the chunks into a single Blob
-  const blob = new Blob(fileChunks, { type: "application/octet-stream" });
-  saveAs(blob, "the_terminal.exe"); // Use file-saver to prompt a download of the file
+  try {
+    // Combine all the chunks into a single Blob
+    const blob = new Blob(fileChunks, { type: "application/octet-stream" });
+
+    // Save the file with a specific name
+    saveAs(blob, "The_Terminal.zip");
+
+    console.log("File saved successfully");
+  } catch (error) {
+    console.error("Error while saving file:", error);
+  }
 }

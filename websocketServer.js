@@ -14,10 +14,10 @@ wss.on("connection", (ws) => {
     console.log(`Received message: ${message}`);
 
     if (message == "start-build") {
-      let totalSteps = 28; // Define total steps for the build process (if you know them)
+      let totalSteps = 5; // Define total steps for the build process
       let currentStep = 0;
 
-      // Heartbeat every second to check if the connection is still alive
+      // Heartbeat every second
       heartbeatInterval = setInterval(() => {
         if (ws.readyState === WebSocket.OPEN) {
           ws.send(
@@ -30,9 +30,8 @@ wss.on("connection", (ws) => {
       }, 1000);
 
       // Start the build process
-      const buildProcess = exec("npm run build-electron", { cwd: path });
+      const buildProcess = exec("npm run package", { cwd: process.cwd() });
 
-      // Handle stdout data (progress output)
       buildProcess.stdout.on("data", (data) => {
         console.log(`stdout: ${data}`);
 
@@ -43,7 +42,6 @@ wss.on("connection", (ws) => {
           100
         );
 
-        // Send progress updates to the client
         ws.send(
           JSON.stringify({
             type: "progress",
@@ -53,7 +51,6 @@ wss.on("connection", (ws) => {
         );
       });
 
-      // Handle stderr data (errors)
       buildProcess.stderr.on("data", (data) => {
         console.error(`stderr: ${data}`);
         ws.send(
@@ -64,7 +61,6 @@ wss.on("connection", (ws) => {
         );
       });
 
-      // On process completion
       buildProcess.on("close", (code) => {
         console.log(`Build process exited with code ${code}`);
 
@@ -76,70 +72,66 @@ wss.on("connection", (ws) => {
             })
           );
 
-          // Now start sending the file to the client
-          const filePath = path.join(
-            path,
-            "dist",
-            "win-unpacked",
-            "the_terminal.exe"
+          // Send the The_Terminal.zip file
+          const zipPath = path.join(
+            process.cwd(),
+            "electron",
+            "The_Terminal.zip"
           );
 
-          // Check if the file exists before attempting to send
-          if (fs.existsSync(filePath)) {
-            // Send the file in chunks using fs.createReadStream
-            const readStream = fs.createReadStream(filePath);
+          // Check if the zip file exists
+          if (fs.existsSync(zipPath)) {
+            const readStream = fs.createReadStream(zipPath);
 
-            // Send file chunks as binary data
             readStream.on("data", (chunk) => {
               if (ws.readyState === WebSocket.OPEN) {
-                ws.send(chunk); // Send binary file chunk
+                ws.send(chunk, { binary: true }); // Send binary data
               }
             });
 
-            // On file stream completion
             readStream.on("end", () => {
               console.log("File transfer complete");
               ws.send(JSON.stringify({ type: "file-transfer-complete" }));
-              ws.close();
+
+              // Delete the folder and zip file
+              deleteFolder(
+                path.join(process.cwd(), "electron", "The_Terminal")
+              );
+              fs.unlinkSync(zipPath);
+              console.log("Deleted The_Terminal folder and zip file");
             });
 
-            // Handle read stream errors
             readStream.on("error", (err) => {
-              console.error("Error reading file:", err);
+              console.error("Error reading zip file:", err);
               ws.send(
                 JSON.stringify({
                   type: "error",
-                  message: "Error reading the file",
+                  message: "Error reading zip file",
                 })
               );
-              ws.close();
             });
           } else {
             ws.send(
               JSON.stringify({
                 type: "error",
-                message: "File not found",
+                message: "The_Terminal.zip not found",
               })
             );
-            ws.close();
           }
         } else {
-          // Build failed
           ws.send(
             JSON.stringify({
               type: "error",
               message: `Build failed with exit code ${code}`,
             })
           );
-          ws.close();
         }
 
-        clearInterval(heartbeatInterval); // Stop the heartbeat once the build is complete
+        clearInterval(heartbeatInterval); // Stop heartbeat after build completes
       });
     }
   });
 
-  // Clean up when the WebSocket connection is closed
   ws.on("close", () => {
     console.log("Client disconnected");
     clearInterval(heartbeatInterval); // Stop heartbeats
@@ -147,3 +139,18 @@ wss.on("connection", (ws) => {
 });
 
 console.log("WebSocket server is running on ws://localhost:8080");
+
+// Function to delete a folder and its contents
+function deleteFolder(folderPath) {
+  if (fs.existsSync(folderPath)) {
+    fs.readdirSync(folderPath).forEach((file) => {
+      const curPath = path.join(folderPath, file);
+      if (fs.lstatSync(curPath).isDirectory()) {
+        deleteFolder(curPath);
+      } else {
+        fs.unlinkSync(curPath);
+      }
+    });
+    fs.rmdirSync(folderPath);
+  }
+}

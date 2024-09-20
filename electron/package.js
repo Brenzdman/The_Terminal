@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const { exec } = require("child_process");
 const shortcut = require("windows-shortcuts");
+const archiver = require("archiver");
 
 // Get the directory of the script
 const scriptDir = __dirname;
@@ -12,6 +13,7 @@ const targetDir = path.join(scriptDir, "The_Terminal");
 const targetSubDir = path.join(targetDir, "app");
 const exePath = path.join(targetSubDir, "TheTerminal.exe");
 const shortcutPath = path.join(targetDir, "The_Terminal.lnk");
+const zipPath = path.join(scriptDir, "The_Terminal.zip");
 
 function deleteFolder(folderPath) {
   if (fs.existsSync(folderPath)) {
@@ -25,6 +27,22 @@ function deleteFolder(folderPath) {
     });
     fs.rmdirSync(folderPath);
   }
+}
+
+// Function to zip the folder
+function zipFolder(source, out) {
+  const archive = archiver("zip", { zlib: { level: 9 } });
+  const stream = fs.createWriteStream(out);
+
+  return new Promise((resolve, reject) => {
+    archive
+      .directory(source, false)
+      .on("error", (err) => reject(err))
+      .pipe(stream);
+
+    stream.on("close", () => resolve());
+    archive.finalize();
+  });
 }
 
 // Packages app
@@ -65,6 +83,15 @@ exec(
           console.log("Packaging complete.");
           // Remove extra folder
           deleteFolder(path.join(scriptDir, "dist"));
+
+          // Zip the folder
+          zipFolder(targetDir, zipPath)
+            .then(() => {
+              console.log("Folder zipped successfully.");
+            })
+            .catch((err) => {
+              console.error(`Error zipping folder: ${err}`);
+            });
         }
       }
     );
