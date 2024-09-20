@@ -27,7 +27,7 @@ export default async function handler(req, res) {
 
     // Compile script.js into The_Terminal.exe using pkg with debug flag
     await execAsync(
-      `npx pkg --debug ${scriptJsPath} --targets node16-win-x64 --output ${exeFilePath}`
+      `npm_config_cache=${tempDir}/.npm npx pkg --debug ${scriptJsPath} --targets node16-win-x64 --output ${exeFilePath}`
     );
 
     // Check if the executable was created
