@@ -1,4 +1,3 @@
-import { MAX_LINE_LENGTH } from "@/constants/constants";
 import { StyledText } from "@/classes/StyledText";
 export class Line {
   color: string = "#fff";
@@ -61,9 +60,17 @@ export class Line {
   }
 }
 
+function getMaxLineLength(): number {
+  const windowWidth = window.innerWidth;
+  const charWidth = 10;
+  const maxChars = Math.floor((windowWidth * 0.9) / charWidth);
+
+   return Math.min(100, maxChars);
+}
+
 export function addLineBreaks(
   input: string,
-  maxLineLength: number = MAX_LINE_LENGTH
+  maxLineLength: number = getMaxLineLength()
 ): string {
   const lines = input.split("\n");
   let result = "";
