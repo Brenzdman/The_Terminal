@@ -13,6 +13,7 @@ const UserText = () => {
   const [directoryManager, setDirectoryManager] = useAtom(DIRECTORY_MANAGER);
   const [cmdHistory, setCmdHistory] = useState<string[]>([]);
   const [cmdIndex, setCmdIndex] = useState<number>(-1);
+  const [savedText, setSavedText] = useState<string>("");
   const { isVisible: AccessBoxIsVisible } = usePopup();
 
   const handleRightClick = (event: MouseEvent) => {
@@ -96,12 +97,15 @@ const UserText = () => {
 
     if (event.key === "ArrowUp" || event.key === "ArrowDown") {
       event.preventDefault();
-      if (cmdIndex < 0) return;
+      if (cmdHistory.length == 0) return;
 
       let newCmdIndex = cmdIndex;
 
       // Gets the next or previous command
       if (event.key === "ArrowUp") {
+        if (cmdIndex === -1 || cmdIndex === cmdHistory.length) {
+          setSavedText(lastLine.getText());
+        }
         newCmdIndex = Math.max(0, cmdIndex - 1);
       } else if (event.key === "ArrowDown") {
         newCmdIndex = Math.min(cmdHistory.length, cmdIndex + 1);
@@ -110,11 +114,13 @@ const UserText = () => {
       // Sets the text to the command
       if (newCmdIndex === cmdHistory.length) {
         textDisplay.setAutofill("");
+        textDisplay.getLastLine().setText(savedText);
+        textDisplay.cursorX = savedText.length;
       } else {
         textDisplay.setAutofill(cmdHistory[newCmdIndex], true);
+        textDisplay.cursorX = textDisplay.autoFill.length;
       }
 
-      textDisplay.cursorX = textDisplay.autoFill.length;
       textDisplay.cursorSymbol = "|";
 
       // Update the index with the new calculated value

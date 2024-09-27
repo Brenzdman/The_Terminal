@@ -2,7 +2,8 @@
 
 import { DirectoryManager } from "@/classes/DirectoryManager";
 import { TextDisplay } from "@/classes/TextDisplay";
-import poemFile from "../txtFiles/poem1";
+import poemFile1 from "../txtFiles/poem1";
+import poemFile2 from "../txtFiles/poem2";
 import { beginEXE, getOnRun } from "@/exeFiles/begin";
 import { downloadEXE, getDownloadOnRun } from "@/exeFiles/download";
 
@@ -30,7 +31,7 @@ export function generateDirectory(
   // Initial print to the terminal
   const welcomeMessage = [
     "Welcome to the Terminal.",
-    "Type 'help' to see a list of available commands.",
+    "Type `help` to see a list of available commands.",
   ];
 
   directoryManager.textDisplay = new TextDisplay(
@@ -39,9 +40,14 @@ export function generateDirectory(
   );
 
   // Files
-  let poem1 = Doc.addFile("poem.txt", false, false);
+  let poem1 = Doc.addFile("poem1.txt", false, false);
   if (poem1) {
-    Object.assign(poem1, poemFile);
+    Object.assign(poem1, poemFile1);
+  }
+
+  let poem2 = Doc.addFile("poem2.txt", false, false);
+  if (poem2) {
+    Object.assign(poem2, poemFile2);
   }
 
   let begin = root?.addFile("begin.exe", false, false);

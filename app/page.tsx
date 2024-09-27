@@ -9,6 +9,8 @@ import TextRenderer from "@/components/TextRenderer";
 import UserText from "@/components/UserText";
 import { AccessProvider } from "@/components/AccessProvider";
 import React from "react";
+import { VERSION } from "@/constants/constants";
+import MobileInput from "@/components/MobileInput";
 
 export default function Home() {
   return (
@@ -38,7 +40,18 @@ export default function Home() {
         <UserText />
         <TextRenderer />
         <FullscreenButton />
+        <MobileInput />
       </DirectoryAtom>
+
+      <span
+        style={{
+          position: "fixed",
+          bottom: "10px",
+          right: "15px",
+        }}
+      >
+        {VERSION}
+      </span>
     </div>
   );
 }
