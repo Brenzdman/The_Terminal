@@ -9,13 +9,14 @@ export function getOnRun(
   showPopup: (arg0: any, arg1: any) => void
 ) {
   return async function (): Promise<void> {
-    dm.textDisplay.addLines("Welcome to the Terminal.");
+    dm.textDisplay.addLines("Welcome to The Terminal.");
 
     const onComplete = () => {
       const textDisplay = dm.textDisplay;
       textDisplay.addLines([
         "Congratulations! You have successfully decoded the ASCII message.",
         "This is all I have for you right now. See you in a future update.",
+        "Feel free to contact me at Brenden.Bushman@gmail.com if you have any questions or suggestions.",
         "",
         `${VERSION}`,
       ]);
