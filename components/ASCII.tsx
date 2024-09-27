@@ -98,8 +98,8 @@ const ASCII: React.FC = () => {
   };
 
   return (
-    <div >
-      <span style={containerStyle}>{text}</span>
+    <div style={containerStyle}>
+      <pre>{text}</pre>
     </div>
   );
 };

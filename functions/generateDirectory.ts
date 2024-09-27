@@ -30,7 +30,7 @@ export function generateDirectory(
 
   // Initial print to the terminal
   const welcomeMessage = [
-    "Welcome to The Terminal.",
+    "Welcome to the Terminal.",
     "Type `help` to see a list of available commands.",
   ];
 
