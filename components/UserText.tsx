@@ -13,7 +13,7 @@ const UserText = () => {
   const [directoryManager, setDirectoryManager] = useAtom(DIRECTORY_MANAGER);
   const [cmdHistory, setCmdHistory] = useState<string[]>([]);
   const [cmdIndex, setCmdIndex] = useState<number>(-1);
-  const [savedText, setSavedText] = useState<string>("");
+  const [savedText, setSavedText] = useState<string | null>(null);
   const { isVisible: AccessBoxIsVisible } = usePopup();
 
   const handleRightClick = (event: MouseEvent) => {
@@ -34,11 +34,21 @@ const UserText = () => {
   };
 
   const handleKeyDown = (event: KeyboardEvent) => {
-    const lastLine = directoryManager.textDisplay.getLastLine();
+    const textDisplay = directoryManager.textDisplay;
+    const lastLine = textDisplay.getLastLine();
 
     if (AccessBoxIsVisible || !lastLine.userGenerated) return;
 
-    const textDisplay = directoryManager.textDisplay;
+    if (
+      textDisplay.autoFillReplace &&
+      event.key !== "ArrowUp" &&
+      event.key !== "ArrowDown"
+    ) {
+      textDisplay.getLastLine().setText(textDisplay.autoFill);
+      textDisplay.autoFillReplace = false;
+      setSavedText(null);
+    }
+
     if (event.key.length === 1 && !event.getModifierState("Control")) {
       textDisplay.typeCharacter(event.key, true);
     } else if (event.key === "Backspace") {
@@ -114,8 +124,10 @@ const UserText = () => {
       // Sets the text to the command
       if (newCmdIndex === cmdHistory.length) {
         textDisplay.setAutofill("");
-        textDisplay.getLastLine().setText(savedText);
-        textDisplay.cursorX = savedText.length;
+        if (savedText != null) {
+          textDisplay.getLastLine().setText(savedText);
+          textDisplay.cursorX = savedText.length;
+        }
       } else {
         textDisplay.setAutofill(cmdHistory[newCmdIndex], true);
         textDisplay.cursorX = textDisplay.autoFill.length;

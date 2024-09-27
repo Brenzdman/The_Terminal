@@ -69,13 +69,12 @@ export class DirectoryManager {
 
     // handles ../ and similar
     let startPath = path.slice(0, path.indexOf("/") + 1);
-    let isDotsOnly = /^[.]+$/.test(startPath.slice(0, -1));
+    let endPath = path.slice(path.indexOf("/") + 1);
     let numBack = 0;
 
-    while (isDotsOnly && startPath.includes("../")) {
+    while (startPath.includes("../")) {
       numBack++;
       startPath = startPath.slice(1);
-      isDotsOnly = /^[.]+$/.test(startPath.slice(0, -1));
     }
 
     if (numBack > 0) {
@@ -89,7 +88,8 @@ export class DirectoryManager {
           break;
         }
 
-        currentPath = currentPath.slice(0, lastSlash + 1);
+        currentPath = currentPath.slice(0, lastSlash + 1) + endPath;
+        console.log(startPath, currentPath);
       }
 
       path = currentPath;
