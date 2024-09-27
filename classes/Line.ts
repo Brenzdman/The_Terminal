@@ -36,14 +36,18 @@ export class Line {
     lineText.styles = text.styles;
 
     if (path) {
-      const firstSpaceIndex = lineText.text.indexOf(" ");
+      let firstSpaceIndex = lineText.text.indexOf(" ");
       let secondSpaceIndex = lineText.text.indexOf(" ", firstSpaceIndex + 1);
 
       if (secondSpaceIndex === -1) {
         secondSpaceIndex = lineText.text.length;
       }
 
-      lineText.addStyle(path.length - 1, secondSpaceIndex, "command");
+      if (firstSpaceIndex != -1) {
+        // removes previous command style
+        lineText.removeStyleType("command");
+        lineText.addStyle(firstSpaceIndex, secondSpaceIndex, "command");
+      }
     }
     // subtracts x from the cursor position to account for the line breaks
     // gets last '\n' index
@@ -65,7 +69,7 @@ function getMaxLineLength(): number {
   const charWidth = 10;
   const maxChars = Math.floor((windowWidth * 0.9) / charWidth);
 
-   return Math.min(100, maxChars);
+  return Math.min(100, maxChars);
 }
 
 export function addLineBreaks(

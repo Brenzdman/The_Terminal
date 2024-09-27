@@ -48,6 +48,10 @@ export class StyledText {
     this.styles.push(new Style(indexStart, indexEnd, modifier, type));
   }
 
+  removeStyleType(type: string): void {
+    this.styles = this.styles.filter((style) => style.styleType !== type);
+  }
+
   getStyledTextDiv(): React.ReactElement {
     const textLength = this.text.length;
     const colorArray: string[] = new Array(textLength).fill("");

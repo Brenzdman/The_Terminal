@@ -13,7 +13,7 @@ export function getDownloadOnRun(dm: DirectoryManager): () => void {
 async function onRun(dm: DirectoryManager) {
   const textDisplay = dm.textDisplay;
   try {
-    const fileResponse = await fetch("/api/download"); // Adjust API endpoint for file download
+    const fileResponse = await fetch("/api/download");
 
     if (!fileResponse.ok) {
       throw new Error(`HTTP error! status: ${fileResponse.status}`);
@@ -28,5 +28,3 @@ async function onRun(dm: DirectoryManager) {
     textDisplay.addLines(`Error: ${error}`);
   }
 }
-
-// Optional: Implement polling or status checking for real-time progress updates if needed

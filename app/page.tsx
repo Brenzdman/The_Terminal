@@ -35,11 +35,12 @@ export default function Home() {
         <AccessBox />
       </AccessProvider>
 
+      <FullscreenButton />
+
       <DirectoryAtom>
         <ASCII />
         <UserText />
         <TextRenderer />
-        <FullscreenButton />
         <MobileInput />
       </DirectoryAtom>
 

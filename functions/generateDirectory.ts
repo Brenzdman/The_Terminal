@@ -6,6 +6,7 @@ import poemFile1 from "../txtFiles/poem1";
 import poemFile2 from "../txtFiles/poem2";
 import { introEXE, getOnRun } from "@/exeFiles/intro";
 import { downloadEXE, getDownloadOnRun } from "@/exeFiles/download";
+import { YouTubeEXE } from "@/exeFiles/YouTube";
 
 export function generateDirectory(
   showPopup: (arg0: any, arg1: any) => void
@@ -25,7 +26,7 @@ export function generateDirectory(
   // home directories
   const Doc = home.makeDirectory("Documents", false, true);
   const Downloads = home.makeDirectory("Downloads", false, true);
-  home.makeDirectory("Pictures", false, true);
+  const Videos = home.makeDirectory("Videos", false, true);
   home.makeDirectory("Music", false, true);
 
   // Initial print to the terminal
@@ -57,11 +58,14 @@ export function generateDirectory(
   }
 
   let download = Downloads.addFile("download.exe", false, false);
-
   if (download) {
     Object.assign(download, downloadEXE);
     download.onRun = getDownloadOnRun(directoryManager);
   }
 
+  let YouTube = Videos.addFile("YouTube.exe", false, true);
+  if (YouTube) {
+    Object.assign(YouTube, YouTubeEXE);
+  }
   return directoryManager;
 }
