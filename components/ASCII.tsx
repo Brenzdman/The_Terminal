@@ -88,17 +88,21 @@ const ASCII: React.FC = () => {
     height: "100vh",
     width: "100vw",
     textAlign: "center",
-    fontFamily: "monospace",
+    fontFamily: `"Courier New", monospace`,
     fontSize: `${fontSize}px`,
     whiteSpace: "pre-wrap",
     backgroundColor: "#000",
     color: "#3d3680",
     userSelect: "none",
     left: "-5px",
+    lineHeight: "1",
+    letterSpacing: "0px",
+    textDecoration: "none",
     fontSmooth: "antialiased",
     WebkitFontSmoothing: "antialiased",
     MozOsxFontSmoothing: "grayscale",
   };
+
 
   return (
     <div style={containerStyle}>
