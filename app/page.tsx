@@ -44,15 +44,19 @@ export default function Home() {
         <MobileInput />
       </DirectoryAtom>
 
-      <span
+      <div
         style={{
           position: "fixed",
           bottom: "10px",
           right: "15px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-end",
         }}
       >
-        {VERSION}
-      </span>
+        <span>{VERSION}</span>
+        <span>Created by: Brenden Bushman</span>
+      </div>
     </div>
   );
 }

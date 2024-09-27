@@ -7,6 +7,7 @@ import poemFile2 from "../txtFiles/poem2";
 import { introEXE, getOnRun } from "@/exeFiles/intro";
 import { downloadEXE, getDownloadOnRun } from "@/exeFiles/download";
 import { YouTubeEXE } from "@/exeFiles/YouTube";
+import music_READ_ME from "@/txtFiles/music_READ_ME";
 
 export function generateDirectory(
   showPopup: (arg0: any, arg1: any) => void
@@ -27,7 +28,7 @@ export function generateDirectory(
   const Doc = home.makeDirectory("Documents", false, true);
   const Downloads = home.makeDirectory("Downloads", false, true);
   const Videos = home.makeDirectory("Videos", false, true);
-  home.makeDirectory("Music", false, true);
+  const Music = home.makeDirectory("Music", false, true);
 
   // Initial print to the terminal
   const welcomeMessage = [
@@ -42,30 +43,24 @@ export function generateDirectory(
 
   // Files
   let poem1 = Doc.addFile("poem1.txt", false, false);
-  if (poem1) {
-    Object.assign(poem1, poemFile1);
-  }
+  Object.assign(poem1!, poemFile1);
 
   let poem2 = Doc.addFile("poem2.txt", false, false);
-  if (poem2) {
-    Object.assign(poem2, poemFile2);
-  }
+  Object.assign(poem2!, poemFile2);
 
   let intro = root?.addFile("intro.exe", false, false);
-  if (intro) {
-    Object.assign(intro, introEXE);
-    intro.onRun = getOnRun(directoryManager, showPopup);
-  }
+  Object.assign(intro!, introEXE);
+  intro!.onRun = getOnRun(directoryManager, showPopup);
+
+  let musicREAD_ME = Music.addFile("READ_ME.txt", false, false);
+  Object.assign(musicREAD_ME!, music_READ_ME);
 
   let download = Downloads.addFile("download.exe", false, false);
-  if (download) {
-    Object.assign(download, downloadEXE);
-    download.onRun = getDownloadOnRun(directoryManager);
-  }
+  Object.assign(download!, downloadEXE);
+  download!.onRun = getDownloadOnRun(directoryManager);
 
   let YouTube = Videos.addFile("YouTube.exe", false, true);
-  if (YouTube) {
-    Object.assign(YouTube, YouTubeEXE);
-  }
+  Object.assign(YouTube!, YouTubeEXE);
+
   return directoryManager;
 }
