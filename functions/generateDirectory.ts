@@ -4,7 +4,7 @@ import { DirectoryManager } from "@/classes/DirectoryManager";
 import { TextDisplay } from "@/classes/TextDisplay";
 import poemFile1 from "../txtFiles/poem1";
 import poemFile2 from "../txtFiles/poem2";
-import { beginEXE, getOnRun } from "@/exeFiles/begin";
+import { introEXE, getOnRun } from "@/exeFiles/intro";
 import { downloadEXE, getDownloadOnRun } from "@/exeFiles/download";
 
 export function generateDirectory(
@@ -50,10 +50,10 @@ export function generateDirectory(
     Object.assign(poem2, poemFile2);
   }
 
-  let begin = root?.addFile("begin.exe", false, false);
-  if (begin) {
-    Object.assign(begin, beginEXE);
-    begin.onRun = getOnRun(directoryManager, showPopup);
+  let intro = root?.addFile("intro.exe", false, false);
+  if (intro) {
+    Object.assign(intro, introEXE);
+    intro.onRun = getOnRun(directoryManager, showPopup);
   }
 
   let download = Downloads.addFile("download.exe", false, false);

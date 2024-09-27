@@ -1,7 +1,8 @@
 import { Dir_File } from "@/classes/Directory";
 import { DirectoryManager } from "@/classes/DirectoryManager";
+import { VERSION } from "@/constants/constants";
 
-export const beginEXE = new Dir_File("begin", ".exe");
+export const introEXE = new Dir_File("intro", ".exe");
 
 export function getOnRun(
   dm: DirectoryManager,
@@ -16,7 +17,7 @@ export function getOnRun(
         "Congratulations! You have successfully decoded the ASCII message.",
         "This is all I have for you right now. See you in a future update.",
         "",
-        "Version 0.1.0",
+        `${VERSION}`,
       ]);
       textDisplay.newUserLine();
     };

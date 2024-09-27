@@ -4,7 +4,7 @@ const palette = [
   "#5FA8FF", // Function Color (Medium Blue)
   "#7AD7F0", // Text Color (Light Cyan)
   "#9A76FF", // Directory Color (Medium Purple)
-  "#66CCFF", // Executable Color (Light Blue)
+  "#00FF33", // Executable Color (Green)
   "#FF5555", // Error Color (Red)
   "#9ebadb", // Input Box (Light blue)
 ];
