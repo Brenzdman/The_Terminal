@@ -1,2 +1,2 @@
 export const ASCII_CODE = process.env.ASCII_CODE;
-export const VERSION = "v0.1.1";
+export const VERSION = "v1.1.4";
