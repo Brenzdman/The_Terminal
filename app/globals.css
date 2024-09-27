@@ -37,6 +37,7 @@ span {
   font-family: "Cascadia Code", "Courier New", Courier, monospace;
   color: #c9c9c9;
   white-space: pre; /* Preserve whitespace */
+  text-decoration: "none";
 }
 
 @layer utilities {
