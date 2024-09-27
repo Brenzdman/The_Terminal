@@ -95,6 +95,9 @@ const ASCII: React.FC = () => {
     color: "#3d3680",
     userSelect: "none",
     left: "-5px",
+    fontSmooth: "antialiased",
+    WebkitFontSmoothing: "antialiased",
+    MozOsxFontSmoothing: "grayscale",
   };
 
   return (
