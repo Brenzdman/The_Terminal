@@ -11,6 +11,7 @@ import { AccessProvider } from "@/components/AccessProvider";
 import React from "react";
 import { VERSION } from "@/constants/constants";
 import MobileInput from "@/components/MobileInput";
+import GTag from "./GTag";
 
 export default function Home() {
   return (
@@ -30,6 +31,7 @@ export default function Home() {
           content="Windows, Terminal, Command, Prompt, Emulator, Online"
         />
       </Head>
+      <GTag />
 
       <AccessProvider>
         <AccessBox />
