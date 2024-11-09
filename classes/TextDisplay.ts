@@ -8,6 +8,7 @@ export class TextDisplay {
   autoFill: string = "";
   autoFillReplace: boolean = false;
   directoryManager: DirectoryManager;
+  suppressDialog: boolean = false;
 
   constructor(directoryManager: DirectoryManager, lines?: string[]) {
     this.directoryManager = directoryManager;
@@ -19,6 +20,10 @@ export class TextDisplay {
   }
 
   addLines(lines: string[] | string | StyledText[] | StyledText): Line[] {
+    if (this.suppressDialog) {
+      return [];
+    }
+
     const path = this.directoryManager.currentPath;
     if (typeof lines === "string") {
       lines = lines.split("\n");

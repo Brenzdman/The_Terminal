@@ -64,8 +64,7 @@ export class Directory {
 
   public addFile(
     pathSegment: string,
-    userMalleable = false,
-    suppressDialog: boolean = false
+    userMalleable = false
   ): Dir_File | undefined {
     const textDisplay = this.directoryManager.textDisplay;
     let [pathDir, name] = this.splitPathName(pathSegment);
@@ -85,9 +84,7 @@ export class Directory {
     let file = this.directoryManager.getFile(pathDir, pathSegment);
 
     if (file) {
-      if (!suppressDialog) {
-        errorMessage(textDisplay, "fileAlreadyExists", file.toString());
-      }
+      errorMessage(textDisplay, "fileAlreadyExists", file.toString());
 
       return file;
     }
@@ -135,11 +132,7 @@ export class Directory {
     return pathDir ? [pathDir, name] : [this, pathName];
   }
 
-  public makeDirectory(
-    pathName: string,
-    userMalleable = false,
-    suppressDialog: boolean = false
-  ): Directory {
+  public makeDirectory(pathName: string, userMalleable = false): Directory {
     const textDisplay = this.directoryManager.textDisplay;
     const [pathDir, name] = this.splitPathName(pathName);
 
@@ -155,9 +148,8 @@ export class Directory {
     }
 
     if (existingDir) {
-      if (!suppressDialog) {
-        errorMessage(textDisplay, "dirAlreadyExists", existingDir.toString());
-      }
+      errorMessage(textDisplay, "dirAlreadyExists", existingDir.toString());
+
       return existingDir;
     }
 
@@ -170,7 +162,7 @@ export class Directory {
     pathDir.directories.push(newFolder);
     pathDir.directoryManager.addDirectoryToList(newFolder);
 
-    if (!suppressDialog) textDisplay?.addLines("Directory created");
+    textDisplay?.addLines("Directory created");
     return newFolder;
   }
 

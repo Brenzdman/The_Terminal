@@ -14,6 +14,7 @@ const UserText = () => {
   const [cmdHistory, setCmdHistory] = useState<string[]>([]);
   const [cmdIndex, setCmdIndex] = useState<number>(-1);
   const [savedText, setSavedText] = useState<string | null>(null);
+  const [masterStorageList, setMasterStorageList] = useState<string[]>([]);
   const { isVisible: AccessBoxIsVisible } = usePopup();
 
   const handleRightClick = (event: MouseEvent) => {
@@ -69,6 +70,8 @@ const UserText = () => {
         lastLine.setText(textDisplay.autoFill);
         lastLine.userGenerated = true;
         textDisplay.autoFillReplace = false;
+        masterStorageList.push(textDisplay.autoFill);
+        console.log(masterStorageList);
       }
 
       const cmd = textDisplay.getLastLine().getText().trim();

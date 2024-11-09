@@ -17,12 +17,14 @@ const nextConfig = {
               "script-src": [
                 "'self'",
                 "'unsafe-inline'",
+                "https://www.googletagmanager.com",
                 ...(isDev ? ["'unsafe-eval'"] : []),
               ],
               "img-src": ["'self'", "blob:"],
               "style-src": ["'self'", "'unsafe-inline'"],
               "connect-src": [
                 "'self'",
+                "https://www.google-analytics.com",
                 ...(isDev
                   ? ["http://localhost:3000", "ws://localhost:8080"]
                   : ["https://cmdterminal.vercel.app"]),
@@ -62,10 +64,10 @@ const nextConfig = {
           {
             key: "Content-Security-Policy",
             value:
-              "default-src 'self'; script-src 'self' 'unsafe-inline'" +
+              "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com" +
               (isDev ? " 'unsafe-eval'" : "") +
               "; img-src 'self' blob:; style-src 'self' 'unsafe-inline'; " +
-              `connect-src 'self' ${
+              `connect-src 'self' https://www.google-analytics.com ${
                 isDev
                   ? "http://localhost:3000 ws://localhost:8080"
                   : "https://cmdterminal.vercel.app"
