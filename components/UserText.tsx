@@ -10,7 +10,6 @@ import { errorMessage } from "@/functions/messages";
 import { usePopup } from "@/components/AccessProvider";
 import { getCommandList, saveCommandList } from "@/functions/storage";
 import { StyledText } from "@/classes/StyledText";
-import { generateDirectory } from "@/functions/generateDirectory";
 
 const UserText = () => {
   const [directoryManager, setDirectoryManager] = useAtom(DIRECTORY_MANAGER);
@@ -157,10 +156,6 @@ const UserText = () => {
     let currentDirectory = directoryManager.currentDirectory;
     const lastLine = textDisplay.getLastLine();
     let text = altCommand || lastLine.getText().trim();
-
-    if (altCommand) {
-      console.log(`Running alt command: ${altCommand}`);
-    }
 
     const getSegments = (text: string): string[] => {
       let segments: string[] = [];
