@@ -187,13 +187,19 @@ export class TextDisplay {
     }
 
     const lastLine = this.getLastLine();
-    if (lastLine.getText().trim() !== "") {
+
+    // Sets 'empty' line
+    if (lastLine.getText().trim() != "") {
       this.lines.push(new Line("", this.directoryManager.currentPath));
     }
 
-    const newLine = new Line("", this.directoryManager.currentPath);
-    newLine.userGenerated = true;
-    this.lines.push(newLine);
+    // if statement prevents consecutive 'input' lines
+    if (!lastLine.userGenerated || lastLine.getText().trim() != "") {
+      const newLine = new Line("", this.directoryManager.currentPath);
+      newLine.userGenerated = true;
+      this.lines.push(newLine);
+    }
+
     this.cursorX = 0;
   }
 

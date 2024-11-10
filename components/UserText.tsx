@@ -10,6 +10,7 @@ import { errorMessage } from "@/functions/messages";
 import { usePopup } from "@/components/AccessProvider";
 import { getCommandList, saveCommandList } from "@/functions/storage";
 import { StyledText } from "@/classes/StyledText";
+import { SAVE_PATH } from "@/constants/constants";
 
 const UserText = () => {
   const [directoryManager, setDirectoryManager] = useAtom(DIRECTORY_MANAGER);
@@ -242,13 +243,14 @@ const UserText = () => {
 
       // Echo text to terminal
     } else if (cmd === "echo") {
-      currentDirectory.echo(segments.slice(1));
+      let path = currentDirectory.echo(segments.slice(1));
 
-      if (text.endsWith("/save.txt")) {
+      console.log("path", path);
+      if (path == SAVE_PATH + "save.txt") {
         skipSaveCmd = true;
 
         let saveFile = directoryManager
-          .getDirectory(undefined, "/")
+          .getDirectory(undefined, SAVE_PATH)
           ?.addFile("save.txt", true);
         let currentContent: string[] =
           saveFile?.content.map((line) => line.text) || [];
@@ -273,7 +275,7 @@ const UserText = () => {
       let path = currentDirectory.deleteFile(segments[1]);
 
       // if deleting save file, reset system
-      if ((path = "/save.txt")) {
+      if (path == SAVE_PATH + "save.txt") {
         skipSaveCmd = true;
 
         // refresh page
@@ -325,7 +327,7 @@ const UserText = () => {
       const currentSuppression = textDisplay.suppressDialog;
       textDisplay.suppressDialog = true;
       let saveFile = directoryManager
-        .getDirectory(undefined, "/")
+        .getDirectory(undefined, SAVE_PATH)
         ?.addFile("save.txt", true);
       let currentContent: string[] =
         saveFile?.content.map((line) => line.text) || [];
@@ -356,7 +358,7 @@ const UserText = () => {
   const makeSaveFile = (cmdList: string[]) => {
     // Makes `save file`
     const saveFile = directoryManager
-      .getDirectory(undefined, "/")
+      .getDirectory(undefined, SAVE_PATH)
       ?.addFile("save.txt", true);
 
     let content: StyledText[] = cmdList.map((cmd) => {
@@ -377,6 +379,10 @@ const UserText = () => {
     setHasLoaded(true);
     makeSaveFile(cmdList);
     directoryManager.textDisplay.suppressDialog = false;
+
+    // Force updates last line.
+    directoryManager.textDisplay.typeCharacter("", true);
+    directoryManager.textDisplay.newUserLine();
   }
 
   useEffect(() => {

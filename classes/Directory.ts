@@ -292,21 +292,24 @@ export class Directory {
   }
 
   public echo(segments: string[]): string | void {
-    const textManager = this.directoryManager.textDisplay;
+    const textDisplay = this.directoryManager.textDisplay;
+
     if (segments.length >= 2) {
       const pathSegment = segments[segments.length - 1];
+      const [pathDir, name] = this.splitPathName(pathSegment);
+
       const previousSegment = segments[segments.length - 2];
       if (previousSegment == ">") {
         if (pathSegment.includes(".txt")) {
-          let file = this.getFile(pathSegment);
+          let file = pathDir.getFile(name);
 
           if (!file) {
-            file = this.addFile(pathSegment, true);
+            file = pathDir.addFile(name, true);
             if (!file) return;
           }
 
           if (!file.userMalleable) {
-            errorMessage(textManager, "accessDenied", pathSegment);
+            errorMessage(textDisplay, "accessDenied", pathSegment);
             return;
           }
 
@@ -318,16 +321,16 @@ export class Directory {
           });
 
           file.content = content;
-          textManager.addLines(`Text echoed to ${file.name}.txt`);
-          return file.name + file.type;
+          textDisplay.addLines(`Text echoed to ${file.name}.txt`);
+          return pathDir.path + file.name + file.type;
         } else {
-          errorMessage(textManager, "invalidFileType", pathSegment);
+          errorMessage(textDisplay, "invalidFileType", pathSegment);
           return;
         }
       }
     }
 
-    textManager.addLines(segments);
+    textDisplay.addLines(segments);
   }
 
   public cd(path: string): void {
