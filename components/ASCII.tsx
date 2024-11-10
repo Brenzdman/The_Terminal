@@ -91,7 +91,6 @@ const ASCII: React.FC = () => {
     fontFamily: "monospace",
     fontSize: `${fontSize}px`,
     whiteSpace: "pre-wrap",
-    backgroundColor: "#000",
     color: "#3d3680",
     userSelect: "none",
     left: "-5px",

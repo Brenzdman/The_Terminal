@@ -1,5 +1,6 @@
 import { Dir_File } from "@/classes/Directory";
 import { DirectoryManager } from "@/classes/DirectoryManager";
+import { changeProgram } from "@/components/ProgramManager";
 import { VERSION } from "@/constants/constants";
 
 export const introEXE = new Dir_File("intro", ".exe");
@@ -21,6 +22,7 @@ export function getOnRun(
         `${VERSION}`,
       ]);
       textDisplay.newUserLine();
+      changeProgram("desktop");
     };
 
     showPopup("ASCII", onComplete);

@@ -9,7 +9,6 @@
 }
 
 body {
-  background-color: rgb(var(--background-start-rgb));
   color: rgb(var(--foreground-rgb));
   font-family: "Courier New", Courier, monospace; /* Monospace font */
   padding: 20px; /* Padding to give terminal-like appearance */
@@ -28,8 +27,6 @@ body {
 @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255; /* White text */
-    --background-start-rgb: 0, 0, 0; /* Black background */
-    --background-end-rgb: 0, 0, 0; /* Black background */
   }
 }
 

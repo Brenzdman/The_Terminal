@@ -17,7 +17,7 @@ const UserText = () => {
   const [cmdHistory, setCmdHistory] = useState<string[]>([]);
   const [cmdIndex, setCmdIndex] = useState<number>(-1);
   const [savedText, setSavedText] = useState<string | null>(null);
-  const { isVisible: AccessBoxIsVisible, showPopup } = usePopup();
+  const { isVisible: AccessBoxIsVisible } = usePopup();
   const [hasLoaded, setHasLoaded] = useState(false);
 
   const handleRightClick = (event: MouseEvent) => {

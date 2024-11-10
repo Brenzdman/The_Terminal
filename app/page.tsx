@@ -1,17 +1,10 @@
 "use client";
 
 import Head from "next/head";
-import AccessBox from "@/components/AccessBox";
-import ASCII from "@/components/ASCII";
-import { DirectoryAtom } from "@/components/DirectoryAtom";
-import FullscreenButton from "@/components/FullscreenButton";
-import TextRenderer from "@/components/TextRenderer";
-import UserText from "@/components/UserText";
-import { AccessProvider } from "@/components/AccessProvider";
 import React from "react";
 import { VERSION } from "@/constants/constants";
-import MobileInput from "@/components/MobileInput";
 import GTag from "./GTag";
+import { ProgramManager } from "@/components/ProgramManager";
 
 export default function Home() {
   return (
@@ -33,18 +26,7 @@ export default function Home() {
       </Head>
       <GTag />
 
-      <AccessProvider>
-        <AccessBox />
-      </AccessProvider>
-
-      <FullscreenButton />
-
-      <DirectoryAtom>
-        <ASCII />
-        <UserText />
-        <TextRenderer />
-        <MobileInput />
-      </DirectoryAtom>
+      <ProgramManager />
 
       <div
         style={{
