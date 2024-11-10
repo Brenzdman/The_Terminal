@@ -1,6 +1,6 @@
 // Collaborates heavily with userText.tsx and DirectoryManager.ts
 
-import { errorMessage } from "@/functions/messages";
+import { errorMessage } from "@/terminal/functions/messages";
 import { DirectoryManager } from "./DirectoryManager";
 import { StyledText } from "./StyledText";
 

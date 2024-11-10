@@ -5,10 +5,10 @@ import { useAtom } from "jotai";
 import React, { useEffect, useState } from "react";
 import { DIRECTORY_MANAGER } from "./DirectoryAtom";
 import { DirectoryManager } from "@/classes/DirectoryManager";
-import { getDetailedHelp } from "@/functions/help";
-import { errorMessage } from "@/functions/messages";
-import { usePopup } from "@/components/AccessProvider";
-import { getCommandList, saveCommandList } from "@/functions/storage";
+import { getDetailedHelp } from "@/terminal/functions/help";
+import { errorMessage } from "@/terminal/functions/messages";
+import { usePopup } from "@/terminal/components/AccessProvider";
+import { getCommandList, saveCommandList } from "@/terminal/functions/storage";
 import { StyledText } from "@/classes/StyledText";
 import { SAVE_PATH } from "@/constants/constants";
 

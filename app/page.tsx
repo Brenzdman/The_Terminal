@@ -4,7 +4,7 @@ import Head from "next/head";
 import React from "react";
 import { VERSION } from "@/constants/constants";
 import GTag from "./GTag";
-import { ProgramManager } from "@/components/ProgramManager";
+import { ProgramManager } from "@/terminal/components/ProgramManager";
 
 export default function Home() {
   return (

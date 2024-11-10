@@ -3,8 +3,8 @@ import { useAtom } from "jotai";
 import { TextDisplay } from "@/classes/TextDisplay";
 import { Line } from "@/classes/Line";
 import { DirectoryManager } from "@/classes/DirectoryManager";
-import { DIRECTORY_MANAGER } from "./DirectoryAtom";
-import { usePopup } from "@/components/AccessProvider";
+import { DIRECTORY_MANAGER } from "../terminal/components/DirectoryAtom";
+import { usePopup } from "@/terminal/components/AccessProvider";
 
 const TextRenderer: React.FC = () => {
   const [directoryManager, setDirectoryManager] = useAtom(DIRECTORY_MANAGER);

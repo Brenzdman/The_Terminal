@@ -4,10 +4,10 @@ import { DirectoryManager } from "@/classes/DirectoryManager";
 import { TextDisplay } from "@/classes/TextDisplay";
 import poemFile1 from "../txtFiles/poem1";
 import poemFile2 from "../txtFiles/poem2";
-import { introEXE, getOnRun } from "@/exeFiles/intro";
-import { downloadEXE, getDownloadOnRun } from "@/exeFiles/download";
-import { YouTubeEXE } from "@/exeFiles/YouTube";
-import music_READ_ME from "@/txtFiles/music_READ_ME";
+import { introEXE, getOnRun } from "@/terminal/exeFiles/intro";
+import { downloadEXE, getDownloadOnRun } from "@/terminal/exeFiles/download";
+import { YouTubeEXE } from "@/terminal/exeFiles/YouTube";
+import music_READ_ME from "@/terminal/txtFiles/music_READ_ME";
 
 export function generateDirectory(
   showPopup: (arg0: any, arg1: any) => void

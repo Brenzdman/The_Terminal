@@ -1,6 +1,6 @@
 // Handles the styling of text in the terminal.
 
-import { blendColors, getColor, textColor } from "@/functions/color";
+import { blendColors, getColor, textColor } from "@/terminal/functions/color";
 
 export class StyledText {
   text: string = "";
@@ -142,7 +142,7 @@ class Style {
     indexStart: number,
     indexEnd: number,
     modifier: string,
-    styleType: string,
+    styleType: string
   ) {
     this.indexStart = indexStart;
     this.indexEnd = indexEnd;

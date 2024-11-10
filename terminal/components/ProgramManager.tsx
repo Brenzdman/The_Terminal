@@ -4,9 +4,9 @@ import AccessBox from "./AccessBox";
 import { AccessProvider } from "./AccessProvider";
 import ASCII from "./ASCII";
 import { DirectoryAtom } from "./DirectoryAtom";
-import FullscreenButton from "./FullscreenButton";
+import FullscreenButton from "../../components/FullscreenButton";
 import MobileInput from "./MobileInput";
-import TextRenderer from "./TextRenderer";
+import TextRenderer from "../../components/TextRenderer";
 import UserText from "./UserText";
 import EventEmitter from "eventemitter3";
 import { useEffect, useState } from "react";
@@ -16,31 +16,38 @@ const programEventEmitter = new EventEmitter();
 export function changeProgram(program: string) {
   console.log("Changing program to", program);
   programEventEmitter.emit("changeProgram", program);
-  localStorage.setItem("program", program);
+  if (typeof window !== "undefined") {
+    localStorage.setItem("program", program);
+  }
 }
 
 export const ProgramManager = () => {
-  const storedProgram = localStorage.getItem("program");
-  const [program, setProgram] = useState(storedProgram || "terminal");
-
-  console.log("Program is", program);
+  const [program, setProgram] = useState("terminal");
 
   useEffect(() => {
+    const storedProgram = localStorage?.getItem("program");
+    if (storedProgram) {
+      setProgram(storedProgram);
+    }
+
     const handleProgramChange = (newProgram: string) => setProgram(newProgram);
 
     // Subscribe to the event
     programEventEmitter.on("changeProgram", handleProgramChange);
 
+    if (program === "terminal") {
+      document.body.style.backgroundColor = "#000000";
+    } else if (program === "desktop") {
+      document.body.style.backgroundColor = "#269db5";
+    }
+
     return () => {
       // Clean up the subscription on unmount
       programEventEmitter.off("changeProgram", handleProgramChange);
     };
-  }, []);
+  }, [program]);
 
   if (program === "terminal") {
-    useEffect(() => {
-      document.body.style.backgroundColor = "#000000";
-    }, []);
     return (
       <div>
         <AccessProvider>
@@ -58,9 +65,6 @@ export const ProgramManager = () => {
       </div>
     );
   } else if (program === "desktop") {
-    useEffect(() => {
-      document.body.style.backgroundColor = "#269db5";
-    }, []);
     return (
       <div>
         <FullscreenButton />

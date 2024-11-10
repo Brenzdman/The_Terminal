@@ -1,4 +1,4 @@
-import { ASCIIimg } from "@/images/ASCII";
+import { ASCIIimg } from "@/terminal/images/ASCII";
 import React, { useEffect, useState, useRef } from "react";
 
 const ASCII: React.FC = () => {

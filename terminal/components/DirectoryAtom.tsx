@@ -1,6 +1,6 @@
 import { DirectoryManager } from "@/classes/DirectoryManager";
-import { usePopup } from "@/components/AccessProvider";
-import { generateDirectory } from "@/functions/generateDirectory";
+import { usePopup } from "@/terminal/components/AccessProvider";
+import { generateDirectory } from "@/terminal/functions/generateDirectory";
 import { atom, useAtom } from "jotai";
 import { useEffect, useState } from "react";
 
@@ -17,7 +17,7 @@ export function DirectoryAtom({ children }: { children: React.ReactNode }) {
     const updatedDirectoryManager = generateDirectory(showPopup);
     setDirectoryManager(updatedDirectoryManager);
     setIsInitialized(true);
-  }, []);
+  }, [setDirectoryManager, showPopup]);
   if (!isInitialized) {
     return <span>Loading...</span>;
   } else {

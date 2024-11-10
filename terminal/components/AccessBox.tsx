@@ -1,6 +1,6 @@
-import { usePopup } from "@/components/AccessProvider";
+import { usePopup } from "@/terminal/components/AccessProvider";
 import React, { useRef, useState, useEffect } from "react";
-import { getColor } from "@/functions/color";
+import { getColor } from "@/terminal/functions/color";
 
 const AccessBox = () => {
   const { isVisible, hidePopup, popupPassword, onComplete } = usePopup();
