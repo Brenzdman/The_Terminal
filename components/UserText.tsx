@@ -3,7 +3,7 @@
 
 import { useAtom } from "jotai";
 import React, { useEffect, useState } from "react";
-import { DIRECTORY_MANAGER, resetDirectoryManager } from "./DirectoryAtom";
+import { DIRECTORY_MANAGER } from "./DirectoryAtom";
 import { DirectoryManager } from "@/classes/DirectoryManager";
 import { getDetailedHelp } from "@/functions/help";
 import { errorMessage } from "@/functions/messages";
