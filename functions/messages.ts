@@ -1,7 +1,6 @@
 import { StyledText } from "@/classes/StyledText";
 import { TextDisplay } from "@/classes/TextDisplay";
 
-
 // Functions here add a message to the end of the text display
 
 export function errorMessage(
@@ -9,7 +8,7 @@ export function errorMessage(
   type: string,
   string: string
 ): void {
-  let message = `Error: ${string}`;
+  let message = `Unknown Error: ${string}`;
   if (type === "noDirAtPath") {
     message = `No directory found at '${string}'`;
   } else if (type === "noFileAtPath") {
@@ -30,9 +29,16 @@ export function errorMessage(
     message = `This use of the command is only set up for txt files.`;
   } else if (type === "invalidCommand") {
     message = `Invalid command '${string}'`;
+  } else if (type === "accessDenied") {
+    message = `ACCESS DENIED: '${string}'`;
   }
 
   const Lines = textDisplay.addLines(message);
+
+  if (Lines.length === 0) {
+    return;
+  }
+
   const text: StyledText = Lines[0].text;
   text.addStyle(0, text.getText().length, "error");
 }

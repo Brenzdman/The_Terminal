@@ -291,7 +291,7 @@ export class Directory {
     textDisplay.addLines(`File copied to ${destinationFile.name}.txt`);
   }
 
-  public echo(segments: string[]): void {
+  public echo(segments: string[]): string | void {
     const textManager = this.directoryManager.textDisplay;
     if (segments.length >= 2) {
       const pathSegment = segments[segments.length - 1];
@@ -319,7 +319,7 @@ export class Directory {
 
           file.content = content;
           textManager.addLines(`Text echoed to ${file.name}.txt`);
-          return;
+          return file.name + file.type;
         } else {
           errorMessage(textManager, "invalidFileType", pathSegment);
           return;
@@ -378,23 +378,25 @@ export class Directory {
     textDisplay.addLines(file.content);
   }
 
-  deleteFile(requestName: string): void {
+  deleteFile(requestName: string): string {
     const textDisplay = this.directoryManager.textDisplay;
     const [dir, name] = this.splitPathName(requestName);
     const file = dir.getFile(name);
 
     if (!file) {
       errorMessage(textDisplay, "noFileAtPath", requestName);
-      return;
+      return "";
     }
 
     if (!file.userMalleable) {
       errorMessage(textDisplay, "accessDenied", requestName);
-      return;
+      return "";
     }
 
     dir.files.splice(dir.files.indexOf(file), 1);
     textDisplay.addLines(`File ${file.name}${file.type} deleted`);
+
+    return dir.path + file.name + file.type;
   }
 
   clear(): void {

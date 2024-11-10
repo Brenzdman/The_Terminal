@@ -24,3 +24,11 @@ export function DirectoryAtom({ children }: { children: React.ReactNode }) {
     return <div>{children}</div>;
   }
 }
+
+export function resetDirectoryManager() {
+  
+  const [directoryManager, setDirectoryManager] = useAtom(DIRECTORY_MANAGER);
+  const { showPopup } = usePopup();
+  const updatedDirectoryManager = generateDirectory(showPopup);
+  setDirectoryManager(updatedDirectoryManager);
+}

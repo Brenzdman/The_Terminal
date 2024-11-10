@@ -3,19 +3,22 @@
 
 import { useAtom } from "jotai";
 import React, { useEffect, useState } from "react";
-import { DIRECTORY_MANAGER } from "./DirectoryAtom";
+import { DIRECTORY_MANAGER, resetDirectoryManager } from "./DirectoryAtom";
 import { DirectoryManager } from "@/classes/DirectoryManager";
 import { getDetailedHelp } from "@/functions/help";
 import { errorMessage } from "@/functions/messages";
 import { usePopup } from "@/components/AccessProvider";
+import { getCommandList, saveCommandList } from "@/functions/storage";
+import { StyledText } from "@/classes/StyledText";
+import { generateDirectory } from "@/functions/generateDirectory";
 
 const UserText = () => {
   const [directoryManager, setDirectoryManager] = useAtom(DIRECTORY_MANAGER);
   const [cmdHistory, setCmdHistory] = useState<string[]>([]);
   const [cmdIndex, setCmdIndex] = useState<number>(-1);
   const [savedText, setSavedText] = useState<string | null>(null);
-  const [masterStorageList, setMasterStorageList] = useState<string[]>([]);
-  const { isVisible: AccessBoxIsVisible } = usePopup();
+  const { isVisible: AccessBoxIsVisible, showPopup } = usePopup();
+  const [hasLoaded, setHasLoaded] = useState(false);
 
   const handleRightClick = (event: MouseEvent) => {
     event.preventDefault();
@@ -70,8 +73,6 @@ const UserText = () => {
         lastLine.setText(textDisplay.autoFill);
         lastLine.userGenerated = true;
         textDisplay.autoFillReplace = false;
-        masterStorageList.push(textDisplay.autoFill);
-        console.log(masterStorageList);
       }
 
       const cmd = textDisplay.getLastLine().getText().trim();
@@ -151,30 +152,46 @@ const UserText = () => {
     setDirectoryManager(updatedDirectoryManager);
   };
 
-  const getResponseText = () => {
+  const getResponseText = (altCommand?: string) => {
     const textDisplay = directoryManager.textDisplay;
     let currentDirectory = directoryManager.currentDirectory;
     const lastLine = textDisplay.getLastLine();
-    const text = lastLine.getText().trim();
+    let text = altCommand || lastLine.getText().trim();
+
+    if (altCommand) {
+      console.log(`Running alt command: ${altCommand}`);
+    }
 
     const getSegments = (text: string): string[] => {
       let segments: string[] = [];
-
-      let lineBreak = false;
       let currentSegment = "";
+      let inDoubleQuotes = false;
+      let inApostrophes = false;
 
       for (let i = 0; i < text.length; i++) {
         const char = text[i];
-        if (char === " " && !lineBreak) {
-          segments.push(currentSegment);
-          currentSegment = "";
-        } else if (char === '"') {
-          lineBreak = !lineBreak;
+
+        if (char === '"' && !inApostrophes) {
+          // Toggle double-quote mode
+          inDoubleQuotes = !inDoubleQuotes;
+          // currentSegment += char;
+        } else if (char === "'" && !inDoubleQuotes) {
+          // Toggle backtick mode
+          inApostrophes = !inApostrophes;
+          currentSegment += char;
+        } else if (char === " " && !inDoubleQuotes && !inApostrophes) {
+          // If we hit a space and we're not inside quotes or backticks, start a new segment
+          if (currentSegment.length > 0) {
+            segments.push(currentSegment);
+            currentSegment = "";
+          }
         } else {
+          // Add the character to the current segment
           currentSegment += char;
         }
 
-        if (i === text.length - 1) {
+        // Push the last segment if we're at the end of the text
+        if (i === text.length - 1 && currentSegment.length > 0) {
           segments.push(currentSegment);
         }
       }
@@ -191,6 +208,8 @@ const UserText = () => {
 
     // Messages
 
+    let skipSaveCmd = false;
+
     // Help CMD
     const cmd = segments[0].toLowerCase();
     if (cmd === "help") {
@@ -199,6 +218,7 @@ const UserText = () => {
       // List directories and files
     } else if (cmd === "ls" || cmd === "dir") {
       currentDirectory.ls(segments[1]);
+      skipSaveCmd = true;
 
       // Change directory
     } else if (cmd === "cd" || cmd === "chdir") {
@@ -223,10 +243,24 @@ const UserText = () => {
       // Display txt file content
     } else if (cmd === "type") {
       currentDirectory.readFile(segments[1]);
+      skipSaveCmd = true;
 
       // Echo text to terminal
     } else if (cmd === "echo") {
       currentDirectory.echo(segments.slice(1));
+
+      if (text.endsWith("/save.txt")) {
+        skipSaveCmd = true;
+
+        let saveFile = directoryManager
+          .getDirectory(undefined, "/")
+          ?.addFile("save.txt", true);
+        let currentContent: string[] =
+          saveFile?.content.map((line) => line.text) || [];
+
+        saveCommandList(currentContent);
+        window.location.reload();
+      }
 
       // Rename file
     } else if (cmd === "ren" || cmd === "rename") {
@@ -241,10 +275,36 @@ const UserText = () => {
 
       // Delete file
     } else if (cmd === "del") {
-      currentDirectory.deleteFile(segments[1]);
+      let path = currentDirectory.deleteFile(segments[1]);
+
+      // if deleting save file, reset system
+      if ((path = "/save.txt")) {
+        skipSaveCmd = true;
+
+        // refresh page
+        localStorage.clear();
+        window.location.reload();
+
+        /*
+        const newDM = generateDirectory(showPopup);
+
+        const resetDirectoryManager = new DirectoryManager();
+        Object.assign(resetDirectoryManager, {
+          ...newDM,
+          currentDirectory: newDM.currentDirectory,
+          currentPath: newDM.currentDirectory.path,
+        });
+
+        setDirectoryManager(resetDirectoryManager);
+        localStorage.clear();
+        directoryManager.textDisplay.newUserLine();
+        return;
+        */
+      }
       // Clear terminal screen
     } else if (cmd === "cls" || cmd === "clear") {
       currentDirectory.clear();
+      skipSaveCmd = true;
 
       // Exit terminal
     } else if (cmd === "exit") {
@@ -254,12 +314,33 @@ const UserText = () => {
       // Run file
     } else if (cmd === "start") {
       currentDirectory.runFile(segments[1]);
+      skipSaveCmd = true;
 
       // Default
     } else if (cmd === "") {
       // Do nothing;
+      skipSaveCmd = true;
     } else {
+      skipSaveCmd = true;
       errorMessage(textDisplay, "invalidCommand", cmd);
+    }
+
+    if (!skipSaveCmd) {
+      // Updates save file
+      const currentSuppression = textDisplay.suppressDialog;
+      textDisplay.suppressDialog = true;
+      let saveFile = directoryManager
+        .getDirectory(undefined, "/")
+        ?.addFile("save.txt", true);
+      let currentContent: string[] =
+        saveFile?.content.map((line) => line.text) || [];
+
+      currentContent.push(text);
+
+      makeSaveFile(currentContent);
+      saveCommandList(currentContent);
+
+      textDisplay.suppressDialog = currentSuppression;
     }
 
     textDisplay.autoFill = "";
@@ -271,8 +352,37 @@ const UserText = () => {
       currentDirectory: currentDirectory,
       currentPath: currentDirectory.path,
     });
-    setDirectoryManager(updatedDirectoryManager);
+
+    if (!altCommand) {
+      setDirectoryManager(updatedDirectoryManager);
+    }
   };
+
+  const makeSaveFile = (cmdList: string[]) => {
+    // Makes `save file`
+    const saveFile = directoryManager
+      .getDirectory(undefined, "/")
+      ?.addFile("save.txt", true);
+
+    let content: StyledText[] = cmdList.map((cmd) => {
+      return new StyledText(cmd);
+    });
+
+    saveFile!.content = content;
+  };
+
+  if (!hasLoaded) {
+    // Load commands from previous sessions
+    directoryManager.textDisplay.suppressDialog = true;
+
+    const cmdList = getCommandList();
+    cmdList.forEach((cmd) => {
+      getResponseText(cmd);
+    });
+    setHasLoaded(true);
+    makeSaveFile(cmdList);
+    directoryManager.textDisplay.suppressDialog = false;
+  }
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);

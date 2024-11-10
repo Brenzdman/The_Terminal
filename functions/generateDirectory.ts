@@ -42,11 +42,11 @@ export function generateDirectory(
   );
 
   // Files
-  let poem1 = Doc.addFile("poem1.txt", false);
-  Object.assign(poem1!, poemFile1);
+  // let poem1 = Doc.addFile("poem1.txt", false);
+  // Object.assign(poem1!, poemFile1);
 
-  let poem2 = Doc.addFile("poem2.txt", false);
-  Object.assign(poem2!, poemFile2);
+  // let poem2 = Doc.addFile("poem2.txt", false);
+  // Object.assign(poem2!, poemFile2);
 
   let intro = root?.addFile("intro.exe", false);
   Object.assign(intro!, introEXE);

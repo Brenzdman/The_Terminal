@@ -182,6 +182,10 @@ export class TextDisplay {
   }
 
   newUserLine() {
+    if (this.suppressDialog) {
+      return;
+    }
+
     const lastLine = this.getLastLine();
     if (lastLine.getText().trim() !== "") {
       this.lines.push(new Line("", this.directoryManager.currentPath));
