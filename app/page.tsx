@@ -36,6 +36,7 @@ export default function Home() {
           display: "flex",
           flexDirection: "column",
           alignItems: "flex-end",
+          userSelect: "none",
         }}
       >
         <span>{VERSION}</span>

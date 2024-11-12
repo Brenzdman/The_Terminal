@@ -54,16 +54,5 @@ export class IconManager {
   handleIconClick(event: MouseEvent) {
     const x = event.clientX;
     const y = event.clientY;
-
-    this.icons.forEach((icon) => {
-      icon.isSelected = false;
-    });
-
-    for (let i = 0; i < this.icons.length; i++) {
-      const icon = this.icons[i];
-      if (icon.inRange(x, y)) {
-        icon.isSelected = !icon.isSelected;
-      }
-    }
   }
 }

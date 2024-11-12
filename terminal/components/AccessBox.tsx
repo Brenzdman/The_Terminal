@@ -39,9 +39,12 @@ const AccessBox = () => {
           document.addEventListener("keydown", closePopup);
 
           onComplete();
+          console.log("Access granted");
+          return;
         } else {
           setAccessStatus("ACCESS DENIED");
           document.addEventListener("keydown", closePopup);
+          return;
         }
       };
 

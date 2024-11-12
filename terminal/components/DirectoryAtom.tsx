@@ -18,9 +18,12 @@ export function DirectoryAtom({ children }: { children: React.ReactNode }) {
     setDirectoryManager(updatedDirectoryManager);
     setIsInitialized(true);
   }, [setDirectoryManager, showPopup]);
-  if (!isInitialized) {
-    return <span>Loading...</span>;
-  } else {
-    return <div>{children}</div>;
-  }
+
+  return (
+    <>
+      <div style={{ userSelect: "none" }}>
+        {isInitialized ? <div>{children}</div> : <span>Loading...</span>}
+      </div>
+    </>
+  );
 }

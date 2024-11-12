@@ -11,7 +11,7 @@
 body {
   color: rgb(var(--foreground-rgb));
   font-family: "Courier New", Courier, monospace; /* Monospace font */
-  padding: 20px; /* Padding to give terminal-like appearance */
+  /* padding: 20px; Padding to give terminal-like appearance */
 }
 
 ::selection {
